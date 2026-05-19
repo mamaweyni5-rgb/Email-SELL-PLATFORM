@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export interface ErrorResponse {
-  error: string;
+export interface SettingsUpdate {
+  /** @minimum 1 */
+  pricePerEmail: number;
 }

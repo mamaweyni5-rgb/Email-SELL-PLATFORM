@@ -2,23 +2,26 @@ openapi: 3.1.0
 info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
-  version: 0.1.0
-  description: Email account registration and admin panel API
+  version: 0.2.0
+  description: Email marketplace platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
-  - name: registrations
-    description: Registration operations
+  - name: auth
+  - name: profile
+  - name: submissions
+  - name: withdrawals
+  - name: settings
+  - name: admin
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -27,39 +30,24 @@ paths:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
 
-  /registrations:
-    get:
-      operationId: listRegistrations
-      tags: [registrations]
-      summary: List all registrations (admin)
-      description: Returns all user email registrations for the admin panel
-      responses:
-        "200":
-          description: List of registrations
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Registration"
+  /auth/register:
     post:
-      operationId: createRegistration
-      tags: [registrations]
-      summary: Submit a registration
-      description: User submits their email and password to register
+      operationId: register
+      tags: [auth]
+      summary: Create a new user account
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegistrationInput"
+              $ref: "#/components/schemas/UserInput"
       responses:
         "201":
-          description: Registration created
+          description: Account created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Registration"
+                $ref: "#/components/schemas/AuthUser"
         "400":
           description: Invalid input
           content:
@@ -67,40 +55,242 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "409":
-          description: Email already registered
+          description: Email already taken
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /registrations/stats:
-    get:
-      operationId: getRegistrationStats
-      tags: [registrations]
-      summary: Get registration statistics (admin)
-      description: Returns total count and recent activity stats
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
       responses:
         "200":
-          description: Registration stats
+          description: Login successful
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RegistrationStats"
+                $ref: "#/components/schemas/AuthUser"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
-  /registrations/{id}:
-    delete:
-      operationId: deleteRegistration
-      tags: [registrations]
-      summary: Delete a registration (admin)
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout current session
+      responses:
+        "204":
+          description: Logged out
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current authenticated user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUser"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /profile:
+    get:
+      operationId: getProfile
+      tags: [profile]
+      summary: Get own profile with wallet and submission stats
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /submissions:
+    get:
+      operationId: listSubmissions
+      tags: [submissions]
+      summary: List own email submissions
+      responses:
+        "200":
+          description: Own submissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Submission"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createSubmission
+      tags: [submissions]
+      summary: Submit an email account for sale
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmissionInput"
+      responses:
+        "201":
+          description: Submission created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Submission"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Email already submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /withdrawals:
+    get:
+      operationId: listWithdrawals
+      tags: [withdrawals]
+      summary: List own withdrawal requests
+      responses:
+        "200":
+          description: Own withdrawals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Withdrawal"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createWithdrawal
+      tags: [withdrawals]
+      summary: Request a withdrawal to Telebirr
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WithdrawalInput"
+      responses:
+        "201":
+          description: Withdrawal request created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Withdrawal"
+        "400":
+          description: Insufficient balance or invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      summary: Get current platform settings (e.g. price per email)
+      responses:
+        "200":
+          description: Platform settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformSettings"
+
+  /admin/submissions:
+    get:
+      operationId: adminListSubmissions
+      tags: [admin]
+      summary: List all submitted email accounts
+      responses:
+        "200":
+          description: All submissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminSubmission"
+
+  /admin/submissions/{id}:
+    patch:
+      operationId: adminUpdateSubmission
+      tags: [admin]
+      summary: Approve or reject a submission
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmissionStatusUpdate"
       responses:
-        "204":
-          description: Deleted
+        "200":
+          description: Updated submission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSubmission"
         "404":
           description: Not found
           content:
@@ -108,32 +298,144 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /admin/withdrawals:
+    get:
+      operationId: adminListWithdrawals
+      tags: [admin]
+      summary: List all withdrawal requests
+      responses:
+        "200":
+          description: All withdrawals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminWithdrawal"
+
+  /admin/withdrawals/{id}:
+    patch:
+      operationId: adminUpdateWithdrawal
+      tags: [admin]
+      summary: Complete or reject a withdrawal request
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WithdrawalStatusUpdate"
+      responses:
+        "200":
+          description: Updated withdrawal
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminWithdrawal"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/users:
+    get:
+      operationId: adminListUsers
+      tags: [admin]
+      summary: List all users with stats
+      responses:
+        "200":
+          description: All users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminUser"
+
+  /admin/stats:
+    get:
+      operationId: adminGetStats
+      tags: [admin]
+      summary: Get platform-wide statistics
+      responses:
+        "200":
+          description: Platform stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+
+  /admin/settings:
+    patch:
+      operationId: adminUpdateSettings
+      tags: [admin]
+      summary: Update platform settings (price per email etc.)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettingsUpdate"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformSettings"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
-    Registration:
+    ErrorResponse:
       type: object
-      required: [id, email, password, createdAt]
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    AuthUser:
+      type: object
+      required: [id, email, walletBalance]
       properties:
         id:
           type: integer
         email:
           type: string
-          format: email
-        password:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
+        walletBalance:
+          type: integer
 
-    RegistrationInput:
+    UserProfile:
+      type: object
+      required: [id, email, walletBalance, totalSubmissions, approvedSubmissions, pendingSubmissions]
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        walletBalance:
+          type: integer
+        totalSubmissions:
+          type: integer
+        approvedSubmissions:
+          type: integer
+        pendingSubmissions:
+          type: integer
+
+    UserInput:
       type: object
       required: [email, password]
       properties:
@@ -144,20 +446,193 @@ components:
           type: string
           minLength: 6
 
-    RegistrationStats:
+    LoginInput:
       type: object
-      required: [total, todayCount, weekCount]
+      required: [email, password]
       properties:
-        total:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    Submission:
+      type: object
+      required: [id, email, status, pricePaid, createdAt]
+      properties:
+        id:
           type: integer
-        todayCount:
+        email:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        pricePaid:
           type: integer
-        weekCount:
+        createdAt:
+          type: string
+          format: date-time
+
+    SubmissionInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 1
+
+    AdminSubmission:
+      type: object
+      required: [id, userId, userEmail, email, password, status, pricePaid, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        userEmail:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        pricePaid:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    SubmissionStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [approved, rejected]
+
+    Withdrawal:
+      type: object
+      required: [id, amount, telebirrNumber, telebirrName, status, createdAt]
+      properties:
+        id:
+          type: integer
+        amount:
+          type: integer
+        telebirrNumber:
+          type: string
+        telebirrName:
+          type: string
+        status:
+          type: string
+          enum: [pending, completed, rejected]
+        adminNote:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+
+    WithdrawalInput:
+      type: object
+      required: [amount, telebirrNumber, telebirrName]
+      properties:
+        amount:
+          type: integer
+          minimum: 1
+        telebirrNumber:
+          type: string
+          minLength: 10
+        telebirrName:
+          type: string
+          minLength: 1
+
+    AdminWithdrawal:
+      type: object
+      required: [id, userId, userEmail, amount, telebirrNumber, telebirrName, status, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        userEmail:
+          type: string
+        amount:
+          type: integer
+        telebirrNumber:
+          type: string
+        telebirrName:
+          type: string
+        status:
+          type: string
+          enum: [pending, completed, rejected]
+        adminNote:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+
+    WithdrawalStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [completed, rejected]
+        adminNote:
+          type: string
+
+    AdminUser:
+      type: object
+      required: [id, email, walletBalance, totalSubmissions, approvedSubmissions, createdAt]
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        walletBalance:
+          type: integer
+        totalSubmissions:
+          type: integer
+        approvedSubmissions:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    AdminStats:
+      type: object
+      required: [totalUsers, totalSubmissions, pendingSubmissions, approvedSubmissions, totalEmailsBought, totalPayoutsBirr, pendingWithdrawals]
+      properties:
+        totalUsers:
+          type: integer
+        totalSubmissions:
+          type: integer
+        pendingSubmissions:
+          type: integer
+        approvedSubmissions:
+          type: integer
+        totalEmailsBought:
+          type: integer
+        totalPayoutsBirr:
+          type: integer
+        pendingWithdrawals:
           type: integer
 
-    ErrorResponse:
+    PlatformSettings:
       type: object
-      required: [error]
+      required: [pricePerEmail]
       properties:
-        error:
-          type: string
+        pricePerEmail:
+          type: integer
+
+    SettingsUpdate:
+      type: object
+      required: [pricePerEmail]
+      properties:
+        pricePerEmail:
+          type: integer
+          minimum: 1

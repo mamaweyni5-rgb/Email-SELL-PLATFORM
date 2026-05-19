@@ -1,157 +1,106 @@
-import { useState } from "react";
-import { Link } from "wouter";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useCreateRegistration, getListRegistrationsQueryKey, getGetRegistrationStatsQueryKey } from "@workspace/api-client-react";
-import { useQueryClient } from "@tanstack/react-query";
-import { Eye, EyeOff, ShieldCheck, Mail, Lock } from "lucide-react";
-
+import { useGetMe, useGetSettings } from "@workspace/api-client-react";
+import { Link, useLocation } from "wouter";
+import { Layout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-
-const formSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters long." }),
-});
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight, CheckCircle2, ShieldCheck, Banknote } from "lucide-react";
+import { useEffect } from "react";
 
 export default function Home() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [success, setSuccess] = useState(false);
-  
-  const queryClient = useQueryClient();
-  const createRegistration = useCreateRegistration();
+  const { data: user, isLoading: authLoading } = useGetMe({ query: { retry: false } });
+  const { data: settings } = useGetSettings();
+  const [, setLocation] = useLocation();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    setSuccess(false);
-    createRegistration.mutate(
-      { data: values },
-      {
-        onSuccess: () => {
-          setSuccess(true);
-          form.reset();
-          queryClient.invalidateQueries({ queryKey: getListRegistrationsQueryKey() });
-          queryClient.invalidateQueries({ queryKey: getGetRegistrationStatsQueryKey() });
-        },
-      }
-    );
-  }
+  useEffect(() => {
+    if (!authLoading && user) {
+      setLocation("/dashboard");
+    }
+  }, [user, authLoading, setLocation]);
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 text-primary mb-4">
-            <ShieldCheck className="w-8 h-8" />
+    <Layout>
+      <div className="flex-1">
+        {/* Hero Section */}
+        <section className="bg-gradient-to-b from-primary/10 to-background py-20 lg:py-32 border-b">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground max-w-4xl mx-auto mb-6">
+              Turn your unused email accounts into <span className="text-primary">real cash</span>.
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
+              The trusted digital marketplace where Ethiopian users earn money by securely selling email accounts. Instant payouts via Telebirr.
+            </p>
+            
+            {settings && (
+              <div className="mb-10 inline-flex items-center justify-center bg-card shadow-sm border rounded-full px-6 py-3">
+                <span className="text-lg font-medium">
+                  Current rate: <span className="text-success font-bold">{settings.pricePerEmail} ETB</span> per approved email
+                </span>
+              </div>
+            )}
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button size="lg" asChild className="text-lg h-14 px-8 w-full sm:w-auto">
+                <Link href="/register">
+                  Start Earning Now <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild className="text-lg h-14 px-8 w-full sm:w-auto">
+                <Link href="/login">Sign In to Dashboard</Link>
+              </Button>
+            </div>
           </div>
-          <h1 className="text-3xl font-serif text-foreground">Secure Portal</h1>
-          <p className="mt-2 text-muted-foreground">Register your credentials to gain access.</p>
-        </div>
+        </section>
 
-        <Card className="border-none shadow-xl shadow-black/5">
-          <CardHeader>
-            <CardTitle>Account Registration</CardTitle>
-            <CardDescription>Enter your email and a secure password to register.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {success ? (
-              <Alert className="bg-primary/5 border-primary/20 text-primary mb-6">
-                <ShieldCheck className="h-4 w-4" />
-                <AlertDescription>
-                  Registration successful. Your account has been created securely.
-                </AlertDescription>
-              </Alert>
-            ) : null}
+        {/* Features Section */}
+        <section className="py-20 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold tracking-tight mb-4">How it works</h2>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                A simple, secure process to monetize your accounts in three easy steps.
+              </p>
+            </div>
 
-            {createRegistration.error ? (
-              <Alert variant="destructive" className="mb-6">
-                <AlertDescription>
-                  {(createRegistration.error as { error?: string })?.error || "Failed to register. Please try again."}
-                </AlertDescription>
-              </Alert>
-            ) : null}
+            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              <Card className="border-none shadow-md bg-card">
+                <CardContent className="pt-8 text-center">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-6">
+                    <ShieldCheck className="h-8 w-8" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3">1. Submit Securely</h3>
+                  <p className="text-muted-foreground">
+                    Create an account and submit your valid email credentials through our secure encrypted platform.
+                  </p>
+                </CardContent>
+              </Card>
 
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email Address</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input placeholder="name@company.com" className="pl-10" {...field} />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Secure Password</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input 
-                            type={showPassword ? "text" : "password"} 
-                            placeholder="••••••••" 
-                            className="pl-10 pr-10" 
-                            {...field} 
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            {showPassword ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </button>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <Card className="border-none shadow-md bg-card">
+                <CardContent className="pt-8 text-center">
+                  <div className="w-16 h-16 rounded-full bg-warning/10 text-warning flex items-center justify-center mx-auto mb-6">
+                    <CheckCircle2 className="h-8 w-8" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3">2. Fast Verification</h3>
+                  <p className="text-muted-foreground">
+                    Our team reviews your submission quickly. Once approved, the funds are instantly added to your wallet.
+                  </p>
+                </CardContent>
+              </Card>
 
-                <Button 
-                  type="submit" 
-                  className="w-full mt-6" 
-                  disabled={createRegistration.isPending}
-                >
-                  {createRegistration.isPending ? "Registering..." : "Complete Registration"}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-
-        <div className="mt-8 text-center">
-          <Link href="/admin" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-            Operator Access &rarr;
-          </Link>
-        </div>
+              <Card className="border-none shadow-md bg-card">
+                <CardContent className="pt-8 text-center">
+                  <div className="w-16 h-16 rounded-full bg-success/10 text-success flex items-center justify-center mx-auto mb-6">
+                    <Banknote className="h-8 w-8" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3">3. Withdraw Cash</h3>
+                  <p className="text-muted-foreground">
+                    Request a withdrawal to your Telebirr account and get your cash within hours.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
       </div>
-    </div>
+    </Layout>
   );
 }
