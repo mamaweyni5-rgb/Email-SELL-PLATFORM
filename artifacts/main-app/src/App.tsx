@@ -3,17 +3,30 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
-
 import Home from "@/pages/home";
-import AdminPanel from "@/pages/admin";
+import Login from "@/pages/login";
+import Register from "@/pages/register";
+import Dashboard from "@/pages/dashboard";
+import Submit from "@/pages/submit";
+import Withdraw from "@/pages/withdraw";
+import Profile from "@/pages/profile";
+import Admin from "@/pages/admin";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: false } },
+});
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/admin" component={AdminPanel} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/submit" component={Submit} />
+      <Route path="/withdraw" component={Withdraw} />
+      <Route path="/profile" component={Profile} />
+      <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -1,4 +1,4 @@
-import { useGetMe, useGetSettings } from "@workspace/api-client-react";
+import { useGetMe, useGetSettings, getGetMeQueryKey } from "@workspace/api-client-react";
 import { Link, useLocation } from "wouter";
 import { Layout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { ArrowRight, CheckCircle2, ShieldCheck, Banknote } from "lucide-react";
 import { useEffect } from "react";
 
 export default function Home() {
-  const { data: user, isLoading: authLoading } = useGetMe({ query: { retry: false } });
+  const { data: user, isLoading: authLoading } = useGetMe({ query: { retry: false, queryKey: getGetMeQueryKey() } });
   const { data: settings } = useGetSettings();
   const [, setLocation] = useLocation();
 

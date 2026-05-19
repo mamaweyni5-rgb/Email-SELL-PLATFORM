@@ -1,4 +1,4 @@
-import { useGetMe, useLogin } from "@workspace/api-client-react";
+import { useGetMe, useLogin, getGetMeQueryKey } from "@workspace/api-client-react";
 import { useLocation, Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,7 +17,7 @@ const loginSchema = z.object({
 });
 
 export default function Login() {
-  const { data: user, isLoading } = useGetMe({ query: { retry: false } });
+  const { data: user, isLoading } = useGetMe({ query: { retry: false, queryKey: getGetMeQueryKey() } });
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const loginMutation = useLogin();
@@ -50,7 +50,7 @@ export default function Login() {
         onError: (error) => {
           toast({
             title: "Login failed",
-            description: error.error || "Please check your credentials and try again.",
+            description: (error as { error?: string })?.error || "Please check your credentials and try again.",
             variant: "destructive",
           });
         },

@@ -1,4 +1,4 @@
-import { useGetMe, useRegister } from "@workspace/api-client-react";
+import { useGetMe, useRegister, getGetMeQueryKey } from "@workspace/api-client-react";
 import { useLocation, Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,7 +17,7 @@ const registerSchema = z.object({
 });
 
 export default function Register() {
-  const { data: user, isLoading } = useGetMe({ query: { retry: false } });
+  const { data: user, isLoading } = useGetMe({ query: { retry: false, queryKey: getGetMeQueryKey() } });
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const registerMutation = useRegister();
@@ -50,7 +50,7 @@ export default function Register() {
         onError: (error) => {
           toast({
             title: "Registration failed",
-            description: error.error || "An error occurred during registration.",
+            description: (error as { error?: string })?.error || "An error occurred during registration.",
             variant: "destructive",
           });
         },

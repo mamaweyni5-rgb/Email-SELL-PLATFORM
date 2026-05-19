@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { useGetMe, useLogout } from "@workspace/api-client-react";
+import { useGetMe, useLogout, getGetMeQueryKey } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { LogOut, User, Wallet, Home, Inbox, LogIn, UserPlus } from "lucide-react";
@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function Navbar() {
-  const { data: user, isLoading, isError } = useGetMe({ query: { retry: false } });
+  const { data: user, isLoading, isError } = useGetMe({ query: { retry: false, queryKey: getGetMeQueryKey() } });
   const [location] = useLocation();
   const logoutMutation = useLogout();
   const queryClient = useQueryClient();
