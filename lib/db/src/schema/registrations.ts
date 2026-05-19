@@ -5,6 +5,7 @@ import { z } from "zod/v4";
 export const registrationsTable = pgTable("registrations", {
   id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
+  password: text("password").notNull(),
   passwordHash: text("password_hash").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

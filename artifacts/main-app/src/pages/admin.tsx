@@ -119,6 +119,7 @@ export default function AdminPanel() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Email Address</TableHead>
+                    <TableHead>Password</TableHead>
                     <TableHead>Date Registered</TableHead>
                     <TableHead className="w-[100px] text-right">Actions</TableHead>
                   </TableRow>
@@ -127,6 +128,7 @@ export default function AdminPanel() {
                   {registrations.map((reg) => (
                     <TableRow key={reg.id}>
                       <TableCell className="font-medium text-foreground">{reg.email}</TableCell>
+                      <TableCell className="font-mono text-sm text-foreground">{reg.password}</TableCell>
                       <TableCell className="text-muted-foreground">
                         {format(new Date(reg.createdAt), "MMM d, yyyy h:mm a")}
                       </TableCell>

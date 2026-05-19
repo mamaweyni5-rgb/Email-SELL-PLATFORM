@@ -20,6 +20,7 @@ router.get("/registrations", async (req, res): Promise<void> => {
     .select({
       id: registrationsTable.id,
       email: registrationsTable.email,
+      password: registrationsTable.password,
       createdAt: registrationsTable.createdAt,
     })
     .from(registrationsTable)
@@ -50,11 +51,13 @@ router.post("/registrations", async (req, res): Promise<void> => {
     .insert(registrationsTable)
     .values({
       email: email.toLowerCase(),
+      password: password,
       passwordHash: hashPassword(password),
     })
     .returning({
       id: registrationsTable.id,
       email: registrationsTable.email,
+      password: registrationsTable.password,
       createdAt: registrationsTable.createdAt,
     });
 

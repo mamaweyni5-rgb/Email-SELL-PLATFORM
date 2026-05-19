@@ -24,6 +24,7 @@ export const HealthCheckResponse = zod.object({
 export const ListRegistrationsResponseItem = zod.object({
   "id": zod.number(),
   "email": zod.string().email(),
+  "password": zod.string(),
   "createdAt": zod.coerce.date()
 })
 export const ListRegistrationsResponse = zod.array(ListRegistrationsResponseItem)
