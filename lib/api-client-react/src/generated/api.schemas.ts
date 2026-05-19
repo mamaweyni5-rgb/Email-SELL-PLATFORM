@@ -186,3 +186,17 @@ export interface SettingsUpdate {
   pricePerEmail: number;
 }
 
+export interface AdminVerifyPasswordInput {
+  password: string;
+}
+
+export interface AdminPasswordCheckResult {
+  valid: boolean;
+}
+
+export interface AdminChangePasswordInput {
+  currentPassword: string;
+  /** @minLength 6 */
+  newPassword: string;
+}
+

@@ -9,6 +9,7 @@ import {
   useAdminListUsers,
   useAdminGetStats,
   useAdminUpdateSettings,
+  useAdminChangePassword,
   getAdminListSubmissionsQueryKey,
   getAdminListWithdrawalsQueryKey,
   getAdminListUsersQueryKey,
@@ -38,10 +39,20 @@ import {
   TrendingUp,
   AlertCircle,
   Loader2,
+  KeyRound,
 } from "lucide-react";
 
 const priceSchema = z.object({
   pricePerEmail: z.coerce.number().min(1, "Price must be at least 1 ETB"),
+});
+
+const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Required"),
+  newPassword: z.string().min(6, "At least 6 characters"),
+  confirmPassword: z.string().min(1, "Required"),
+}).refine((d) => d.newPassword === d.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
 });
 
 function StatusBadge({ status }: { status: string }) {
@@ -333,19 +344,25 @@ function SettingsTab() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const updateSettings = useAdminUpdateSettings();
+  const changePassword = useAdminChangePassword();
 
-  const form = useForm<z.infer<typeof priceSchema>>({
+  const priceForm = useForm<z.infer<typeof priceSchema>>({
     resolver: zodResolver(priceSchema),
     defaultValues: { pricePerEmail: 20 },
   });
 
-  const onSubmit = (values: z.infer<typeof priceSchema>) => {
+  const pwForm = useForm<z.infer<typeof changePasswordSchema>>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" },
+  });
+
+  const onPriceSubmit = (values: z.infer<typeof priceSchema>) => {
     updateSettings.mutate(
       { data: { pricePerEmail: values.pricePerEmail } },
       {
         onSuccess: (data) => {
           queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
-          form.setValue("pricePerEmail", data.pricePerEmail);
+          priceForm.setValue("pricePerEmail", data.pricePerEmail);
           toast({ title: "Settings saved", description: `Price updated to ${data.pricePerEmail} ETB per email.` });
         },
         onError: () => {
@@ -355,52 +372,134 @@ function SettingsTab() {
     );
   };
 
+  const onPasswordSubmit = (values: z.infer<typeof changePasswordSchema>) => {
+    changePassword.mutate(
+      { data: { currentPassword: values.currentPassword, newPassword: values.newPassword } },
+      {
+        onSuccess: () => {
+          pwForm.reset();
+          toast({ title: "Password changed", description: "Admin password updated successfully." });
+        },
+        onError: (err) => {
+          const msg = (err as { error?: string })?.error ?? "Failed to change password.";
+          toast({ title: "Error", description: msg, variant: "destructive" });
+        },
+      }
+    );
+  };
+
   return (
-    <Card className="max-w-md">
-      <CardHeader>
-        <CardTitle>Price Per Email</CardTitle>
-        <CardDescription>
-          Set how much users earn per approved email account submission (in ETB).
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="pricePerEmail"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price (ETB)</FormLabel>
-                  <FormControl>
-                    <div className="flex gap-2">
-                      <Input
-                        type="number"
-                        min={1}
-                        placeholder="20"
-                        {...field}
-                        data-testid="input-price-per-email"
-                      />
-                      <span className="flex items-center text-sm text-muted-foreground px-3 border rounded-md bg-muted">
-                        ETB
-                      </span>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" disabled={updateSettings.isPending} data-testid="button-save-settings">
-              {updateSettings.isPending ? (
-                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</>
-              ) : (
-                "Save Price"
-              )}
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+    <div className="space-y-6 max-w-md">
+      <Card>
+        <CardHeader>
+          <CardTitle>Price Per Email</CardTitle>
+          <CardDescription>
+            Set how much users earn per approved email account submission (in ETB).
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...priceForm}>
+            <form onSubmit={priceForm.handleSubmit(onPriceSubmit)} className="space-y-4">
+              <FormField
+                control={priceForm.control}
+                name="pricePerEmail"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price (ETB)</FormLabel>
+                    <FormControl>
+                      <div className="flex gap-2">
+                        <Input
+                          type="number"
+                          min={1}
+                          placeholder="20"
+                          {...field}
+                          data-testid="input-price-per-email"
+                        />
+                        <span className="flex items-center text-sm text-muted-foreground px-3 border rounded-md bg-muted">
+                          ETB
+                        </span>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={updateSettings.isPending} data-testid="button-save-settings">
+                {updateSettings.isPending ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</>
+                ) : (
+                  "Save Price"
+                )}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <KeyRound className="h-5 w-5 text-muted-foreground" />
+            <CardTitle>Change Admin Password</CardTitle>
+          </div>
+          <CardDescription>
+            Update the secret password used to access this admin panel.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...pwForm}>
+            <form onSubmit={pwForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
+              <FormField
+                control={pwForm.control}
+                name="currentPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Current Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={pwForm.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>New Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={pwForm.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm New Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={changePassword.isPending} variant="outline">
+                {changePassword.isPending ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Changing...</>
+                ) : (
+                  "Change Password"
+                )}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 

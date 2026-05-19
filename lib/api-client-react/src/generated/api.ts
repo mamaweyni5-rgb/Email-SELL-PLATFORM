@@ -20,9 +20,12 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdminChangePasswordInput,
+  AdminPasswordCheckResult,
   AdminStats,
   AdminSubmission,
   AdminUser,
+  AdminVerifyPasswordInput,
   AdminWithdrawal,
   AuthUser,
   ErrorResponse,
@@ -1389,5 +1392,147 @@ export const useAdminUpdateSettings = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getAdminUpdateSettingsMutationOptions(options));
+    }
+
+export const getAdminVerifyPasswordUrl = () => {
+
+
+
+
+  return `/api/admin/verify-password`
+}
+
+/**
+ * @summary Verify the admin panel password
+ */
+export const adminVerifyPassword = async (adminVerifyPasswordInput: AdminVerifyPasswordInput, options?: RequestInit): Promise<AdminPasswordCheckResult> => {
+
+  return customFetch<AdminPasswordCheckResult>(getAdminVerifyPasswordUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminVerifyPasswordInput,)
+  }
+);}
+
+
+
+
+export const getAdminVerifyPasswordMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminVerifyPassword>>, TError,{data: BodyType<AdminVerifyPasswordInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminVerifyPassword>>, TError,{data: BodyType<AdminVerifyPasswordInput>}, TContext> => {
+
+const mutationKey = ['adminVerifyPassword'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminVerifyPassword>>, {data: BodyType<AdminVerifyPasswordInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  adminVerifyPassword(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminVerifyPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof adminVerifyPassword>>>
+    export type AdminVerifyPasswordMutationBody = BodyType<AdminVerifyPasswordInput>
+    export type AdminVerifyPasswordMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Verify the admin panel password
+ */
+export const useAdminVerifyPassword = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminVerifyPassword>>, TError,{data: BodyType<AdminVerifyPasswordInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminVerifyPassword>>,
+        TError,
+        {data: BodyType<AdminVerifyPasswordInput>},
+        TContext
+      > => {
+      return useMutation(getAdminVerifyPasswordMutationOptions(options));
+    }
+
+export const getAdminChangePasswordUrl = () => {
+
+
+
+
+  return `/api/admin/change-password`
+}
+
+/**
+ * @summary Change the admin panel password
+ */
+export const adminChangePassword = async (adminChangePasswordInput: AdminChangePasswordInput, options?: RequestInit): Promise<AdminPasswordCheckResult> => {
+
+  return customFetch<AdminPasswordCheckResult>(getAdminChangePasswordUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminChangePasswordInput,)
+  }
+);}
+
+
+
+
+export const getAdminChangePasswordMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminChangePassword>>, TError,{data: BodyType<AdminChangePasswordInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminChangePassword>>, TError,{data: BodyType<AdminChangePasswordInput>}, TContext> => {
+
+const mutationKey = ['adminChangePassword'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminChangePassword>>, {data: BodyType<AdminChangePasswordInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  adminChangePassword(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminChangePasswordMutationResult = NonNullable<Awaited<ReturnType<typeof adminChangePassword>>>
+    export type AdminChangePasswordMutationBody = BodyType<AdminChangePasswordInput>
+    export type AdminChangePasswordMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Change the admin panel password
+ */
+export const useAdminChangePassword = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminChangePassword>>, TError,{data: BodyType<AdminChangePasswordInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminChangePassword>>,
+        TError,
+        {data: BodyType<AdminChangePasswordInput>},
+        TContext
+      > => {
+      return useMutation(getAdminChangePasswordMutationOptions(options));
     }
 

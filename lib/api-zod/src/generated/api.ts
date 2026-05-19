@@ -255,3 +255,32 @@ export const AdminUpdateSettingsResponse = zod.object({
 })
 
 
+/**
+ * @summary Verify the admin panel password
+ */
+export const AdminVerifyPasswordBody = zod.object({
+  "password": zod.string()
+})
+
+export const AdminVerifyPasswordResponse = zod.object({
+  "valid": zod.boolean()
+})
+
+
+/**
+ * @summary Change the admin panel password
+ */
+export const adminChangePasswordBodyNewPasswordMin = 6;
+
+
+
+export const AdminChangePasswordBody = zod.object({
+  "currentPassword": zod.string(),
+  "newPassword": zod.string().min(adminChangePasswordBodyNewPasswordMin)
+})
+
+export const AdminChangePasswordResponse = zod.object({
+  "valid": zod.boolean()
+})
+
+

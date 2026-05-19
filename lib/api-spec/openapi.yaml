@@ -391,6 +391,50 @@ paths:
               schema:
                 $ref: "#/components/schemas/PlatformSettings"
 
+  /admin/verify-password:
+    post:
+      operationId: adminVerifyPassword
+      tags: [admin]
+      summary: Verify the admin panel password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminVerifyPasswordInput"
+      responses:
+        "200":
+          description: Verification result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminPasswordCheckResult"
+
+  /admin/change-password:
+    patch:
+      operationId: adminChangePassword
+      tags: [admin]
+      summary: Change the admin panel password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminChangePasswordInput"
+      responses:
+        "200":
+          description: Password changed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminPasswordCheckResult"
+        "401":
+          description: Current password is wrong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -636,3 +680,27 @@ components:
         pricePerEmail:
           type: integer
           minimum: 1
+
+    AdminVerifyPasswordInput:
+      type: object
+      required: [password]
+      properties:
+        password:
+          type: string
+
+    AdminPasswordCheckResult:
+      type: object
+      required: [valid]
+      properties:
+        valid:
+          type: boolean
+
+    AdminChangePasswordInput:
+      type: object
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+          minLength: 6

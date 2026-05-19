@@ -1,5 +1,6 @@
 import { Router, type IRouter } from "express";
 import { eq, sql } from "drizzle-orm";
+import bcrypt from "bcryptjs";
 import { db, usersTable, submissionsTable, withdrawalsTable, settingsTable } from "@workspace/db";
 import {
   AdminListSubmissionsResponse,
@@ -14,7 +15,21 @@ import {
   AdminGetStatsResponse,
   AdminUpdateSettingsBody,
   AdminUpdateSettingsResponse,
+  AdminVerifyPasswordBody,
+  AdminVerifyPasswordResponse,
+  AdminChangePasswordBody,
 } from "@workspace/api-zod";
+
+const DEFAULT_ADMIN_PASSWORD = "mailtrade@admin2024";
+
+async function getAdminPasswordHash(): Promise<string> {
+  const [row] = await db
+    .select({ value: settingsTable.value })
+    .from(settingsTable)
+    .where(eq(settingsTable.key, "admin_password_hash"));
+  if (row) return row.value;
+  return bcrypt.hash(DEFAULT_ADMIN_PASSWORD, 10);
+}
 
 const router: IRouter = Router();
 
@@ -258,6 +273,44 @@ router.patch("/admin/settings", async (req, res): Promise<void> => {
 
   req.log.info({ pricePerEmail }, "Settings updated");
   res.json(AdminUpdateSettingsResponse.parse({ pricePerEmail }));
+});
+
+router.post("/admin/verify-password", async (req, res): Promise<void> => {
+  const parsed = AdminVerifyPasswordBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+
+  const hash = await getAdminPasswordHash();
+  const valid = await bcrypt.compare(parsed.data.password, hash);
+  res.json(AdminVerifyPasswordResponse.parse({ valid }));
+});
+
+router.patch("/admin/change-password", async (req, res): Promise<void> => {
+  const parsed = AdminChangePasswordBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+
+  const { currentPassword, newPassword } = parsed.data;
+
+  const hash = await getAdminPasswordHash();
+  const valid = await bcrypt.compare(currentPassword, hash);
+  if (!valid) {
+    res.status(401).json({ error: "Current password is incorrect" });
+    return;
+  }
+
+  const newHash = await bcrypt.hash(newPassword, 10);
+  await db
+    .insert(settingsTable)
+    .values({ key: "admin_password_hash", value: newHash })
+    .onConflictDoUpdate({ target: settingsTable.key, set: { value: newHash } });
+
+  req.log.info("Admin password changed");
+  res.json(AdminVerifyPasswordResponse.parse({ valid: true }));
 });
 
 export default router;

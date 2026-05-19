@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { useGetMe, useLogout, getGetMeQueryKey } from "@workspace/api-client-react";
+import { useGetMe, useLogout, useAdminVerifyPassword, getGetMeQueryKey } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { LogOut, User, Wallet } from "lucide-react";
@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
 const ADMIN_TAP_COUNT = 5;
-const ADMIN_PASSWORD = "mailtrade@admin2024";
 
 export function Navbar() {
   const { data: user, isLoading, isError } = useGetMe({ query: { retry: false, queryKey: getGetMeQueryKey() } });
@@ -21,6 +20,7 @@ export function Navbar() {
   const logoutMutation = useLogout();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const verifyPassword = useAdminVerifyPassword();
 
   const [tapCount, setTapCount] = useState(0);
   const [showAdminDialog, setShowAdminDialog] = useState(false);
@@ -46,18 +46,34 @@ export function Navbar() {
   };
 
   const handleAdminLogin = () => {
-    if (adminPassword === ADMIN_PASSWORD) {
-      setShowAdminDialog(false);
-      setAdminPassword("");
-      setLocation("/admin");
-    } else {
-      toast({
-        title: "Access denied",
-        description: "Incorrect admin password.",
-        variant: "destructive",
-      });
-      setAdminPassword("");
-    }
+    if (!adminPassword) return;
+    verifyPassword.mutate(
+      { data: { password: adminPassword } },
+      {
+        onSuccess: (result) => {
+          if (result.valid) {
+            setShowAdminDialog(false);
+            setAdminPassword("");
+            setLocation("/admin");
+          } else {
+            toast({
+              title: "Access denied",
+              description: "Incorrect admin password.",
+              variant: "destructive",
+            });
+            setAdminPassword("");
+          }
+        },
+        onError: () => {
+          toast({
+            title: "Error",
+            description: "Could not verify password. Try again.",
+            variant: "destructive",
+          });
+          setAdminPassword("");
+        },
+      }
+    );
   };
 
   const handleLogout = () => {
@@ -161,8 +177,12 @@ export function Navbar() {
               onKeyDown={(e) => { if (e.key === "Enter") handleAdminLogin(); }}
               autoFocus
             />
-            <Button className="w-full" onClick={handleAdminLogin}>
-              Enter Admin Panel
+            <Button
+              className="w-full"
+              onClick={handleAdminLogin}
+              disabled={verifyPassword.isPending || !adminPassword}
+            >
+              {verifyPassword.isPending ? "Checking..." : "Enter Admin Panel"}
             </Button>
           </div>
         </DialogContent>

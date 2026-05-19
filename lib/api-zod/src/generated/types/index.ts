@@ -6,10 +6,13 @@
  * OpenAPI spec version: 0.2.0
  */
 
+export * from './adminChangePasswordInput';
+export * from './adminPasswordCheckResult';
 export * from './adminStats';
 export * from './adminSubmission';
 export * from './adminSubmissionStatus';
 export * from './adminUser';
+export * from './adminVerifyPasswordInput';
 export * from './adminWithdrawal';
 export * from './adminWithdrawalStatus';
 export * from './authUser';
