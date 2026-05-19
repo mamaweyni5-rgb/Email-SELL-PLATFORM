@@ -40,6 +40,11 @@ router.post("/submissions", requireAuth, async (req, res): Promise<void> => {
 
   const { email, password } = parsed.data;
 
+  if (!email.toLowerCase().endsWith("@gmail.com")) {
+    res.status(400).json({ error: "Only Gmail accounts (@gmail.com) are accepted" });
+    return;
+  }
+
   const existing = await db
     .select({ id: submissionsTable.id })
     .from(submissionsTable)

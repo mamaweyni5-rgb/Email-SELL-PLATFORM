@@ -16,7 +16,12 @@ import { Mail, Lock, CheckCircle2, ArrowLeft, Eye, EyeOff, Loader2 } from "lucid
 import { useLanguage } from "@/lib/i18n";
 
 const submitSchema = z.object({
-  email: z.string().email("Enter a valid email address"),
+  email: z
+    .string()
+    .email("Enter a valid email address")
+    .refine((v) => v.toLowerCase().endsWith("@gmail.com"), {
+      message: "Only Gmail accounts (@gmail.com) are accepted",
+    }),
   password: z.string().min(1, "Password is required"),
 });
 
