@@ -53,7 +53,7 @@ export default function Submit() {
           toast({ title: t("submit_success_title"), description: t("submit_success_desc") });
         },
         onError: (err) => {
-          const message = (err as { error?: string })?.error ?? "Failed to submit. Try again.";
+          const message = (err as any)?.data?.error ?? (err as any)?.message ?? "Failed to submit. Try again.";
           toast({ title: t("submit_error_title"), description: message, variant: "destructive" });
         },
       }

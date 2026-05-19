@@ -59,7 +59,7 @@ export default function Withdraw() {
           toast({ title: t("wd_toast_title"), description: t("wd_toast_desc") });
         },
         onError: (err) => {
-          const message = (err as { error?: string })?.error ?? "Failed to request withdrawal.";
+          const message = (err as any)?.data?.error ?? (err as any)?.message ?? "Failed to request withdrawal.";
           toast({ title: "Error", description: message, variant: "destructive" });
         },
       }

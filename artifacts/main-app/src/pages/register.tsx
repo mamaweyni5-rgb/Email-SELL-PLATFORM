@@ -46,7 +46,7 @@ export default function Register() {
         onError: (error) => {
           toast({
             title: t("register_error_title"),
-            description: (error as { error?: string })?.error || "An error occurred during registration.",
+            description: (error as any)?.data?.error ?? (error as any)?.message ?? "An error occurred during registration.",
             variant: "destructive",
           });
         },

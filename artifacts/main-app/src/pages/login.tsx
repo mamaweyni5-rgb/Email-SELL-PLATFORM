@@ -46,7 +46,7 @@ export default function Login() {
         onError: (error) => {
           toast({
             title: t("login_error_title"),
-            description: (error as { error?: string })?.error || t("login_error_desc"),
+            description: (error as any)?.data?.error ?? (error as any)?.message ?? t("login_error_desc"),
             variant: "destructive",
           });
         },
