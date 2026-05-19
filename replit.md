@@ -1,10 +1,11 @@
-# [Project name]
+# Email Registration Portal
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+An app where users submit their email and password credentials via a registration form, and an admin panel lets the operator view all submissions — organized per entry, separately stored.
 
 ## Run & Operate
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/main-app run dev` — run the frontend (port assigned by workflow)
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
@@ -14,6 +15,7 @@ _Replace the heading above with the project's name, and this line with one sente
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
+- Frontend: React + Vite + Tailwind + shadcn/ui, wouter routing
 - API: Express 5
 - DB: PostgreSQL + Drizzle ORM
 - Validation: Zod (`zod/v4`), `drizzle-zod`
@@ -22,15 +24,28 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- **OpenAPI spec**: `lib/api-spec/openapi.yaml`
+- **DB schema**: `lib/db/src/schema/registrations.ts`
+- **API routes**: `artifacts/api-server/src/routes/registrations.ts`
+- **Frontend pages**: `artifacts/main-app/src/pages/`
+  - `home.tsx` — user registration form
+  - `admin.tsx` — admin panel with list and stats
+- **Generated hooks**: `lib/api-client-react/src/generated/`
+- **Generated Zod schemas**: `lib/api-zod/src/generated/`
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Passwords are hashed with SHA-256 before storage (no plain-text storage)
+- Email uniqueness is enforced at both DB level (UNIQUE constraint) and API level (409 response)
+- Admin panel has no authentication (internal use only)
+- Registration success shows inline confirmation — no redirect
+- Stats (total, today, week) are computed server-side via SQL aggregates
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Users land on a clean registration form, enter their email + password, and receive confirmation
+- Admin panel at `/admin` shows all registrations in a table with timestamps and per-row delete
+- Stats cards show total accounts, registrations today, and registrations this week
 
 ## User preferences
 
@@ -38,7 +53,8 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- After changing `lib/api-spec/openapi.yaml`, always run `pnpm --filter @workspace/api-spec run codegen` before using updated types
+- Do not restart the frontend workflow while the design subagent is running
 
 ## Pointers
 
