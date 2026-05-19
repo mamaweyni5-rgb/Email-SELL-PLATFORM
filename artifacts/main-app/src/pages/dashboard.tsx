@@ -2,16 +2,18 @@ import { useGetMe, useGetProfile, useListSubmissions, useListWithdrawals } from 
 import { Link, useLocation } from "wouter";
 import { useEffect } from "react";
 import { Layout } from "@/components/layout";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mail, Wallet, Clock, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
+import { useLanguage } from "@/lib/i18n";
 
 export default function Dashboard() {
   const { data: user, isLoading: authLoading, isError } = useGetMe({ query: { retry: false } });
   const [, setLocation] = useLocation();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!authLoading && (isError || !user)) {
@@ -19,17 +21,23 @@ export default function Dashboard() {
     }
   }, [user, authLoading, isError, setLocation]);
 
-  const { data: profile, isLoading: profileLoading } = useGetProfile({
-    query: { enabled: !!user, retry: false }
-  });
-  
-  const { data: submissions, isLoading: submissionsLoading } = useListSubmissions({
-    query: { enabled: !!user, retry: false }
-  });
+  const { data: profile, isLoading: profileLoading } = useGetProfile({ query: { enabled: !!user, retry: false } });
+  const { data: submissions, isLoading: submissionsLoading } = useListSubmissions({ query: { enabled: !!user, retry: false } });
+  const { data: withdrawals, isLoading: withdrawalsLoading } = useListWithdrawals({ query: { enabled: !!user, retry: false } });
 
-  const { data: withdrawals, isLoading: withdrawalsLoading } = useListWithdrawals({
-    query: { enabled: !!user, retry: false }
-  });
+  const statusClass = (status: string) =>
+    status === "approved" || status === "completed"
+      ? "bg-success/10 text-success border-success/20"
+      : status === "rejected"
+      ? "bg-destructive/10 text-destructive border-destructive/20"
+      : "bg-warning/10 text-warning border-warning/20";
+
+  const statusLabel = (status: string) => {
+    if (status === "approved") return t("status_approved");
+    if (status === "rejected") return t("status_rejected");
+    if (status === "completed") return t("status_completed");
+    return t("status_pending");
+  };
 
   if (authLoading || (user && !profile && profileLoading)) {
     return (
@@ -56,15 +64,15 @@ export default function Dashboard() {
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Welcome back!</h1>
-            <p className="text-muted-foreground mt-1">Here's an overview of your earnings and submissions.</p>
+            <h1 className="text-3xl font-bold tracking-tight">{t("dash_welcome")}</h1>
+            <p className="text-muted-foreground mt-1">{t("dash_subtitle")}</p>
           </div>
           <div className="flex items-center gap-3">
             <Button asChild variant="outline">
-              <Link href="/withdraw">Withdraw Funds</Link>
+              <Link href="/withdraw">{t("dash_withdraw_btn")}</Link>
             </Button>
             <Button asChild>
-              <Link href="/submit">Sell Account</Link>
+              <Link href="/submit">{t("dash_sell_btn")}</Link>
             </Button>
           </div>
         </div>
@@ -74,31 +82,31 @@ export default function Dashboard() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
                 <Wallet className="mr-2 h-4 w-4 text-primary" />
-                Available Balance
+                {t("dash_balance")}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-primary">{profile?.walletBalance || 0} ETB</div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
                 <CheckCircle className="mr-2 h-4 w-4 text-success" />
-                Approved Accounts
+                {t("dash_approved")}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{profile?.approvedSubmissions || 0}</div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
                 <Clock className="mr-2 h-4 w-4 text-warning" />
-                Pending Verification
+                {t("dash_pending")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -110,12 +118,11 @@ export default function Dashboard() {
         <div className="grid md:grid-cols-2 gap-8">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Recent Submissions</h2>
+              <h2 className="text-xl font-semibold">{t("dash_recent_subs")}</h2>
               <Button variant="link" asChild size="sm" className="text-primary">
-                <Link href="/profile">View all <ArrowRight className="ml-1 h-3 w-3" /></Link>
+                <Link href="/profile">{t("dash_view_all")} <ArrowRight className="ml-1 h-3 w-3" /></Link>
               </Button>
             </div>
-            
             <Card>
               <CardContent className="p-0">
                 {submissionsLoading ? (
@@ -133,17 +140,13 @@ export default function Dashboard() {
                           </div>
                           <div className="min-w-0">
                             <p className="font-medium text-sm truncate">{sub.email}</p>
-                            <p className="text-xs text-muted-foreground">{format(new Date(sub.createdAt), 'MMM d, yyyy')}</p>
+                            <p className="text-xs text-muted-foreground">{format(new Date(sub.createdAt), "MMM d, yyyy")}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3 shrink-0 ml-4">
                           <span className="font-medium text-sm">{sub.pricePaid} ETB</span>
-                          <Badge variant="outline" className={
-                            sub.status === 'approved' ? 'bg-success/10 text-success border-success/20' :
-                            sub.status === 'rejected' ? 'bg-destructive/10 text-destructive border-destructive/20' :
-                            'bg-warning/10 text-warning border-warning/20'
-                          }>
-                            {sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
+                          <Badge variant="outline" className={statusClass(sub.status)}>
+                            {statusLabel(sub.status)}
                           </Badge>
                         </div>
                       </div>
@@ -152,9 +155,9 @@ export default function Dashboard() {
                 ) : (
                   <div className="p-8 text-center text-muted-foreground flex flex-col items-center">
                     <Mail className="h-8 w-8 mb-3 opacity-20" />
-                    <p>No submissions yet.</p>
+                    <p>{t("dash_no_subs")}</p>
                     <Button variant="link" asChild className="mt-2">
-                      <Link href="/submit">Submit your first account</Link>
+                      <Link href="/submit">{t("dash_first_sub")}</Link>
                     </Button>
                   </div>
                 )}
@@ -164,12 +167,11 @@ export default function Dashboard() {
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Recent Withdrawals</h2>
+              <h2 className="text-xl font-semibold">{t("dash_recent_wd")}</h2>
               <Button variant="link" asChild size="sm" className="text-primary">
-                <Link href="/profile">View all <ArrowRight className="ml-1 h-3 w-3" /></Link>
+                <Link href="/profile">{t("dash_view_all")} <ArrowRight className="ml-1 h-3 w-3" /></Link>
               </Button>
             </div>
-            
             <Card>
               <CardContent className="p-0">
                 {withdrawalsLoading ? (
@@ -179,25 +181,21 @@ export default function Dashboard() {
                   </div>
                 ) : withdrawals && withdrawals.length > 0 ? (
                   <div className="divide-y">
-                    {withdrawals.slice(0, 5).map((withdrawal) => (
-                      <div key={withdrawal.id} className="p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
+                    {withdrawals.slice(0, 5).map((wd) => (
+                      <div key={wd.id} className="p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
                         <div className="flex items-center gap-3 overflow-hidden">
                           <div className="bg-secondary p-2 rounded-md shrink-0">
                             <Wallet className="h-4 w-4 text-secondary-foreground" />
                           </div>
                           <div className="min-w-0">
-                            <p className="font-medium text-sm truncate">{withdrawal.telebirrNumber}</p>
-                            <p className="text-xs text-muted-foreground">{format(new Date(withdrawal.createdAt), 'MMM d, yyyy')}</p>
+                            <p className="font-medium text-sm truncate">{wd.telebirrNumber}</p>
+                            <p className="text-xs text-muted-foreground">{format(new Date(wd.createdAt), "MMM d, yyyy")}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3 shrink-0 ml-4">
-                          <span className="font-bold text-sm text-primary">{withdrawal.amount} ETB</span>
-                          <Badge variant="outline" className={
-                            withdrawal.status === 'completed' ? 'bg-success/10 text-success border-success/20' :
-                            withdrawal.status === 'rejected' ? 'bg-destructive/10 text-destructive border-destructive/20' :
-                            'bg-warning/10 text-warning border-warning/20'
-                          }>
-                            {withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1)}
+                          <span className="font-bold text-sm text-primary">{wd.amount} ETB</span>
+                          <Badge variant="outline" className={statusClass(wd.status)}>
+                            {statusLabel(wd.status)}
                           </Badge>
                         </div>
                       </div>
@@ -206,7 +204,7 @@ export default function Dashboard() {
                 ) : (
                   <div className="p-8 text-center text-muted-foreground flex flex-col items-center">
                     <Wallet className="h-8 w-8 mb-3 opacity-20" />
-                    <p>No withdrawal requests yet.</p>
+                    <p>{t("dash_no_wd")}</p>
                   </div>
                 )}
               </CardContent>

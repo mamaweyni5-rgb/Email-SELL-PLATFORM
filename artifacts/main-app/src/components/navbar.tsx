@@ -11,6 +11,7 @@ import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/lib/i18n";
 
 const ADMIN_TAP_COUNT = 5;
 
@@ -21,6 +22,7 @@ export function Navbar() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const verifyPassword = useAdminVerifyPassword();
+  const { lang, setLang, t } = useLanguage();
 
   const [tapCount, setTapCount] = useState(0);
   const [showAdminDialog, setShowAdminDialog] = useState(false);
@@ -30,13 +32,10 @@ export function Navbar() {
   const handleLogoTap = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
     const newCount = tapCount + 1;
     setTapCount(newCount);
-
     if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
     tapTimerRef.current = setTimeout(() => setTapCount(0), 3000);
-
     if (newCount >= ADMIN_TAP_COUNT) {
       setTapCount(0);
       if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
@@ -56,20 +55,12 @@ export function Navbar() {
             setAdminPassword("");
             setLocation("/admin");
           } else {
-            toast({
-              title: "Access denied",
-              description: "Incorrect admin password.",
-              variant: "destructive",
-            });
+            toast({ title: "Access denied", description: "Incorrect admin password.", variant: "destructive" });
             setAdminPassword("");
           }
         },
         onError: () => {
-          toast({
-            title: "Error",
-            description: "Could not verify password. Try again.",
-            variant: "destructive",
-          });
+          toast({ title: "Error", description: "Could not verify password. Try again.", variant: "destructive" });
           setAdminPassword("");
         },
       }
@@ -102,18 +93,26 @@ export function Navbar() {
 
             {!isLoading && !isError && user && (
               <div className="hidden md:flex items-center gap-1 text-sm font-medium text-muted-foreground">
-                <Link href="/dashboard" className={`px-3 py-2 rounded-md hover:text-foreground transition-colors ${location === '/dashboard' ? 'bg-secondary text-foreground' : ''}`}>Dashboard</Link>
-                <Link href="/submit" className={`px-3 py-2 rounded-md hover:text-foreground transition-colors ${location === '/submit' ? 'bg-secondary text-foreground' : ''}`}>Sell Account</Link>
-                <Link href="/withdraw" className={`px-3 py-2 rounded-md hover:text-foreground transition-colors ${location === '/withdraw' ? 'bg-secondary text-foreground' : ''}`}>Withdraw</Link>
+                <Link href="/dashboard" className={`px-3 py-2 rounded-md hover:text-foreground transition-colors ${location === '/dashboard' ? 'bg-secondary text-foreground' : ''}`}>{t("nav_dashboard")}</Link>
+                <Link href="/submit" className={`px-3 py-2 rounded-md hover:text-foreground transition-colors ${location === '/submit' ? 'bg-secondary text-foreground' : ''}`}>{t("nav_sell")}</Link>
+                <Link href="/withdraw" className={`px-3 py-2 rounded-md hover:text-foreground transition-colors ${location === '/withdraw' ? 'bg-secondary text-foreground' : ''}`}>{t("nav_withdraw")}</Link>
               </div>
             )}
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setLang(lang === "en" ? "am" : "en")}
+              className="text-xs font-semibold px-2.5 py-1.5 rounded-md border bg-secondary/50 hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground"
+              title={lang === "en" ? "Switch to Amharic" : "Switch to English"}
+            >
+              {lang === "en" ? "አማ" : "EN"}
+            </button>
+
             {isLoading ? (
               <Skeleton className="h-9 w-24" />
             ) : !isError && user ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <div className="hidden sm:flex items-center gap-2 bg-secondary/50 px-3 py-1.5 rounded-full border">
                   <Wallet className="w-4 h-4 text-warning" />
                   <span className="font-semibold text-sm">{user.walletBalance} ETB</span>
@@ -132,18 +131,18 @@ export function Navbar() {
                     <div className="flex items-center justify-start gap-2 p-2">
                       <div className="flex flex-col space-y-1 leading-none">
                         <p className="font-medium text-sm truncate">{user.email}</p>
-                        <p className="text-xs text-muted-foreground">Wallet: {user.walletBalance} ETB</p>
+                        <p className="text-xs text-muted-foreground">{t("nav_wallet")}: {user.walletBalance} ETB</p>
                       </div>
                     </div>
                     <DropdownMenuItem asChild>
                       <Link href="/profile" className="cursor-pointer flex items-center w-full">
                         <User className="mr-2 h-4 w-4" />
-                        <span>Profile & History</span>
+                        <span>{t("nav_profile")}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer">
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
+                      <span>{t("nav_logout")}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -151,10 +150,10 @@ export function Navbar() {
             ) : (
               <div className="flex items-center gap-2">
                 <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground px-3 py-2">
-                  Sign In
+                  {t("nav_signin")}
                 </Link>
                 <Link href="/register" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2">
-                  Get Started
+                  {t("nav_get_started")}
                 </Link>
               </div>
             )}
@@ -165,24 +164,20 @@ export function Navbar() {
       <Dialog open={showAdminDialog} onOpenChange={(open) => { setShowAdminDialog(open); setAdminPassword(""); }}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>Admin Access</DialogTitle>
-            <DialogDescription>Enter the admin password to continue.</DialogDescription>
+            <DialogTitle>{t("nav_admin_title")}</DialogTitle>
+            <DialogDescription>{t("nav_admin_desc")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <Input
               type="password"
-              placeholder="Admin password"
+              placeholder={t("nav_admin_placeholder")}
               value={adminPassword}
               onChange={(e) => setAdminPassword(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") handleAdminLogin(); }}
               autoFocus
             />
-            <Button
-              className="w-full"
-              onClick={handleAdminLogin}
-              disabled={verifyPassword.isPending || !adminPassword}
-            >
-              {verifyPassword.isPending ? "Checking..." : "Enter Admin Panel"}
+            <Button className="w-full" onClick={handleAdminLogin} disabled={verifyPassword.isPending || !adminPassword}>
+              {verifyPassword.isPending ? t("nav_admin_checking") : t("nav_admin_enter")}
             </Button>
           </div>
         </DialogContent>

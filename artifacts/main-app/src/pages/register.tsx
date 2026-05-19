@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { Layout } from "@/components/layout";
+import { useLanguage } from "@/lib/i18n";
 
 const registerSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -21,6 +22,7 @@ export default function Register() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const registerMutation = useRegister();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -30,10 +32,7 @@ export default function Register() {
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: { email: "", password: "" },
   });
 
   const onSubmit = (data: z.infer<typeof registerSchema>) => {
@@ -41,15 +40,12 @@ export default function Register() {
       { data },
       {
         onSuccess: () => {
-          toast({
-            title: "Account created!",
-            description: "You have successfully registered.",
-          });
+          toast({ title: t("register_success_title"), description: t("register_success_desc") });
           setLocation("/dashboard");
         },
         onError: (error) => {
           toast({
-            title: "Registration failed",
+            title: t("register_error_title"),
             description: (error as { error?: string })?.error || "An error occurred during registration.",
             variant: "destructive",
           });
@@ -63,10 +59,8 @@ export default function Register() {
       <div className="flex flex-1 items-center justify-center p-4">
         <Card className="w-full max-w-md shadow-lg border-primary/20">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-3xl font-bold tracking-tight text-primary">Create an account</CardTitle>
-            <CardDescription className="text-muted-foreground">
-              Join MailTrade to start earning today
-            </CardDescription>
+            <CardTitle className="text-3xl font-bold tracking-tight text-primary">{t("register_title")}</CardTitle>
+            <CardDescription className="text-muted-foreground">{t("register_subtitle")}</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -76,7 +70,7 @@ export default function Register() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t("register_email")}</FormLabel>
                       <FormControl>
                         <Input placeholder="name@example.com" type="email" {...field} />
                       </FormControl>
@@ -89,7 +83,7 @@ export default function Register() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel>{t("register_password")}</FormLabel>
                       <FormControl>
                         <Input placeholder="••••••••" type="password" {...field} />
                       </FormControl>
@@ -98,15 +92,15 @@ export default function Register() {
                   )}
                 />
                 <Button type="submit" className="w-full mt-4" disabled={registerMutation.isPending}>
-                  {registerMutation.isPending ? "Creating account..." : "Sign up"}
+                  {registerMutation.isPending ? t("register_creating") : t("register_submit")}
                 </Button>
               </form>
             </Form>
-            
+
             <div className="mt-6 text-center text-sm">
-              <span className="text-muted-foreground">Already have an account? </span>
+              <span className="text-muted-foreground">{t("register_have_account")} </span>
               <Link href="/login" className="text-primary hover:underline font-medium">
-                Sign in
+                {t("register_signin")}
               </Link>
             </div>
           </CardContent>

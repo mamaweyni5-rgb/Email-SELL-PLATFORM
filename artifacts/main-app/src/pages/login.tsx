@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { Layout } from "@/components/layout";
+import { useLanguage } from "@/lib/i18n";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -21,6 +22,7 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const loginMutation = useLogin();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -30,10 +32,7 @@ export default function Login() {
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: { email: "", password: "" },
   });
 
   const onSubmit = (data: z.infer<typeof loginSchema>) => {
@@ -41,16 +40,13 @@ export default function Login() {
       { data },
       {
         onSuccess: () => {
-          toast({
-            title: "Welcome back!",
-            description: "You have successfully logged in.",
-          });
+          toast({ title: t("login_success_title"), description: t("login_success_desc") });
           setLocation("/dashboard");
         },
         onError: (error) => {
           toast({
-            title: "Login failed",
-            description: (error as { error?: string })?.error || "Please check your credentials and try again.",
+            title: t("login_error_title"),
+            description: (error as { error?: string })?.error || t("login_error_desc"),
             variant: "destructive",
           });
         },
@@ -63,10 +59,8 @@ export default function Login() {
       <div className="flex flex-1 items-center justify-center p-4">
         <Card className="w-full max-w-md shadow-lg border-primary/20">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-3xl font-bold tracking-tight text-primary">Welcome back</CardTitle>
-            <CardDescription className="text-muted-foreground">
-              Sign in to your MailTrade account
-            </CardDescription>
+            <CardTitle className="text-3xl font-bold tracking-tight text-primary">{t("login_title")}</CardTitle>
+            <CardDescription className="text-muted-foreground">{t("login_subtitle")}</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -76,7 +70,7 @@ export default function Login() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t("login_email")}</FormLabel>
                       <FormControl>
                         <Input placeholder="name@example.com" type="email" {...field} />
                       </FormControl>
@@ -89,7 +83,7 @@ export default function Login() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel>{t("login_password")}</FormLabel>
                       <FormControl>
                         <Input placeholder="••••••••" type="password" {...field} />
                       </FormControl>
@@ -98,15 +92,15 @@ export default function Login() {
                   )}
                 />
                 <Button type="submit" className="w-full mt-4" disabled={loginMutation.isPending}>
-                  {loginMutation.isPending ? "Signing in..." : "Sign in"}
+                  {loginMutation.isPending ? t("login_signing") : t("login_submit")}
                 </Button>
               </form>
             </Form>
-            
+
             <div className="mt-6 text-center text-sm">
-              <span className="text-muted-foreground">Don't have an account? </span>
+              <span className="text-muted-foreground">{t("login_no_account")} </span>
               <Link href="/register" className="text-primary hover:underline font-medium">
-                Create one
+                {t("login_create")}
               </Link>
             </div>
           </CardContent>

@@ -13,6 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { Wallet, Phone, User, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 const withdrawSchema = z.object({
   amount: z.coerce.number().min(1, "Amount must be at least 1 ETB"),
@@ -28,6 +29,7 @@ export default function Withdraw() {
   const [success, setSuccess] = useState(false);
   const { toast } = useToast();
   const createWithdrawal = useCreateWithdrawal();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!authLoading && !user) setLocation("/login");
@@ -41,7 +43,7 @@ export default function Withdraw() {
   const onSubmit = (values: z.infer<typeof withdrawSchema>) => {
     const balance = profile?.walletBalance ?? 0;
     if (values.amount > balance) {
-      form.setError("amount", { message: `Cannot exceed your balance of ${balance} ETB` });
+      form.setError("amount", { message: `${t("wd_error_exceed")} ${balance} ETB` });
       return;
     }
     setSuccess(false);
@@ -54,7 +56,7 @@ export default function Withdraw() {
           queryClient.invalidateQueries({ queryKey: getListWithdrawalsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetProfileQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetMeQueryKey() });
-          toast({ title: "Request submitted!", description: "Admin will process your Telebirr payment." });
+          toast({ title: t("wd_toast_title"), description: t("wd_toast_desc") });
         },
         onError: (err) => {
           const message = (err as { error?: string })?.error ?? "Failed to request withdrawal.";
@@ -70,13 +72,13 @@ export default function Withdraw() {
     <Layout>
       <div className="container mx-auto px-4 py-10 max-w-lg">
         <Link href="/dashboard" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
-          <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+          <ArrowLeft className="h-4 w-4" /> {t("wd_back")}
         </Link>
 
         <div className="mb-6">
-          <h1 className="text-2xl font-bold tracking-tight">Withdraw Funds</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{t("wd_title")}</h1>
           <p className="text-muted-foreground mt-1">
-            Available balance:{" "}
+            {t("wd_balance_label")}{" "}
             <span className="font-bold text-blue-600">{profile?.walletBalance ?? 0} ETB</span>
           </p>
         </div>
@@ -84,16 +86,14 @@ export default function Withdraw() {
         {success && (
           <Alert className="mb-6 border-green-200 bg-green-50 text-green-800">
             <CheckCircle2 className="h-4 w-4 text-green-600" />
-            <AlertDescription>
-              Withdrawal request submitted! Admin will send payment to your Telebirr account.
-            </AlertDescription>
+            <AlertDescription>{t("wd_success_desc")}</AlertDescription>
           </Alert>
         )}
 
         <Card className="border-none shadow-md">
           <CardHeader>
-            <CardTitle className="text-base">Telebirr Payment Info</CardTitle>
-            <CardDescription>Enter the Telebirr account you want to receive payment on.</CardDescription>
+            <CardTitle className="text-base">{t("wd_card_title")}</CardTitle>
+            <CardDescription>{t("wd_card_desc")}</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -103,11 +103,11 @@ export default function Withdraw() {
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Amount (ETB)</FormLabel>
+                      <FormLabel>{t("wd_amount_label")}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Wallet className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input className="pl-9" type="number" min={1} placeholder="Enter amount" data-testid="input-amount" {...field} />
+                          <Input className="pl-9" type="number" min={1} placeholder={t("wd_amount_placeholder")} data-testid="input-amount" {...field} />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -119,11 +119,11 @@ export default function Withdraw() {
                   name="telebirrNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Telebirr Number</FormLabel>
+                      <FormLabel>{t("wd_telebirr_label")}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input className="pl-9" placeholder="09XXXXXXXX" data-testid="input-telebirr-number" {...field} />
+                          <Input className="pl-9" placeholder={t("wd_telebirr_placeholder")} data-testid="input-telebirr-number" {...field} />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -135,11 +135,11 @@ export default function Withdraw() {
                   name="telebirrName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Account Holder Name</FormLabel>
+                      <FormLabel>{t("wd_name_label")}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input className="pl-9" placeholder="Full name on Telebirr" data-testid="input-telebirr-name" {...field} />
+                          <Input className="pl-9" placeholder={t("wd_name_placeholder")} data-testid="input-telebirr-name" {...field} />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -153,13 +153,13 @@ export default function Withdraw() {
                   data-testid="button-withdraw"
                 >
                   {createWithdrawal.isPending ? (
-                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</>
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t("wd_submitting")}</>
                   ) : (
-                    "Request Withdrawal"
+                    t("wd_btn")
                   )}
                 </Button>
                 {(profile?.walletBalance ?? 0) === 0 && (
-                  <p className="text-xs text-muted-foreground text-center">You need an approved submission before withdrawing.</p>
+                  <p className="text-xs text-muted-foreground text-center">{t("wd_no_balance")}</p>
                 )}
               </form>
             </Form>
