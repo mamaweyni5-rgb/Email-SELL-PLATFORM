@@ -147,6 +147,21 @@ const translations = {
     status_rejected: "Rejected",
     status_pending: "Pending",
     status_completed: "Completed",
+
+    // Referral
+    referral_card_title: "Earn Commission by Referring Friends",
+    referral_card_desc: "Share your referral link. Every time a friend's submission gets approved, you earn a commission.",
+    referral_code_label: "Your Referral Code",
+    referral_link_label: "Your Referral Link",
+    referral_copy: "Copy Link",
+    referral_copied: "Copied!",
+    referral_friends: "Friends Referred",
+    referral_earned: "Total Commission Earned",
+    referral_how: "How it works: your friend registers with your link → submits a Gmail account → gets approved → you earn commission automatically.",
+
+    // Register referral
+    register_ref_label: "Referral Code (optional)",
+    register_ref_placeholder: "e.g. ABC12345",
   },
 
   am: {
@@ -293,6 +308,21 @@ const translations = {
     status_rejected: "ተቀባይነት አላገኘም",
     status_pending: "በጥበቃ ላይ",
     status_completed: "ተጠናቋል",
+
+    // Referral
+    referral_card_title: "ጓደኞቸን ጋብዘህ ኮሚሽን ተቀበል",
+    referral_card_desc: "ሊንክህን አጋራ። ጓደኛህ ያቀረበ Gmail ሲጸድቅ ኮሚሽን ታገኛለህ።",
+    referral_code_label: "የምልክት ኮድህ",
+    referral_link_label: "የጋብዘ ሊንክህ",
+    referral_copy: "ሊንክ ቅዳ",
+    referral_copied: "ተቀድቷል!",
+    referral_friends: "የጋበዟቸው ሰዎች",
+    referral_earned: "ጠቅላላ ኮሚሽን",
+    referral_how: "እንዴት ይሰራል: ጓደኛህ ሊንክህ ተጠቅሞ ይመዘገባል → Gmail ያቀርባል → ሲጸድቅ → ኮሚሽን ወዲያው ወደ ቦርሳህ ይገባል።",
+
+    // Register referral
+    register_ref_label: "የምልክት ኮድ (አስፈላጊ ካልሆነ ይተው)",
+    register_ref_placeholder: "ምሳሌ ABC12345",
   },
 } as const;
 

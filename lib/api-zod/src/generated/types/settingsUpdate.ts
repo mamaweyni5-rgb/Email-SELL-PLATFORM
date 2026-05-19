@@ -9,4 +9,9 @@
 export interface SettingsUpdate {
   /** @minimum 1 */
   pricePerEmail: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  referralCommissionPct: number;
 }

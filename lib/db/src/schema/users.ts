@@ -5,6 +5,9 @@ export const usersTable = pgTable("users", {
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   walletBalance: integer("wallet_balance").notNull().default(0),
+  referralCode: text("referral_code").unique(),
+  referredBy: integer("referred_by"),
+  commissionEarned: integer("commission_earned").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

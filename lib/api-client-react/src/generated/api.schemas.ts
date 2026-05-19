@@ -32,6 +32,7 @@ export interface UserInput {
   email: string;
   /** @minLength 6 */
   password: string;
+  referralCode?: string;
 }
 
 export interface LoginInput {
@@ -179,11 +180,23 @@ export interface AdminStats {
 
 export interface PlatformSettings {
   pricePerEmail: number;
+  referralCommissionPct: number;
 }
 
 export interface SettingsUpdate {
   /** @minimum 1 */
   pricePerEmail: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  referralCommissionPct: number;
+}
+
+export interface ReferralInfo {
+  referralCode: string;
+  referralCount: number;
+  commissionEarned: number;
 }
 
 export interface AdminVerifyPasswordInput {

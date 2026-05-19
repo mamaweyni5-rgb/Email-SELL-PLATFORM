@@ -252,6 +252,25 @@ paths:
               schema:
                 $ref: "#/components/schemas/PlatformSettings"
 
+  /referral:
+    get:
+      operationId: getReferralInfo
+      tags: [profile]
+      summary: Get current user referral code and stats
+      responses:
+        "200":
+          description: Referral info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReferralInfo"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /admin/submissions:
     get:
       operationId: adminListSubmissions
@@ -489,6 +508,8 @@ components:
         password:
           type: string
           minLength: 6
+        referralCode:
+          type: string
 
     LoginInput:
       type: object
@@ -668,18 +689,35 @@ components:
 
     PlatformSettings:
       type: object
-      required: [pricePerEmail]
+      required: [pricePerEmail, referralCommissionPct]
       properties:
         pricePerEmail:
+          type: integer
+        referralCommissionPct:
           type: integer
 
     SettingsUpdate:
       type: object
-      required: [pricePerEmail]
+      required: [pricePerEmail, referralCommissionPct]
       properties:
         pricePerEmail:
           type: integer
           minimum: 1
+        referralCommissionPct:
+          type: integer
+          minimum: 0
+          maximum: 100
+
+    ReferralInfo:
+      type: object
+      required: [referralCode, referralCount, commissionEarned]
+      properties:
+        referralCode:
+          type: string
+        referralCount:
+          type: integer
+        commissionEarned:
+          type: integer
 
     AdminVerifyPasswordInput:
       type: object

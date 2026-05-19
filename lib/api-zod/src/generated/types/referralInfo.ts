@@ -6,7 +6,8 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export interface PlatformSettings {
-  pricePerEmail: number;
-  referralCommissionPct: number;
+export interface ReferralInfo {
+  referralCode: string;
+  referralCount: number;
+  commissionEarned: number;
 }

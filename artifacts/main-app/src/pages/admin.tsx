@@ -44,6 +44,7 @@ import {
 
 const priceSchema = z.object({
   pricePerEmail: z.coerce.number().min(1, "Price must be at least 1 ETB"),
+  referralCommissionPct: z.coerce.number().min(0, "Min 0%").max(100, "Max 100%"),
 });
 
 const changePasswordSchema = z.object({
@@ -348,7 +349,7 @@ function SettingsTab() {
 
   const priceForm = useForm<z.infer<typeof priceSchema>>({
     resolver: zodResolver(priceSchema),
-    defaultValues: { pricePerEmail: 20 },
+    defaultValues: { pricePerEmail: 20, referralCommissionPct: 10 },
   });
 
   const pwForm = useForm<z.infer<typeof changePasswordSchema>>({
@@ -358,12 +359,13 @@ function SettingsTab() {
 
   const onPriceSubmit = (values: z.infer<typeof priceSchema>) => {
     updateSettings.mutate(
-      { data: { pricePerEmail: values.pricePerEmail } },
+      { data: { pricePerEmail: values.pricePerEmail, referralCommissionPct: values.referralCommissionPct } },
       {
         onSuccess: (data) => {
           queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
           priceForm.setValue("pricePerEmail", data.pricePerEmail);
-          toast({ title: "Settings saved", description: `Price updated to ${data.pricePerEmail} ETB per email.` });
+          priceForm.setValue("referralCommissionPct", data.referralCommissionPct);
+          toast({ title: "Settings saved", description: `Price: ${data.pricePerEmail} ETB | Commission: ${data.referralCommissionPct}%` });
         },
         onError: () => {
           toast({ title: "Error", description: "Failed to save settings.", variant: "destructive" });
@@ -424,11 +426,35 @@ function SettingsTab() {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={priceForm.control}
+                name="referralCommissionPct"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Referral Commission (%)</FormLabel>
+                    <FormControl>
+                      <div className="flex gap-2">
+                        <Input
+                          type="number"
+                          min={0}
+                          max={100}
+                          placeholder="10"
+                          {...field}
+                        />
+                        <span className="flex items-center text-sm text-muted-foreground px-3 border rounded-md bg-muted">
+                          %
+                        </span>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <Button type="submit" disabled={updateSettings.isPending} data-testid="button-save-settings">
                 {updateSettings.isPending ? (
                   <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</>
                 ) : (
-                  "Save Price"
+                  "Save Settings"
                 )}
               </Button>
             </form>

@@ -6,6 +6,7 @@ import submissionsRouter from "./submissions";
 import withdrawalsRouter from "./withdrawals";
 import settingsRouter from "./settings";
 import adminRouter from "./admin";
+import referralRouter from "./referral";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(submissionsRouter);
 router.use(withdrawalsRouter);
 router.use(settingsRouter);
 router.use(adminRouter);
+router.use(referralRouter);
 
 export default router;

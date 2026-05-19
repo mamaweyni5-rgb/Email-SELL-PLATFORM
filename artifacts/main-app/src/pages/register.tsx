@@ -15,6 +15,7 @@ import { useLanguage } from "@/lib/i18n";
 const registerSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  referralCode: z.string().optional(),
 });
 
 export default function Register() {
@@ -24,6 +25,9 @@ export default function Register() {
   const registerMutation = useRegister();
   const { t } = useLanguage();
 
+  const urlParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+  const refFromUrl = urlParams.get("ref") ?? "";
+
   useEffect(() => {
     if (!isLoading && user) {
       setLocation("/dashboard");
@@ -32,12 +36,12 @@ export default function Register() {
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: "", password: "", referralCode: refFromUrl },
   });
 
   const onSubmit = (data: z.infer<typeof registerSchema>) => {
     registerMutation.mutate(
-      { data },
+      { data: { email: data.email, password: data.password, referralCode: data.referralCode || undefined } },
       {
         onSuccess: () => {
           toast({ title: t("register_success_title"), description: t("register_success_desc") });
@@ -86,6 +90,24 @@ export default function Register() {
                       <FormLabel>{t("register_password")}</FormLabel>
                       <FormControl>
                         <Input placeholder="••••••••" type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="referralCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("register_ref_label")}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t("register_ref_placeholder")}
+                          {...field}
+                          className="uppercase"
+                          onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

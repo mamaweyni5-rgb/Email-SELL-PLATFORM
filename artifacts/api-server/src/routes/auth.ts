@@ -6,6 +6,10 @@ import { RegisterBody, LoginBody, LoginResponse, GetMeResponse } from "@workspac
 
 const router: IRouter = Router();
 
+function generateReferralCode(): string {
+  return Math.random().toString(36).substring(2, 10).toUpperCase();
+}
+
 router.post("/auth/register", async (req, res): Promise<void> => {
   const parsed = RegisterBody.safeParse(req.body);
   if (!parsed.success) {
@@ -13,7 +17,7 @@ router.post("/auth/register", async (req, res): Promise<void> => {
     return;
   }
 
-  const { email, password } = parsed.data;
+  const { email, password, referralCode: inputCode } = parsed.data;
 
   const existing = await db
     .select({ id: usersTable.id })
@@ -25,15 +29,43 @@ router.post("/auth/register", async (req, res): Promise<void> => {
     return;
   }
 
+  let referrerId: number | null = null;
+  if (inputCode) {
+    const [referrer] = await db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.referralCode, inputCode.toUpperCase()));
+    if (referrer) {
+      referrerId = referrer.id;
+    }
+  }
+
   const passwordHash = await bcrypt.hash(password, 10);
+
+  let newCode = generateReferralCode();
+  let attempts = 0;
+  while (attempts < 5) {
+    const conflict = await db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.referralCode, newCode));
+    if (conflict.length === 0) break;
+    newCode = generateReferralCode();
+    attempts++;
+  }
 
   const [user] = await db
     .insert(usersTable)
-    .values({ email: email.toLowerCase(), passwordHash })
+    .values({
+      email: email.toLowerCase(),
+      passwordHash,
+      referralCode: newCode,
+      referredBy: referrerId ?? undefined,
+    })
     .returning({ id: usersTable.id, email: usersTable.email, walletBalance: usersTable.walletBalance });
 
   req.session.userId = user.id;
-  req.log.info({ userId: user.id }, "User registered");
+  req.log.info({ userId: user.id, referrerId }, "User registered");
   res.status(201).json(LoginResponse.parse(user));
 });
 

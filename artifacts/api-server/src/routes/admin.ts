@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { eq, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { db, usersTable, submissionsTable, withdrawalsTable, settingsTable } from "@workspace/db";
+import { getSettingValue } from "./settings";
 import {
   AdminListSubmissionsResponse,
   AdminUpdateSubmissionParams,
@@ -84,6 +85,26 @@ router.patch("/admin/submissions/:id", async (req, res): Promise<void> => {
       .update(usersTable)
       .set({ walletBalance: sql`${usersTable.walletBalance} + ${existing.pricePaid}` })
       .where(eq(usersTable.id, existing.userId));
+
+    const [submitter] = await db
+      .select({ referredBy: usersTable.referredBy })
+      .from(usersTable)
+      .where(eq(usersTable.id, existing.userId));
+
+    if (submitter?.referredBy) {
+      const commissionPct = await getSettingValue("referral_commission_pct", 10);
+      const commission = Math.floor(existing.pricePaid * commissionPct / 100);
+      if (commission > 0) {
+        await db
+          .update(usersTable)
+          .set({
+            walletBalance: sql`${usersTable.walletBalance} + ${commission}`,
+            commissionEarned: sql`${usersTable.commissionEarned} + ${commission}`,
+          })
+          .where(eq(usersTable.id, submitter.referredBy));
+        req.log.info({ referrerId: submitter.referredBy, commission }, "Referral commission paid");
+      }
+    }
   }
 
   if (status === "rejected" && existing.status === "approved") {
@@ -264,15 +285,20 @@ router.patch("/admin/settings", async (req, res): Promise<void> => {
     return;
   }
 
-  const { pricePerEmail } = body.data;
+  const { pricePerEmail, referralCommissionPct } = body.data;
 
   await db
     .insert(settingsTable)
     .values({ key: "price_per_email", value: String(pricePerEmail) })
     .onConflictDoUpdate({ target: settingsTable.key, set: { value: String(pricePerEmail) } });
 
-  req.log.info({ pricePerEmail }, "Settings updated");
-  res.json(AdminUpdateSettingsResponse.parse({ pricePerEmail }));
+  await db
+    .insert(settingsTable)
+    .values({ key: "referral_commission_pct", value: String(referralCommissionPct) })
+    .onConflictDoUpdate({ target: settingsTable.key, set: { value: String(referralCommissionPct) } });
+
+  req.log.info({ pricePerEmail, referralCommissionPct }, "Settings updated");
+  res.json(AdminUpdateSettingsResponse.parse({ pricePerEmail, referralCommissionPct }));
 });
 
 router.post("/admin/verify-password", async (req, res): Promise<void> => {

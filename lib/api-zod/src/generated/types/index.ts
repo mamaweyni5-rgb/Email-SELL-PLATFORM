@@ -20,6 +20,7 @@ export * from './errorResponse';
 export * from './healthStatus';
 export * from './loginInput';
 export * from './platformSettings';
+export * from './referralInfo';
 export * from './settingsUpdate';
 export * from './submission';
 export * from './submissionInput';

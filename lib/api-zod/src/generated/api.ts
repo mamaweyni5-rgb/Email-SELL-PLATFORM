@@ -25,7 +25,8 @@ export const registerBodyPasswordMin = 6;
 
 export const RegisterBody = zod.object({
   "email": zod.string().email(),
-  "password": zod.string().min(registerBodyPasswordMin)
+  "password": zod.string().min(registerBodyPasswordMin),
+  "referralCode": zod.string().optional()
 })
 
 
@@ -127,7 +128,18 @@ export const CreateWithdrawalBody = zod.object({
  * @summary Get current platform settings (e.g. price per email)
  */
 export const GetSettingsResponse = zod.object({
-  "pricePerEmail": zod.number()
+  "pricePerEmail": zod.number(),
+  "referralCommissionPct": zod.number()
+})
+
+
+/**
+ * @summary Get current user referral code and stats
+ */
+export const GetReferralInfoResponse = zod.object({
+  "referralCode": zod.string(),
+  "referralCount": zod.number(),
+  "commissionEarned": zod.number()
 })
 
 
@@ -244,14 +256,19 @@ export const AdminGetStatsResponse = zod.object({
  * @summary Update platform settings (price per email etc.)
  */
 
+export const adminUpdateSettingsBodyReferralCommissionPctMin = 0;
+export const adminUpdateSettingsBodyReferralCommissionPctMax = 100;
+
 
 
 export const AdminUpdateSettingsBody = zod.object({
-  "pricePerEmail": zod.number().min(1)
+  "pricePerEmail": zod.number().min(1),
+  "referralCommissionPct": zod.number().min(adminUpdateSettingsBodyReferralCommissionPctMin).max(adminUpdateSettingsBodyReferralCommissionPctMax)
 })
 
 export const AdminUpdateSettingsResponse = zod.object({
-  "pricePerEmail": zod.number()
+  "pricePerEmail": zod.number(),
+  "referralCommissionPct": zod.number()
 })
 
 

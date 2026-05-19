@@ -10,4 +10,5 @@ export interface UserInput {
   email: string;
   /** @minLength 6 */
   password: string;
+  referralCode?: string;
 }

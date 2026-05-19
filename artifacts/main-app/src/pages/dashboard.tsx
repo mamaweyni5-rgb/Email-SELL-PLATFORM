@@ -1,12 +1,13 @@
-import { useGetMe, useGetProfile, useListSubmissions, useListWithdrawals } from "@workspace/api-client-react";
+import { useGetMe, useGetProfile, useListSubmissions, useListWithdrawals, useGetReferralInfo } from "@workspace/api-client-react";
 import { Link, useLocation } from "wouter";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Layout } from "@/components/layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Mail, Wallet, Clock, CheckCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ArrowRight, Mail, Wallet, Clock, CheckCircle, Users, Gift, Copy, Check } from "lucide-react";
 import { format } from "date-fns";
 import { useLanguage } from "@/lib/i18n";
 
@@ -14,6 +15,7 @@ export default function Dashboard() {
   const { data: user, isLoading: authLoading, isError } = useGetMe({ query: { retry: false } });
   const [, setLocation] = useLocation();
   const { t } = useLanguage();
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!authLoading && (isError || !user)) {
@@ -24,6 +26,19 @@ export default function Dashboard() {
   const { data: profile, isLoading: profileLoading } = useGetProfile({ query: { enabled: !!user, retry: false } });
   const { data: submissions, isLoading: submissionsLoading } = useListSubmissions({ query: { enabled: !!user, retry: false } });
   const { data: withdrawals, isLoading: withdrawalsLoading } = useListWithdrawals({ query: { enabled: !!user, retry: false } });
+  const { data: referral } = useGetReferralInfo({ query: { enabled: !!user, retry: false } });
+
+  const referralLink = referral?.referralCode
+    ? `${window.location.origin}/register?ref=${referral.referralCode}`
+    : "";
+
+  const handleCopy = () => {
+    if (!referralLink) return;
+    navigator.clipboard.writeText(referralLink).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   const statusClass = (status: string) =>
     status === "approved" || status === "completed"
@@ -114,6 +129,53 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {referral && (
+          <Card className="mb-8 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Gift className="h-5 w-5 text-primary" />
+                {t("referral_card_title")}
+              </CardTitle>
+              <CardDescription>{t("referral_card_desc")}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="bg-muted/50 rounded-lg p-3 text-center">
+                  <div className="flex items-center justify-center gap-1 text-muted-foreground text-xs mb-1">
+                    <Users className="h-3 w-3" />
+                    {t("referral_friends")}
+                  </div>
+                  <div className="text-2xl font-bold text-primary">{referral.referralCount ?? 0}</div>
+                </div>
+                <div className="bg-muted/50 rounded-lg p-3 text-center">
+                  <div className="flex items-center justify-center gap-1 text-muted-foreground text-xs mb-1">
+                    <Wallet className="h-3 w-3" />
+                    {t("referral_earned")}
+                  </div>
+                  <div className="text-2xl font-bold text-primary">{referral.commissionEarned ?? 0} ETB</div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-muted-foreground">{t("referral_link_label")}</label>
+                <div className="flex gap-2">
+                  <Input
+                    value={referralLink}
+                    readOnly
+                    className="text-xs font-mono bg-muted/50 cursor-text"
+                  />
+                  <Button variant="outline" size="sm" onClick={handleCopy} className="shrink-0 gap-1.5">
+                    {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
+                    {copied ? t("referral_copied") : t("referral_copy")}
+                  </Button>
+                </div>
+              </div>
+
+              <p className="text-xs text-muted-foreground">{t("referral_how")}</p>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="grid md:grid-cols-2 gap-8">
           <div className="space-y-4">

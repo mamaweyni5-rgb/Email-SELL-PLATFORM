@@ -5,14 +5,18 @@ import { GetSettingsResponse } from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
-router.get("/settings", async (_req, res): Promise<void> => {
-  const [setting] = await db
+export async function getSettingValue(key: string, defaultVal: number): Promise<number> {
+  const [row] = await db
     .select({ value: settingsTable.value })
     .from(settingsTable)
-    .where(eq(settingsTable.key, "price_per_email"));
+    .where(eq(settingsTable.key, key));
+  return row ? parseInt(row.value, 10) : defaultVal;
+}
 
-  const pricePerEmail = setting ? parseInt(setting.value, 10) : 20;
-  res.json(GetSettingsResponse.parse({ pricePerEmail }));
+router.get("/settings", async (_req, res): Promise<void> => {
+  const pricePerEmail = await getSettingValue("price_per_email", 20);
+  const referralCommissionPct = await getSettingValue("referral_commission_pct", 10);
+  res.json(GetSettingsResponse.parse({ pricePerEmail, referralCommissionPct }));
 });
 
 export default router;
