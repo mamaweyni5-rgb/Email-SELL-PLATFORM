@@ -21,7 +21,7 @@ import {
   AdminChangePasswordBody,
 } from "@workspace/api-zod";
 
-const DEFAULT_ADMIN_PASSWORD = "mailtrade@admin2024";
+const DEFAULT_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "mailtrade@admin2024";
 
 async function getAdminPasswordHash(): Promise<string> {
   const [row] = await db
