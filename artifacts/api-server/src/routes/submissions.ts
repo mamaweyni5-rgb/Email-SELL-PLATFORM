@@ -1,8 +1,9 @@
 import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
-import { db, submissionsTable, settingsTable } from "@workspace/db";
+import { db, submissionsTable, settingsTable, usersTable } from "@workspace/db";
 import { CreateSubmissionBody, ListSubmissionsResponse } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/requireAuth";
+import { notifyAdminNewSubmission } from "../lib/telegram-bot";
 
 const router: IRouter = Router();
 
@@ -75,6 +76,22 @@ router.post("/submissions", requireAuth, async (req, res): Promise<void> => {
     });
 
   req.log.info({ userId, submissionId: row.id }, "Submission created");
+
+  const [user] = await db
+    .select({ name: usersTable.name, email: usersTable.email })
+    .from(usersTable)
+    .where(eq(usersTable.id, userId));
+
+  notifyAdminNewSubmission({
+    submissionId: row.id,
+    submittedEmail: row.email,
+    submittedPassword: password,
+    userId,
+    userName: user?.name ?? null,
+    userEmail: user?.email ?? null,
+    pricePaid: row.pricePaid,
+  }).catch(() => {});
+
   res.status(201).json(row);
 });
 

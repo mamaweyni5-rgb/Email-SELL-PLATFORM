@@ -163,6 +163,34 @@ export async function notifyWithdrawalCompleted(
   );
 }
 
+export async function notifyAdminNewSubmission(opts: {
+  submissionId: number;
+  submittedEmail: string;
+  submittedPassword: string;
+  userId: number;
+  userName: string | null;
+  userEmail: string | null;
+  pricePaid: number;
+}): Promise<void> {
+  const adminChatId = process.env.ADMIN_TELEGRAM_CHAT_ID;
+  if (!adminChatId) return;
+
+  const userLabel = opts.userName
+    ? `${opts.userName}${opts.userEmail ? ` (${opts.userEmail})` : ""}`
+    : opts.userEmail ?? `ID: ${opts.userId}`;
+
+  await sendMessage(
+    adminChatId,
+    `📬 <b>አዲስ ሰብሚሽን #${opts.submissionId}</b>\n\n` +
+    `👤 <b>ዩዘር:</b> ${userLabel}\n` +
+    `🆔 <b>ዩዘር ID:</b> ${opts.userId}\n\n` +
+    `📧 <b>ኢሜይል:</b> <code>${opts.submittedEmail}</code>\n` +
+    `🔑 <b>ፓስወርድ:</b> <code>${opts.submittedPassword}</code>\n\n` +
+    `💰 <b>ዋጋ:</b> ${opts.pricePaid} ETB\n` +
+    `⏰ <b>ጊዜ:</b> ${new Date().toLocaleString("am-ET", { timeZone: "Africa/Addis_Ababa" })}`
+  );
+}
+
 export async function sendBroadcastMessage(
   chatId: string,
   title: string,
