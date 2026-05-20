@@ -16,14 +16,15 @@ COPY tsconfig.json ./
 RUN sed -i 's/minimumReleaseAge: 1440/minimumReleaseAge: 0/' pnpm-workspace.yaml && \
     pnpm install --frozen-lockfile
 
-RUN echo "=== ENV ===" && node --version && pnpm --version && uname -a && \
-    echo "=== NATIVE BINARY CHECK ===" && \
-    node -e "try { require('@rollup/rollup-linux-x64-gnu'); console.log('rollup: OK'); } catch(e) { console.error('rollup FAIL:', e.message); }" && \
-    node -e "try { require('@tailwindcss/oxide-linux-x64-gnu'); console.log('oxide: OK'); } catch(e) { console.error('oxide FAIL:', e.message); }" && \
-    node -e "try { require('lightningcss-linux-x64-gnu'); console.log('lightningcss: OK'); } catch(e) { console.error('lightningcss FAIL:', e.message); }" && \
-    node -e "try { require('esbuild'); console.log('esbuild: OK'); } catch(e) { console.error('esbuild FAIL:', e.message); }" && \
-    echo "=== STARTING VITE BUILD ===" && \
-    pnpm --filter @workspace/main-app run build
+RUN node --version && pnpm --version && uname -a
+
+RUN node -e "require('@rollup/rollup-linux-x64-gnu'); console.log('rollup OK')"
+RUN node -e "require('@tailwindcss/oxide-linux-x64-gnu'); console.log('oxide OK')"
+RUN node -e "require('lightningcss-linux-x64-gnu'); console.log('lightningcss OK')"
+RUN node -e "require('esbuild'); console.log('esbuild OK')"
+
+RUN pnpm --filter @workspace/main-app run build > /tmp/vite-build.log 2>&1 || \
+    (echo "=== VITE BUILD FAILED - FULL OUTPUT ===" && cat /tmp/vite-build.log && exit 1)
 
 RUN pnpm --filter @workspace/api-server run build
 
