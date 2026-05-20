@@ -37,7 +37,25 @@ import {
   AlertCircle,
   Loader2,
   KeyRound,
+  FileDown,
 } from "lucide-react";
+
+function downloadCSV(filename: string, headers: string[], rows: (string | number)[][]) {
+  const escape = (v: string | number) => {
+    const s = String(v);
+    return s.includes(",") || s.includes('"') || s.includes("\n")
+      ? `"${s.replace(/"/g, '""')}"`
+      : s;
+  };
+  const csv = [headers, ...rows].map((r) => r.map(escape).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 const priceSchema = z.object({
   pricePerEmail: z.coerce.number().min(1, "Price must be at least 1 ETB"),
@@ -80,6 +98,23 @@ function SubmissionsTab() {
   const { data: submissions, isLoading } = useAdminListSubmissions();
   const updateSubmission = useAdminUpdateSubmission();
 
+  const handleExport = () => {
+    if (!submissions?.length) return;
+    downloadCSV(
+      `submissions-${new Date().toISOString().slice(0, 10)}.csv`,
+      ["ID", "Seller", "Email Account", "Password", "Price (ETB)", "Date", "Status"],
+      submissions.map((s) => [
+        s.id,
+        s.userEmail,
+        s.email,
+        s.password,
+        s.pricePaid,
+        format(new Date(s.createdAt), "yyyy-MM-dd HH:mm"),
+        s.status,
+      ]),
+    );
+  };
+
   const handleUpdate = (id: number, status: "approved" | "rejected") => {
     updateSubmission.mutate(
       { id, data: { status } },
@@ -107,6 +142,17 @@ function SubmissionsTab() {
   );
 
   return (
+    <div>
+      <div className="flex justify-end mb-3">
+        <button
+          onClick={handleExport}
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all"
+          style={{ background: "hsl(344,70%,18%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}
+        >
+          <FileDown className="h-3.5 w-3.5" />
+          Export CSV
+        </button>
+      </div>
     <div
       className="rounded-2xl overflow-hidden"
       style={{ border: "1px solid hsl(43,30%,24%,0.4)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}
@@ -165,6 +211,7 @@ function SubmissionsTab() {
         </TableBody>
       </Table>
     </div>
+    </div>
   );
 }
 
@@ -174,6 +221,24 @@ function WithdrawalsTab() {
   const [noteMap, setNoteMap] = useState<Record<number, string>>({});
   const { data: withdrawals, isLoading } = useAdminListWithdrawals();
   const updateWithdrawal = useAdminUpdateWithdrawal();
+
+  const handleExport = () => {
+    if (!withdrawals?.length) return;
+    downloadCSV(
+      `withdrawals-${new Date().toISOString().slice(0, 10)}.csv`,
+      ["ID", "User", "Telebirr Number", "Name", "Amount (ETB)", "Date", "Status", "Note"],
+      withdrawals.map((w) => [
+        w.id,
+        w.userEmail,
+        w.telebirrNumber,
+        w.telebirrName,
+        w.amount,
+        format(new Date(w.createdAt), "yyyy-MM-dd HH:mm"),
+        w.status,
+        w.adminNote ?? "",
+      ]),
+    );
+  };
 
   const handleUpdate = (id: number, status: "completed" | "rejected") => {
     updateWithdrawal.mutate(
@@ -202,6 +267,17 @@ function WithdrawalsTab() {
   );
 
   return (
+    <div>
+      <div className="flex justify-end mb-3">
+        <button
+          onClick={handleExport}
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all"
+          style={{ background: "hsl(344,70%,18%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}
+        >
+          <FileDown className="h-3.5 w-3.5" />
+          Export CSV
+        </button>
+      </div>
     <div
       className="rounded-2xl overflow-hidden"
       style={{ border: "1px solid hsl(43,30%,24%,0.4)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}
@@ -272,11 +348,28 @@ function WithdrawalsTab() {
         </TableBody>
       </Table>
     </div>
+    </div>
   );
 }
 
 function UsersTab() {
   const { data: users, isLoading } = useAdminListUsers();
+
+  const handleExport = () => {
+    if (!users?.length) return;
+    downloadCSV(
+      `users-${new Date().toISOString().slice(0, 10)}.csv`,
+      ["ID", "Email", "Wallet Balance (ETB)", "Total Submitted", "Approved", "Joined"],
+      users.map((u) => [
+        u.id,
+        u.email,
+        u.walletBalance,
+        u.totalSubmissions,
+        u.approvedSubmissions,
+        format(new Date(u.createdAt), "yyyy-MM-dd HH:mm"),
+      ]),
+    );
+  };
 
   if (isLoading) return (
     <div className="space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(344,65%,18%)" }} />)}</div>
@@ -290,32 +383,44 @@ function UsersTab() {
   );
 
   return (
-    <div
-      className="rounded-2xl overflow-hidden"
-      style={{ border: "1px solid hsl(43,30%,24%,0.4)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}
-    >
-      <Table>
-        <TableHeader>
-          <TableRow style={{ background: "hsl(344,80%,14%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
-            {["Email","Wallet Balance","Total Submitted","Approved","Joined"].map(h => (
-              <TableHead key={h} className="text-xs font-bold uppercase tracking-wider" style={{ color: GOLD }}>{h}</TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id} className="luxury-row transition-colors" style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}`, background: BURGUNDY_CARD }}>
-              <TableCell className="font-semibold text-sm" style={{ color: TEXT_BODY }}>{user.email}</TableCell>
-              <TableCell className="font-extrabold text-sm" style={{ color: GOLD_BRIGHT }}>{user.walletBalance} ETB</TableCell>
-              <TableCell className="text-sm" style={{ color: TEXT_BODY }}>{user.totalSubmissions}</TableCell>
-              <TableCell className="text-sm" style={{ color: TEXT_BODY }}>{user.approvedSubmissions}</TableCell>
-              <TableCell className="text-xs" style={{ color: TEXT_SOFT }}>
-                {format(new Date(user.createdAt), "MMM d, yyyy")}
-              </TableCell>
+    <div>
+      <div className="flex justify-end mb-3">
+        <button
+          onClick={handleExport}
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all"
+          style={{ background: "hsl(344,70%,18%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}
+        >
+          <FileDown className="h-3.5 w-3.5" />
+          Export CSV
+        </button>
+      </div>
+      <div
+        className="rounded-2xl overflow-hidden"
+        style={{ border: "1px solid hsl(43,30%,24%,0.4)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}
+      >
+        <Table>
+          <TableHeader>
+            <TableRow style={{ background: "hsl(344,80%,14%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
+              {["Email","Wallet Balance","Total Submitted","Approved","Joined"].map(h => (
+                <TableHead key={h} className="text-xs font-bold uppercase tracking-wider" style={{ color: GOLD }}>{h}</TableHead>
+              ))}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.id} className="luxury-row transition-colors" style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}`, background: BURGUNDY_CARD }}>
+                <TableCell className="font-semibold text-sm" style={{ color: TEXT_BODY }}>{user.email}</TableCell>
+                <TableCell className="font-extrabold text-sm" style={{ color: GOLD_BRIGHT }}>{user.walletBalance} ETB</TableCell>
+                <TableCell className="text-sm" style={{ color: TEXT_BODY }}>{user.totalSubmissions}</TableCell>
+                <TableCell className="text-sm" style={{ color: TEXT_BODY }}>{user.approvedSubmissions}</TableCell>
+                <TableCell className="text-xs" style={{ color: TEXT_SOFT }}>
+                  {format(new Date(user.createdAt), "MMM d, yyyy")}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
