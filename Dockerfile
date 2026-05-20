@@ -17,16 +17,12 @@ RUN pnpm --filter @workspace/api-server run build
 
 FROM node:22-alpine AS runner
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
 WORKDIR /app
 
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
-COPY lib/ ./lib/
-COPY artifacts/api-server/ ./artifacts/api-server/
-COPY tsconfig.json ./
-
-RUN pnpm install --frozen-lockfile --prod
+COPY --from=base /app/node_modules ./node_modules
+COPY --from=base /app/artifacts/api-server/node_modules ./artifacts/api-server/node_modules
+COPY package.json pnpm-workspace.yaml ./
+COPY artifacts/api-server/package.json ./artifacts/api-server/package.json
 
 COPY --from=base /app/artifacts/api-server/dist ./artifacts/api-server/dist
 COPY --from=base /app/artifacts/main-app/dist ./artifacts/main-app/dist
