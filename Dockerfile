@@ -13,10 +13,14 @@ COPY lib/api-spec/package.json lib/api-spec/package.json
 COPY scripts/package.json scripts/package.json
 COPY tsconfig.json tsconfig.base.json ./
 
+RUN find . -name "package.json" -not -path "*/node_modules/*" \
+    -exec sed -i 's/"workspace:\*"/"*"/g' {} \;
+
 RUN npm install --legacy-peer-deps
 
 COPY lib/ ./lib/
 COPY artifacts/ ./artifacts/
+COPY scripts/ ./scripts/
 
 RUN npm run build -w @workspace/main-app > /tmp/main-build.log 2>&1 || \
     (echo "=== MAIN-APP BUILD FAILED ===" && cat /tmp/main-build.log && exit 1)
