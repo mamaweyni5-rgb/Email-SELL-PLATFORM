@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { db, usersTable } from "@workspace/db";
 import { RegisterBody, LoginBody, LoginResponse, GetMeResponse } from "@workspace/api-zod";
@@ -17,7 +17,7 @@ router.post("/auth/register", async (req, res): Promise<void> => {
     return;
   }
 
-  const { email, password, referralCode: inputCode } = parsed.data;
+  const { email, name, password, referralCode: inputCode } = parsed.data;
 
   const existing = await db
     .select({ id: usersTable.id })
@@ -58,11 +58,12 @@ router.post("/auth/register", async (req, res): Promise<void> => {
     .insert(usersTable)
     .values({
       email: email.toLowerCase(),
+      name: name ?? null,
       passwordHash,
       referralCode: newCode,
       referredBy: referrerId ?? undefined,
     })
-    .returning({ id: usersTable.id, email: usersTable.email, walletBalance: usersTable.walletBalance });
+    .returning({ id: usersTable.id, email: usersTable.email, name: usersTable.name, walletBalance: usersTable.walletBalance });
 
   req.session.userId = user.id;
   req.log.info({ userId: user.id, referrerId }, "User registered");
@@ -76,27 +77,33 @@ router.post("/auth/login", async (req, res): Promise<void> => {
     return;
   }
 
-  const { email, password } = parsed.data;
+  const { identifier, password } = parsed.data;
+
+  const looksLikeEmail = identifier.includes("@");
 
   const [user] = await db
     .select()
     .from(usersTable)
-    .where(eq(usersTable.email, email.toLowerCase()));
+    .where(
+      looksLikeEmail
+        ? eq(usersTable.email, identifier.toLowerCase())
+        : or(eq(usersTable.email, identifier.toLowerCase()), eq(usersTable.name, identifier))
+    );
 
   if (!user) {
-    res.status(401).json({ error: "Invalid email or password" });
+    res.status(401).json({ error: "Invalid email/name or password" });
     return;
   }
 
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) {
-    res.status(401).json({ error: "Invalid email or password" });
+    res.status(401).json({ error: "Invalid email/name or password" });
     return;
   }
 
   req.session.userId = user.id;
   req.log.info({ userId: user.id }, "User logged in");
-  res.json(LoginResponse.parse({ id: user.id, email: user.email, walletBalance: user.walletBalance }));
+  res.json(LoginResponse.parse({ id: user.id, email: user.email, name: user.name, walletBalance: user.walletBalance }));
 });
 
 router.post("/auth/logout", async (req, res): Promise<void> => {

@@ -14,6 +14,7 @@ import { tgHaptic, tgSuccess, tgError } from "@/lib/telegram";
 
 const registerSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
+  name: z.string().optional(),
   password: z.string().min(6, "Password must be at least 6 characters"),
   referralCode: z.string().optional(),
 });
@@ -36,13 +37,13 @@ export default function Register() {
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { email: "", password: "", referralCode: refFromUrl },
+    defaultValues: { email: "", name: "", password: "", referralCode: refFromUrl },
   });
 
   const onSubmit = (data: z.infer<typeof registerSchema>) => {
     tgHaptic("medium");
     registerMutation.mutate(
-      { data: { email: data.email, password: data.password, referralCode: data.referralCode || undefined } },
+      { data: { email: data.email, name: data.name || undefined, password: data.password, referralCode: data.referralCode || undefined } },
       {
         onSuccess: () => {
           tgSuccess();
@@ -112,6 +113,26 @@ export default function Register() {
                       <Input
                         placeholder="name@example.com"
                         type="email"
+                        className="luxury-input h-11 rounded-lg"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                      {t("register_name")}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t("register_name_placeholder")}
+                        type="text"
                         className="luxury-input h-11 rounded-lg"
                         {...field}
                       />

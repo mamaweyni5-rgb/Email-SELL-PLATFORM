@@ -478,6 +478,9 @@ components:
           type: integer
         email:
           type: string
+        name:
+          type: string
+          nullable: true
         walletBalance:
           type: integer
 
@@ -489,6 +492,9 @@ components:
           type: integer
         email:
           type: string
+        name:
+          type: string
+          nullable: true
         walletBalance:
           type: integer
         totalSubmissions:
@@ -505,6 +511,8 @@ components:
         email:
           type: string
           format: email
+        name:
+          type: string
         password:
           type: string
           minLength: 6
@@ -513,11 +521,11 @@ components:
 
     LoginInput:
       type: object
-      required: [email, password]
+      required: [identifier, password]
       properties:
-        email:
+        identifier:
           type: string
-          format: email
+          description: Email address or display name
         password:
           type: string
 

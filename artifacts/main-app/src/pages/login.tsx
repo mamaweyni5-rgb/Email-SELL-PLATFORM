@@ -13,7 +13,7 @@ import { Loader2 } from "lucide-react";
 import { tgHaptic, tgSuccess, tgError } from "@/lib/telegram";
 
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  identifier: z.string().min(1, "Please enter your email or name"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
@@ -32,13 +32,13 @@ export default function Login() {
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { identifier: "", password: "" },
   });
 
   const onSubmit = (data: z.infer<typeof loginSchema>) => {
     tgHaptic("medium");
     loginMutation.mutate(
-      { data },
+      { data: { identifier: data.identifier, password: data.password } },
       {
         onSuccess: () => {
           tgSuccess();
@@ -98,16 +98,16 @@ export default function Login() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
               <FormField
                 control={form.control}
-                name="email"
+                name="identifier"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>
-                      {t("login_email")}
+                      {t("login_identifier")}
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="name@example.com"
-                        type="email"
+                        placeholder={t("login_identifier_placeholder")}
+                        type="text"
                         className="luxury-input h-11 rounded-lg"
                         {...field}
                       />
