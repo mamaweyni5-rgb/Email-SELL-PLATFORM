@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { Layout } from "@/components/layout";
 import { useLanguage } from "@/lib/i18n";
 import { Loader2 } from "lucide-react";
+import { tgHaptic, tgSuccess, tgError } from "@/lib/telegram";
 
 const registerSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -39,14 +40,17 @@ export default function Register() {
   });
 
   const onSubmit = (data: z.infer<typeof registerSchema>) => {
+    tgHaptic("medium");
     registerMutation.mutate(
       { data: { email: data.email, password: data.password, referralCode: data.referralCode || undefined } },
       {
         onSuccess: () => {
+          tgSuccess();
           toast({ title: t("register_success_title"), description: t("register_success_desc") });
           setLocation("/dashboard");
         },
         onError: (error) => {
+          tgError();
           toast({
             title: t("register_error_title"),
             description: (error as any)?.data?.error ?? (error as any)?.message ?? "An error occurred during registration.",

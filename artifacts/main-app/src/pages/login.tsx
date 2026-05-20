@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { Layout } from "@/components/layout";
 import { useLanguage } from "@/lib/i18n";
 import { Loader2 } from "lucide-react";
+import { tgHaptic, tgSuccess, tgError } from "@/lib/telegram";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -35,14 +36,17 @@ export default function Login() {
   });
 
   const onSubmit = (data: z.infer<typeof loginSchema>) => {
+    tgHaptic("medium");
     loginMutation.mutate(
       { data },
       {
         onSuccess: () => {
+          tgSuccess();
           toast({ title: t("login_success_title"), description: t("login_success_desc") });
           setLocation("/dashboard");
         },
         onError: (error) => {
+          tgError();
           toast({
             title: t("login_error_title"),
             description: (error as any)?.data?.error ?? (error as any)?.message ?? t("login_error_desc"),

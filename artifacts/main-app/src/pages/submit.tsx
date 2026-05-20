@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Lock, CheckCircle2, ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
+import { tgHaptic, tgSuccess, tgError } from "@/lib/telegram";
 
 const submitSchema = z.object({
   email: z
@@ -43,11 +44,13 @@ export default function Submit() {
   });
 
   const onSubmit = (values: z.infer<typeof submitSchema>) => {
+    tgHaptic("medium");
     setSuccess(false);
     createSubmission.mutate(
       { data: values },
       {
         onSuccess: () => {
+          tgSuccess();
           setSuccess(true);
           form.reset();
           queryClient.invalidateQueries({ queryKey: getListSubmissionsQueryKey() });
@@ -55,6 +58,7 @@ export default function Submit() {
           toast({ title: t("submit_success_title"), description: t("submit_success_desc") });
         },
         onError: (err) => {
+          tgError();
           const message = (err as any)?.data?.error ?? (err as any)?.message ?? "Failed to submit. Try again.";
           toast({ title: t("submit_error_title"), description: message, variant: "destructive" });
         },

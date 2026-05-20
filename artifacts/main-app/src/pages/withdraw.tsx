@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { Wallet, Phone, User, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
+import { tgHaptic, tgSuccess, tgError } from "@/lib/telegram";
 
 const withdrawSchema = z.object({
   amount: z.coerce.number().min(1, "Amount must be at least 1 ETB"),
@@ -40,14 +41,17 @@ export default function Withdraw() {
   const onSubmit = (values: z.infer<typeof withdrawSchema>) => {
     const balance = profile?.walletBalance ?? 0;
     if (values.amount > balance) {
+      tgError();
       form.setError("amount", { message: `${t("wd_error_exceed")} ${balance} ETB` });
       return;
     }
+    tgHaptic("medium");
     setSuccess(false);
     createWithdrawal.mutate(
       { data: values },
       {
         onSuccess: () => {
+          tgSuccess();
           setSuccess(true);
           form.reset();
           queryClient.invalidateQueries({ queryKey: getListWithdrawalsQueryKey() });
@@ -56,6 +60,7 @@ export default function Withdraw() {
           toast({ title: t("wd_toast_title"), description: t("wd_toast_desc") });
         },
         onError: (err) => {
+          tgError();
           const message = (err as any)?.data?.error ?? (err as any)?.message ?? "Failed to request withdrawal.";
           toast({ title: "Error", description: message, variant: "destructive" });
         },
