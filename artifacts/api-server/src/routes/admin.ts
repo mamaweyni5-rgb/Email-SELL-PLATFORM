@@ -4,6 +4,12 @@ import bcrypt from "bcryptjs";
 import { db, usersTable, submissionsTable, withdrawalsTable, settingsTable } from "@workspace/db";
 import { getSettingValue } from "./settings";
 import {
+  notifySubmissionApproved,
+  notifySubmissionRejected,
+  notifyWithdrawalCompleted,
+  notifyWithdrawalRejected,
+} from "../lib/telegram-bot";
+import {
   AdminListSubmissionsResponse,
   AdminUpdateSubmissionParams,
   AdminUpdateSubmissionBody,
@@ -80,18 +86,18 @@ router.patch("/admin/submissions/:id", async (req, res): Promise<void> => {
     return;
   }
 
+  const [owner] = await db
+    .select({ telegramChatId: usersTable.telegramChatId, referredBy: usersTable.referredBy })
+    .from(usersTable)
+    .where(eq(usersTable.id, existing.userId));
+
   if (status === "approved" && existing.status !== "approved") {
     await db
       .update(usersTable)
       .set({ walletBalance: sql`${usersTable.walletBalance} + ${existing.pricePaid}` })
       .where(eq(usersTable.id, existing.userId));
 
-    const [submitter] = await db
-      .select({ referredBy: usersTable.referredBy })
-      .from(usersTable)
-      .where(eq(usersTable.id, existing.userId));
-
-    if (submitter?.referredBy) {
+    if (owner?.referredBy) {
       const commissionPct = await getSettingValue("referral_commission_pct", 10);
       const commission = Math.floor(existing.pricePaid * commissionPct / 100);
       if (commission > 0) {
@@ -101,17 +107,22 @@ router.patch("/admin/submissions/:id", async (req, res): Promise<void> => {
             walletBalance: sql`${usersTable.walletBalance} + ${commission}`,
             commissionEarned: sql`${usersTable.commissionEarned} + ${commission}`,
           })
-          .where(eq(usersTable.id, submitter.referredBy));
-        req.log.info({ referrerId: submitter.referredBy, commission }, "Referral commission paid");
+          .where(eq(usersTable.id, owner.referredBy));
+        req.log.info({ referrerId: owner.referredBy, commission }, "Referral commission paid");
       }
     }
+
+    notifySubmissionApproved(owner?.telegramChatId, existing.email, existing.pricePaid).catch(() => {});
   }
 
-  if (status === "rejected" && existing.status === "approved") {
-    await db
-      .update(usersTable)
-      .set({ walletBalance: sql`${usersTable.walletBalance} - ${existing.pricePaid}` })
-      .where(eq(usersTable.id, existing.userId));
+  if (status === "rejected" && existing.status !== "rejected") {
+    if (existing.status === "approved") {
+      await db
+        .update(usersTable)
+        .set({ walletBalance: sql`${usersTable.walletBalance} - ${existing.pricePaid}` })
+        .where(eq(usersTable.id, existing.userId));
+    }
+    notifySubmissionRejected(owner?.telegramChatId, existing.email).catch(() => {});
   }
 
   await db.update(submissionsTable).set({ status }).where(eq(submissionsTable.id, id));
@@ -182,11 +193,21 @@ router.patch("/admin/withdrawals/:id", async (req, res): Promise<void> => {
     return;
   }
 
+  const [wdOwner] = await db
+    .select({ telegramChatId: usersTable.telegramChatId })
+    .from(usersTable)
+    .where(eq(usersTable.id, existing.userId));
+
   if (status === "rejected" && existing.status === "pending") {
     await db
       .update(usersTable)
       .set({ walletBalance: sql`${usersTable.walletBalance} + ${existing.amount}` })
       .where(eq(usersTable.id, existing.userId));
+    notifyWithdrawalRejected(wdOwner?.telegramChatId, existing.amount, adminNote).catch(() => {});
+  }
+
+  if (status === "completed" && existing.status !== "completed") {
+    notifyWithdrawalCompleted(wdOwner?.telegramChatId, existing.amount, existing.telebirrNumber).catch(() => {});
   }
 
   await db

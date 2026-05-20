@@ -7,6 +7,7 @@ import withdrawalsRouter from "./withdrawals";
 import settingsRouter from "./settings";
 import adminRouter from "./admin";
 import referralRouter from "./referral";
+import telegramRouter from "./telegram";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(withdrawalsRouter);
 router.use(settingsRouter);
 router.use(adminRouter);
 router.use(referralRouter);
+router.use(telegramRouter);
 
 export default router;

@@ -3,8 +3,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/lib/i18n";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { initTelegram, isTelegram, tg } from "@/lib/telegram";
+import { useGetMe } from "@workspace/api-client-react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Login from "@/pages/login";
@@ -62,6 +63,26 @@ function TelegramBackButton() {
   return null;
 }
 
+function TelegramChatIdSyncer() {
+  const { data: user } = useGetMe({ query: { retry: false } });
+  const savedRef = useRef(false);
+
+  useEffect(() => {
+    if (!user || savedRef.current || !isTelegram()) return;
+    const telegramUser = tg()?.initDataUnsafe?.user;
+    if (!telegramUser?.id) return;
+
+    savedRef.current = true;
+    fetch("/api/auth/telegram-id", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ telegramChatId: String(telegramUser.id) }),
+    }).catch(() => {});
+  }, [user]);
+
+  return null;
+}
+
 function Router() {
   return (
     <Switch>
@@ -99,6 +120,7 @@ function App() {
           <TooltipProvider>
             <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
               <TelegramBackButton />
+              <TelegramChatIdSyncer />
               <Router />
             </WouterRouter>
             <Toaster />
