@@ -43,7 +43,7 @@ const translations = {
 
     // Login
     login_title: "Welcome back",
-    login_subtitle: "Sign in to your MailTrade account",
+    login_subtitle: "Sign in to your ሜል ማርት account",
     login_email: "Email",
     login_password: "Password",
     login_signing: "Signing in...",
@@ -57,7 +57,7 @@ const translations = {
 
     // Register
     register_title: "Create an account",
-    register_subtitle: "Join MailTrade to start earning today",
+    register_subtitle: "Join ሜል ማርት to start earning today",
     register_email: "Email",
     register_password: "Password",
     register_creating: "Creating account...",
@@ -204,7 +204,7 @@ const translations = {
 
     // Login
     login_title: "እንኳን ደህና ተመለሱ",
-    login_subtitle: "ወደ MailTrade አካውንትህ ግባ",
+    login_subtitle: "ወደ ሜል ማርት አካውንትህ ግባ",
     login_email: "ኢሜይል",
     login_password: "ፓስዎርድ",
     login_signing: "እየገባ ነው...",
@@ -218,7 +218,7 @@ const translations = {
 
     // Register
     register_title: "አካውንት ፍጠር",
-    register_subtitle: "ዛሬ ትርፍ ለማግኘት MailTrade ተቀላቀል",
+    register_subtitle: "ዛሬ ትርፍ ለማግኘት ሜል ማርት ተቀላቀል",
     register_email: "ኢሜይል",
     register_password: "ፓስዎርድ",
     register_creating: "አካውንት እየተፈጠረ ነው...",
@@ -340,7 +340,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(() => {
     try {
       const stored = localStorage.getItem("lang");
-      return stored === "am" || stored === "en" ? stored : "en";
+      return stored === "am" || stored === "en" ? stored : "am";
     } catch {
       return "en";
     }
