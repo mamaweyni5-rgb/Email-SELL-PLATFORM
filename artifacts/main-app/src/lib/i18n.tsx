@@ -31,6 +31,8 @@ const translations = {
     home_how_title: "How it works",
     home_how_subtitle:
       "A simple, secure process to monetize your accounts in three easy steps.",
+    home_hero_badge: "Ethiopia's #1 Email Marketplace",
+    home_step_label: "Step",
     home_step1_title: "1. Submit Securely",
     home_step1_desc:
       "Create an account and submit your valid email credentials through our secure encrypted platform.",
@@ -192,6 +194,8 @@ const translations = {
     home_how_title: "እንዴት ይሰራል",
     home_how_subtitle:
       "አካውንቶችዎን ለማትረፍ ቀላልና ደህንነቱ የተጠበቀ ሂደት በሦስት ቀላል ደረጃዎች።",
+    home_hero_badge: "የኢትዮጵያ ቁጥር 1 ኢሜይል ገበያ",
+    home_step_label: "ደረጃ",
     home_step1_title: "1. በደህንነት አቅርብ",
     home_step1_desc:
       "አካውንት ፍጠርና ትክክለኛ የኢሜይል ምስክር ወረቀቶቸን ባማኝ ምስጠራ ፕሌትፎርም አቅርብ።",
@@ -342,7 +346,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       const stored = localStorage.getItem("lang");
       return stored === "am" || stored === "en" ? stored : "am";
     } catch {
-      return "en";
+      return "am";
     }
   });
 

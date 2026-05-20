@@ -63,7 +63,7 @@ export default function Home() {
               }}
             >
               <Star className="w-3 h-3 fill-current" />
-              {t("home_hero_highlight")} · Ethiopia&apos;s #1 Email Marketplace
+              {t("home_hero_highlight")} · {t("home_hero_badge")}
             </div>
 
             <h1
@@ -168,7 +168,7 @@ export default function Home() {
                     className="text-xs font-bold uppercase tracking-widest mb-2"
                     style={{ color: "hsl(43,40%,50%)" }}
                   >
-                    Step {i + 1}
+                    {t("home_step_label")} {i + 1}
                   </div>
                   <h3 className="text-lg font-bold mb-2" style={{ color: "#D4AF37" }}>{step.title}</h3>
                   <p className="text-sm leading-relaxed" style={{ color: "hsl(46,50%,65%)" }}>{step.desc}</p>

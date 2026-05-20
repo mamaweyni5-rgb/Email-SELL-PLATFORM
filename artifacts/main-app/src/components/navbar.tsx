@@ -116,7 +116,7 @@ export function Navbar() {
                   backgroundClip: "text",
                 }}
               >
-                MailTrade
+                ሜል ማርት
               </span>
             </Link>
 

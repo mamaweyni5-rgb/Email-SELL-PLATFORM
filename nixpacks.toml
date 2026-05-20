@@ -1,0 +1,15 @@
+[phases.setup]
+nixPkgs = ["nodejs_22"]
+cmds = ["npm install -g pnpm@latest"]
+
+[phases.install]
+cmds = ["pnpm install --frozen-lockfile"]
+
+[phases.build]
+cmds = [
+  "PORT=3000 BASE_PATH=/ pnpm --filter @workspace/main-app run build",
+  "pnpm --filter @workspace/api-server run build"
+]
+
+[start]
+cmd = "PORT=${PORT:-3000} NODE_ENV=production node --enable-source-maps ./artifacts/api-server/dist/index.mjs"
