@@ -11,7 +11,7 @@ COPY lib/api-zod/package.json lib/api-zod/package.json
 COPY lib/db/package.json lib/db/package.json
 COPY lib/api-spec/package.json lib/api-spec/package.json
 COPY scripts/package.json scripts/package.json
-COPY tsconfig.json ./
+COPY tsconfig.json tsconfig.base.json ./
 
 RUN npm install --legacy-peer-deps
 
