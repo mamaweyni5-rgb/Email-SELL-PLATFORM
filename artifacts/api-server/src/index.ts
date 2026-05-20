@@ -24,14 +24,21 @@ app.listen(port, (err) => {
 
   logger.info({ port }, "Server listening");
 
-  const domains = process.env.REPLIT_DOMAINS;
-  if (domains) {
-    const domain = domains.split(",")[0]?.trim();
-    if (domain) {
-      const webhookUrl = `https://${domain}/api/telegram/webhook`;
-      setupWebhook(webhookUrl).catch((e) =>
-        logger.warn({ err: e }, "Webhook setup error")
-      );
-    }
+  const appUrl =
+    process.env.APP_URL ??
+    (() => {
+      const domains = process.env.REPLIT_DOMAINS;
+      if (!domains) return null;
+      const domain = domains.split(",")[0]?.trim();
+      return domain ? `https://${domain}` : null;
+    })();
+
+  if (appUrl) {
+    const webhookUrl = `${appUrl}/api/telegram/webhook`;
+    setupWebhook(webhookUrl).catch((e) =>
+      logger.warn({ err: e }, "Webhook setup error")
+    );
+  } else {
+    logger.warn("APP_URL and REPLIT_DOMAINS are not set — webhook setup skipped");
   }
 });

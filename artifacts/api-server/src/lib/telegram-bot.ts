@@ -68,12 +68,14 @@ export type TelegramUpdate = {
 export async function handleUpdate(update: TelegramUpdate): Promise<void> {
   if (!BOT_TOKEN) return;
 
-  const appUrl = (() => {
-    const domains = process.env.REPLIT_DOMAINS;
-    if (!domains) return null;
-    const domain = domains.split(",")[0]?.trim();
-    return domain ? `https://${domain}` : null;
-  })();
+  const appUrl =
+    process.env.APP_URL ??
+    (() => {
+      const domains = process.env.REPLIT_DOMAINS;
+      if (!domains) return null;
+      const domain = domains.split(",")[0]?.trim();
+      return domain ? `https://${domain}` : null;
+    })();
 
   const msg = update.message;
   if (!msg) return;
