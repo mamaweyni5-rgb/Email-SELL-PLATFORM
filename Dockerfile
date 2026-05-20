@@ -1,6 +1,6 @@
 FROM node:22-slim AS base
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@10.26.1 --activate
 
 WORKDIR /app
 
@@ -9,7 +9,8 @@ COPY lib/ ./lib/
 COPY artifacts/ ./artifacts/
 COPY tsconfig.json ./
 
-RUN pnpm install --frozen-lockfile
+RUN sed -i 's/minimumReleaseAge: 1440/minimumReleaseAge: 0/' pnpm-workspace.yaml && \
+    pnpm install --frozen-lockfile
 
 RUN PORT=3000 BASE_PATH=/ pnpm --filter @workspace/main-app run build
 
