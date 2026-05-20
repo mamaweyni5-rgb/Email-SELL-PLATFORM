@@ -1,8 +1,9 @@
 services:
   - type: web
     name: app
-    runtime: docker
-    dockerfilePath: ./Dockerfile
+    runtime: node
+    buildCommand: npm install -g pnpm@10.26.1 && sed -i 's/minimumReleaseAge: 1440/minimumReleaseAge: 0/' pnpm-workspace.yaml && pnpm install --frozen-lockfile && PORT=3000 BASE_PATH=/ pnpm --filter @workspace/main-app run build && pnpm --filter @workspace/api-server run build
+    startCommand: PORT=${PORT:-3000} NODE_ENV=production node --enable-source-maps ./artifacts/api-server/dist/index.mjs
     healthCheckPath: /api/settings
     envVars:
       - key: PORT

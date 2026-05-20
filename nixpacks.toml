@@ -1,9 +1,12 @@
 [phases.setup]
 nixPkgs = ["nodejs_22"]
-cmds = ["npm install -g pnpm@latest"]
+cmds = ["npm install -g pnpm@10.26.1"]
 
 [phases.install]
-cmds = ["pnpm install --frozen-lockfile"]
+cmds = [
+  "sed -i 's/minimumReleaseAge: 1440/minimumReleaseAge: 0/' pnpm-workspace.yaml",
+  "pnpm install --frozen-lockfile"
+]
 
 [phases.build]
 cmds = [
