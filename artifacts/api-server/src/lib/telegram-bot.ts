@@ -1,14 +1,120 @@
+import { logger } from "./logger";
+
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
-async function sendMessage(chatId: string, text: string): Promise<void> {
-  if (!BOT_TOKEN) return;
+async function callApi(method: string, body: Record<string, unknown>): Promise<unknown> {
+  if (!BOT_TOKEN) return null;
   try {
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML" }),
+      body: JSON.stringify(body),
     });
-  } catch {}
+    return await res.json();
+  } catch (err) {
+    logger.warn({ err, method }, "Telegram API call failed");
+    return null;
+  }
+}
+
+async function sendMessage(chatId: string, text: string, extra?: Record<string, unknown>): Promise<void> {
+  if (!BOT_TOKEN) return;
+  await callApi("sendMessage", { chat_id: chatId, text, parse_mode: "HTML", ...extra });
+}
+
+export async function setupWebhook(webhookUrl: string): Promise<void> {
+  if (!BOT_TOKEN) {
+    logger.warn("TELEGRAM_BOT_TOKEN is not set — webhook setup skipped");
+    return;
+  }
+
+  const result = await callApi("setWebhook", {
+    url: webhookUrl,
+    allowed_updates: ["message", "callback_query"],
+    drop_pending_updates: true,
+  }) as { ok: boolean; description?: string } | null;
+
+  if (result?.ok) {
+    logger.info({ webhookUrl }, "Telegram webhook registered successfully");
+  } else {
+    logger.error({ webhookUrl, result }, "Failed to register Telegram webhook");
+  }
+
+  const appUrl = webhookUrl.replace("/api/telegram/webhook", "");
+  await callApi("setChatMenuButton", {
+    menu_button: {
+      type: "web_app",
+      text: "ሜል ማርት ክፈት",
+      web_app: { url: appUrl },
+    },
+  });
+}
+
+export type TelegramUpdate = {
+  update_id: number;
+  message?: {
+    message_id: number;
+    chat: { id: number; type: string; first_name?: string; username?: string };
+    from?: { id: number; first_name: string; username?: string };
+    text?: string;
+  };
+  callback_query?: {
+    id: string;
+    from: { id: number; first_name: string };
+    data?: string;
+  };
+};
+
+export async function handleUpdate(update: TelegramUpdate): Promise<void> {
+  if (!BOT_TOKEN) return;
+
+  const appUrl = (() => {
+    const domains = process.env.REPLIT_DOMAINS;
+    if (!domains) return null;
+    const domain = domains.split(",")[0]?.trim();
+    return domain ? `https://${domain}` : null;
+  })();
+
+  const msg = update.message;
+  if (!msg) return;
+
+  const chatId = String(msg.chat.id);
+  const text = msg.text ?? "";
+  const firstName = msg.from?.first_name ?? "ወዳጄ";
+
+  if (text === "/start" || text.startsWith("/start ")) {
+    const welcomeText =
+      `👋 <b>ሰላም ${firstName}!</b>\n\n` +
+      `🌟 <b>ሜል ማርት</b> እንኳን ደህና መጡ!\n\n` +
+      `📧 ያልተጠቀሙባቸው ኢሜይሎቻቸውን አቅርቡ — ለእያንዳንዱ ጸድቆ ቦርሳዎ ላይ <b>ክፍያ</b> ይጨምራሉ።\n\n` +
+      `👇 ታች ያለውን ቁልፍ ይጫኑ ወደ አፕሊኬሽኑ ለመግባት።`;
+
+    if (appUrl) {
+      await sendMessage(chatId, welcomeText, {
+        reply_markup: {
+          inline_keyboard: [[
+            {
+              text: "🚀 ሜል ማርት ክፈት",
+              web_app: { url: appUrl },
+            },
+          ]],
+        },
+      });
+    } else {
+      await sendMessage(chatId, welcomeText);
+    }
+    return;
+  }
+
+  if (text === "/help") {
+    await sendMessage(
+      chatId,
+      `ℹ️ <b>እርዳታ</b>\n\n` +
+      `/start — አፕሊኬሽኑን ክፈት\n` +
+      `/help — ይህን መልዕክት አሳይ`,
+    );
+    return;
+  }
 }
 
 export async function notifySubmissionApproved(

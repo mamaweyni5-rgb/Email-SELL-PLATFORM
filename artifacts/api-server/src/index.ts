@@ -1,5 +1,6 @@
 import app from "./app";
 import { logger } from "./lib/logger";
+import { setupWebhook } from "./lib/telegram-bot";
 
 const rawPort = process.env["PORT"];
 
@@ -22,4 +23,15 @@ app.listen(port, (err) => {
   }
 
   logger.info({ port }, "Server listening");
+
+  const domains = process.env.REPLIT_DOMAINS;
+  if (domains) {
+    const domain = domains.split(",")[0]?.trim();
+    if (domain) {
+      const webhookUrl = `https://${domain}/api/telegram/webhook`;
+      setupWebhook(webhookUrl).catch((e) =>
+        logger.warn({ err: e }, "Webhook setup error")
+      );
+    }
+  }
 });
