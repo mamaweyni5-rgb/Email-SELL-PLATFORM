@@ -56,6 +56,20 @@ export async function runMigrations(): Promise<void> {
     await client.query(`
       ALTER TABLE users ADD COLUMN IF NOT EXISTS name TEXT;
     `);
+    await client.query(`
+      ALTER TABLE users ALTER COLUMN email DROP NOT NULL;
+    `);
+    await client.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM pg_indexes
+          WHERE tablename = 'users' AND indexname = 'users_name_unique'
+        ) THEN
+          CREATE UNIQUE INDEX users_name_unique ON users (name) WHERE name IS NOT NULL;
+        END IF;
+      END$$;
+    `);
   } finally {
     client.release();
   }

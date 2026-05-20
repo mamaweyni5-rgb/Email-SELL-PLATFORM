@@ -19,14 +19,34 @@ router.post("/auth/register", async (req, res): Promise<void> => {
 
   const { email, name, password, referralCode: inputCode } = parsed.data;
 
-  const existing = await db
-    .select({ id: usersTable.id })
-    .from(usersTable)
-    .where(eq(usersTable.email, email.toLowerCase()));
+  const normalizedEmail = email?.trim() ? email.trim().toLowerCase() : null;
+  const normalizedName = name?.trim() ? name.trim() : null;
 
-  if (existing.length > 0) {
-    res.status(409).json({ error: "This email is already registered" });
+  if (!normalizedEmail && !normalizedName) {
+    res.status(400).json({ error: "Please provide either an email or a display name." });
     return;
+  }
+
+  if (normalizedEmail) {
+    const [existing] = await db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.email, normalizedEmail));
+    if (existing) {
+      res.status(409).json({ error: "This email is already registered." });
+      return;
+    }
+  }
+
+  if (normalizedName) {
+    const [existing] = await db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.name, normalizedName));
+    if (existing) {
+      res.status(409).json({ error: "This display name is already taken." });
+      return;
+    }
   }
 
   let referrerId: number | null = null;
@@ -57,8 +77,8 @@ router.post("/auth/register", async (req, res): Promise<void> => {
   const [user] = await db
     .insert(usersTable)
     .values({
-      email: email.toLowerCase(),
-      name: name ?? null,
+      email: normalizedEmail ?? undefined,
+      name: normalizedName ?? undefined,
       passwordHash,
       referralCode: newCode,
       referredBy: referrerId ?? undefined,
@@ -66,7 +86,7 @@ router.post("/auth/register", async (req, res): Promise<void> => {
     .returning({ id: usersTable.id, email: usersTable.email, name: usersTable.name, walletBalance: usersTable.walletBalance });
 
   req.session.userId = user.id;
-  req.log.info({ userId: user.id, referrerId }, "User registered");
+  req.log.info({ userId: user.id, referrerId, hasEmail: !!normalizedEmail, hasName: !!normalizedName }, "User registered");
   res.status(201).json(LoginResponse.parse(user));
 });
 

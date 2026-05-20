@@ -31,7 +31,7 @@ export interface UserProfile {
 }
 
 export interface UserInput {
-  email: string;
+  email?: string;
   name?: string;
   /** @minLength 6 */
   password: string;

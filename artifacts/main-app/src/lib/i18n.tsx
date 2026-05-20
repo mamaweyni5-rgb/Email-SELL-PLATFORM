@@ -62,9 +62,12 @@ const translations = {
     // Register
     register_title: "Create an account",
     register_subtitle: "Join ሜል ማርት to start earning today",
+    register_or_divider: "or",
+    register_either_hint: "Fill in at least one: email or display name",
     register_email: "Email",
-    register_name: "Display Name (optional)",
-    register_name_placeholder: "Your name",
+    register_email_placeholder: "name@example.com",
+    register_name: "Display Name",
+    register_name_placeholder: "Your name or username",
     register_password: "Password",
     register_creating: "Creating account...",
     register_submit: "Sign up",
@@ -73,6 +76,7 @@ const translations = {
     register_success_title: "Account created!",
     register_success_desc: "You have successfully registered.",
     register_error_title: "Registration failed",
+    register_need_email_or_name: "Please enter either an email or a display name.",
 
     // Dashboard
     dash_welcome: "Welcome back!",
@@ -251,9 +255,12 @@ const translations = {
     // Register
     register_title: "አካውንት ፍጠር",
     register_subtitle: "ዛሬ ትርፍ ለማግኘት ሜል ማርት ተቀላቀል",
+    register_or_divider: "ወይም",
+    register_either_hint: "ኢሜይል ወይም ስም — አንዱን ብቻ ሙላ",
     register_email: "ኢሜይል",
-    register_name: "ስም (አስፈላጊ ካልሆነ ይተው)",
-    register_name_placeholder: "ስምዎ",
+    register_email_placeholder: "name@example.com",
+    register_name: "ስም / Username",
+    register_name_placeholder: "ስምዎ ወይም username",
     register_password: "ፓስዎርድ",
     register_creating: "አካውንት እየተፈጠረ ነው...",
     register_submit: "ተመዝገብ",
@@ -262,6 +269,7 @@ const translations = {
     register_success_title: "አካውንት ተፈጥሯል!",
     register_success_desc: "በትክክል ተመዝግበዋል።",
     register_error_title: "ምዝገባ አልተሳካም",
+    register_need_email_or_name: "ኢሜይል ወይም ስም — አንዱን ማስገባት ያስፈልጋል።",
 
     // Dashboard
     dash_welcome: "እንኳን ደህና ተመለሱ!",
