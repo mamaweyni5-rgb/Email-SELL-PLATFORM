@@ -20,13 +20,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import {
   CheckCircle,
@@ -56,14 +53,25 @@ const changePasswordSchema = z.object({
   path: ["confirmPassword"],
 });
 
-function StatusBadge({ status }: { status: string }) {
-  if (status === "approved" || status === "completed") {
-    return <Badge className="bg-green-100 text-green-700 border-green-200 hover:bg-green-100">{status}</Badge>;
-  }
-  if (status === "rejected") {
-    return <Badge className="bg-red-100 text-red-700 border-red-200 hover:bg-red-100">{status}</Badge>;
-  }
-  return <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200 hover:bg-yellow-100">pending</Badge>;
+const GOLD = "#D4AF37";
+const GOLD_BRIGHT = "#FFD700";
+const BURGUNDY_CARD = "hsl(348,82%,16%)";
+const BURGUNDY_ROW_BORDER = "hsl(344,55%,22%)";
+const TEXT_SOFT = "hsl(43,30%,52%)";
+const TEXT_BODY = "hsl(46,68%,82%)";
+
+function StatusPill({ status }: { status: string }) {
+  const cls =
+    status === "approved" || status === "completed"
+      ? "badge-approved"
+      : status === "rejected"
+      ? "badge-rejected"
+      : "badge-pending";
+  return (
+    <span className={`${cls} inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border`}>
+      {status}
+    </span>
+  );
 }
 
 function SubmissionsTab() {
@@ -79,94 +87,77 @@ function SubmissionsTab() {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getAdminListSubmissionsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getAdminGetStatsQueryKey() });
-          toast({
-            title: status === "approved" ? "Approved" : "Rejected",
-            description: `Submission has been ${status}.`,
-          });
+          toast({ title: status === "approved" ? "Approved" : "Rejected", description: `Submission has been ${status}.` });
         },
-        onError: () => {
-          toast({ title: "Error", description: "Failed to update submission.", variant: "destructive" });
-        },
+        onError: () => toast({ title: "Error", description: "Failed to update submission.", variant: "destructive" }),
       }
     );
   };
 
-  if (isLoading) {
-    return (
-      <div className="space-y-3">
-        {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
-      </div>
-    );
-  }
+  if (isLoading) return (
+    <div className="space-y-3">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(344,65%,18%)" }} />)}</div>
+  );
 
-  if (!submissions || submissions.length === 0) {
-    return (
-      <div className="text-center py-16 text-muted-foreground">
-        <Mail className="h-12 w-12 mx-auto mb-4 opacity-20" />
-        <p className="text-lg font-medium">No submissions yet</p>
-        <p className="text-sm">Email accounts submitted by users will appear here.</p>
-      </div>
-    );
-  }
+  if (!submissions || submissions.length === 0) return (
+    <div className="text-center py-16 flex flex-col items-center">
+      <Mail className="h-12 w-12 mb-4" style={{ color: "hsl(43,30%,30%)" }} />
+      <p className="text-base font-semibold" style={{ color: "hsl(46,50%,70%)" }}>No submissions yet</p>
+      <p className="text-sm mt-1" style={{ color: TEXT_SOFT }}>Email accounts submitted by users will appear here.</p>
+    </div>
+  );
 
   return (
-    <div className="rounded-md border">
+    <div
+      className="rounded-2xl overflow-hidden"
+      style={{ border: "1px solid hsl(43,30%,24%,0.4)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}
+    >
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted/50">
-            <TableHead>Seller</TableHead>
-            <TableHead>Email Account</TableHead>
-            <TableHead>Password</TableHead>
-            <TableHead>Price</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+          <TableRow style={{ background: "hsl(344,80%,14%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
+            {["Seller","Email Account","Password","Price","Date","Status","Actions"].map(h => (
+              <TableHead key={h} className="text-xs font-bold uppercase tracking-wider" style={{ color: GOLD }}>{h}</TableHead>
+            ))}
           </TableRow>
         </TableHeader>
         <TableBody>
           {submissions.map((sub) => (
-            <TableRow key={sub.id} className="hover:bg-muted/30">
-              <TableCell className="text-sm text-muted-foreground">{sub.userEmail}</TableCell>
-              <TableCell className="font-medium">{sub.email}</TableCell>
-              <TableCell className="font-mono text-sm">{sub.password}</TableCell>
-              <TableCell className="font-semibold text-blue-600">{sub.pricePaid} ETB</TableCell>
-              <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+            <TableRow key={sub.id} className="luxury-row transition-colors" style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}`, background: BURGUNDY_CARD }}>
+              <TableCell className="text-xs" style={{ color: TEXT_SOFT }}>{sub.userEmail}</TableCell>
+              <TableCell className="font-semibold text-sm" style={{ color: TEXT_BODY }}>{sub.email}</TableCell>
+              <TableCell className="font-mono text-xs" style={{ color: TEXT_SOFT }}>{sub.password}</TableCell>
+              <TableCell className="font-bold text-sm" style={{ color: GOLD_BRIGHT }}>{sub.pricePaid} ETB</TableCell>
+              <TableCell className="text-xs whitespace-nowrap" style={{ color: TEXT_SOFT }}>
                 {format(new Date(sub.createdAt), "MMM d, yyyy")}
               </TableCell>
-              <TableCell>
-                <StatusBadge status={sub.status} />
-              </TableCell>
+              <TableCell><StatusPill status={sub.status} /></TableCell>
               <TableCell className="text-right">
                 {sub.status === "pending" ? (
                   <div className="flex items-center justify-end gap-2">
-                    <Button
-                      size="sm"
-                      className="bg-green-600 hover:bg-green-700 text-white gap-1"
+                    <button
+                      className="inline-flex items-center gap-1 rounded-lg px-3 h-7 text-xs font-bold transition-all"
+                      style={{ background: "hsl(136,48%,20%)", border: "1px solid hsl(136,48%,32%,0.5)", color: "hsl(136,60%,65%)" }}
                       onClick={() => handleUpdate(sub.id, "approved")}
                       disabled={updateSubmission.isPending}
                       data-testid={`button-approve-${sub.id}`}
                     >
                       {updateSubmission.isPending && updateSubmission.variables?.id === sub.id ? (
                         <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <CheckCircle className="h-3 w-3" />
-                      )}
+                      ) : <CheckCircle className="h-3 w-3" />}
                       Approve
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 gap-1"
+                    </button>
+                    <button
+                      className="inline-flex items-center gap-1 rounded-lg px-3 h-7 text-xs font-bold transition-all"
+                      style={{ background: "hsl(5,55%,18%)", border: "1px solid hsl(5,55%,30%,0.5)", color: "hsl(5,75%,65%)" }}
                       onClick={() => handleUpdate(sub.id, "rejected")}
                       disabled={updateSubmission.isPending}
                       data-testid={`button-reject-${sub.id}`}
                     >
                       <XCircle className="h-3 w-3" />
                       Reject
-                    </Button>
+                    </button>
                   </div>
                 ) : (
-                  <span className="text-sm text-muted-foreground italic">Done</span>
+                  <span className="text-xs italic" style={{ color: TEXT_SOFT }}>Done</span>
                 )}
               </TableCell>
             </TableRow>
@@ -193,98 +184,87 @@ function WithdrawalsTab() {
           queryClient.invalidateQueries({ queryKey: getAdminGetStatsQueryKey() });
           toast({ title: status === "completed" ? "Paid" : "Rejected", description: `Withdrawal has been ${status}.` });
         },
-        onError: () => {
-          toast({ title: "Error", description: "Failed to update withdrawal.", variant: "destructive" });
-        },
+        onError: () => toast({ title: "Error", description: "Failed to update withdrawal.", variant: "destructive" }),
       }
     );
   };
 
-  if (isLoading) {
-    return <div className="space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}</div>;
-  }
+  if (isLoading) return (
+    <div className="space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(344,65%,18%)" }} />)}</div>
+  );
 
-  if (!withdrawals || withdrawals.length === 0) {
-    return (
-      <div className="text-center py-16 text-muted-foreground">
-        <Wallet className="h-12 w-12 mx-auto mb-4 opacity-20" />
-        <p className="text-lg font-medium">No withdrawal requests</p>
-        <p className="text-sm">When users request withdrawals, they will appear here.</p>
-      </div>
-    );
-  }
+  if (!withdrawals || withdrawals.length === 0) return (
+    <div className="text-center py-16 flex flex-col items-center">
+      <Wallet className="h-12 w-12 mb-4" style={{ color: "hsl(43,30%,30%)" }} />
+      <p className="text-base font-semibold" style={{ color: "hsl(46,50%,70%)" }}>No withdrawal requests</p>
+      <p className="text-sm mt-1" style={{ color: TEXT_SOFT }}>When users request withdrawals, they will appear here.</p>
+    </div>
+  );
 
   return (
-    <div className="rounded-md border">
+    <div
+      className="rounded-2xl overflow-hidden"
+      style={{ border: "1px solid hsl(43,30%,24%,0.4)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}
+    >
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted/50">
-            <TableHead>User</TableHead>
-            <TableHead>Telebirr Number</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Amount</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Note</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+          <TableRow style={{ background: "hsl(344,80%,14%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
+            {["User","Telebirr","Name","Amount","Date","Status","Note","Actions"].map(h => (
+              <TableHead key={h} className="text-xs font-bold uppercase tracking-wider" style={{ color: GOLD }}>{h}</TableHead>
+            ))}
           </TableRow>
         </TableHeader>
         <TableBody>
           {withdrawals.map((wd) => (
-            <TableRow key={wd.id} className="hover:bg-muted/30">
-              <TableCell className="text-sm text-muted-foreground">{wd.userEmail}</TableCell>
-              <TableCell className="font-mono font-medium">{wd.telebirrNumber}</TableCell>
-              <TableCell>{wd.telebirrName}</TableCell>
-              <TableCell className="font-bold text-blue-600">{wd.amount} ETB</TableCell>
-              <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+            <TableRow key={wd.id} className="luxury-row transition-colors" style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}`, background: BURGUNDY_CARD }}>
+              <TableCell className="text-xs" style={{ color: TEXT_SOFT }}>{wd.userEmail}</TableCell>
+              <TableCell className="font-mono font-semibold text-sm" style={{ color: TEXT_BODY }}>{wd.telebirrNumber}</TableCell>
+              <TableCell className="text-sm" style={{ color: TEXT_BODY }}>{wd.telebirrName}</TableCell>
+              <TableCell className="font-extrabold text-sm" style={{ color: GOLD_BRIGHT }}>{wd.amount} ETB</TableCell>
+              <TableCell className="text-xs whitespace-nowrap" style={{ color: TEXT_SOFT }}>
                 {format(new Date(wd.createdAt), "MMM d, yyyy")}
               </TableCell>
-              <TableCell>
-                <StatusBadge status={wd.status} />
-              </TableCell>
+              <TableCell><StatusPill status={wd.status} /></TableCell>
               <TableCell>
                 {wd.status === "pending" ? (
                   <Input
-                    className="h-7 text-xs w-36"
+                    className="luxury-input h-7 text-xs w-32 rounded-lg"
                     placeholder="Optional note"
                     value={noteMap[wd.id] ?? ""}
                     onChange={(e) => setNoteMap((m) => ({ ...m, [wd.id]: e.target.value }))}
                   />
                 ) : (
-                  <span className="text-xs text-muted-foreground">{wd.adminNote ?? "—"}</span>
+                  <span className="text-xs italic" style={{ color: TEXT_SOFT }}>{wd.adminNote ?? "—"}</span>
                 )}
               </TableCell>
               <TableCell className="text-right">
                 {wd.status === "pending" ? (
                   <div className="flex items-center justify-end gap-2">
-                    <Button
-                      size="sm"
-                      className="bg-green-600 hover:bg-green-700 text-white gap-1"
+                    <button
+                      className="inline-flex items-center gap-1 rounded-lg px-3 h-7 text-xs font-bold transition-all"
+                      style={{ background: "hsl(136,48%,20%)", border: "1px solid hsl(136,48%,32%,0.5)", color: "hsl(136,60%,65%)" }}
                       onClick={() => handleUpdate(wd.id, "completed")}
                       disabled={updateWithdrawal.isPending}
                       data-testid={`button-pay-${wd.id}`}
                     >
                       {updateWithdrawal.isPending && updateWithdrawal.variables?.id === wd.id ? (
                         <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <CheckCircle className="h-3 w-3" />
-                      )}
+                      ) : <CheckCircle className="h-3 w-3" />}
                       Mark Paid
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-red-200 text-red-600 hover:bg-red-50 gap-1"
+                    </button>
+                    <button
+                      className="inline-flex items-center gap-1 rounded-lg px-3 h-7 text-xs font-bold transition-all"
+                      style={{ background: "hsl(5,55%,18%)", border: "1px solid hsl(5,55%,30%,0.5)", color: "hsl(5,75%,65%)" }}
                       onClick={() => handleUpdate(wd.id, "rejected")}
                       disabled={updateWithdrawal.isPending}
                       data-testid={`button-reject-wd-${wd.id}`}
                     >
                       <XCircle className="h-3 w-3" />
                       Reject
-                    </Button>
+                    </button>
                   </div>
                 ) : (
-                  <span className="text-sm text-muted-foreground italic">Done</span>
+                  <span className="text-xs italic" style={{ color: TEXT_SOFT }}>Done</span>
                 )}
               </TableCell>
             </TableRow>
@@ -298,39 +278,38 @@ function WithdrawalsTab() {
 function UsersTab() {
   const { data: users, isLoading } = useAdminListUsers();
 
-  if (isLoading) {
-    return <div className="space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}</div>;
-  }
+  if (isLoading) return (
+    <div className="space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(344,65%,18%)" }} />)}</div>
+  );
 
-  if (!users || users.length === 0) {
-    return (
-      <div className="text-center py-16 text-muted-foreground">
-        <Users className="h-12 w-12 mx-auto mb-4 opacity-20" />
-        <p className="text-lg font-medium">No users yet</p>
-      </div>
-    );
-  }
+  if (!users || users.length === 0) return (
+    <div className="text-center py-16 flex flex-col items-center">
+      <Users className="h-12 w-12 mb-4" style={{ color: "hsl(43,30%,30%)" }} />
+      <p className="text-base font-semibold" style={{ color: "hsl(46,50%,70%)" }}>No users yet</p>
+    </div>
+  );
 
   return (
-    <div className="rounded-md border">
+    <div
+      className="rounded-2xl overflow-hidden"
+      style={{ border: "1px solid hsl(43,30%,24%,0.4)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}
+    >
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted/50">
-            <TableHead>Email</TableHead>
-            <TableHead>Wallet Balance</TableHead>
-            <TableHead>Total Submitted</TableHead>
-            <TableHead>Approved</TableHead>
-            <TableHead>Joined</TableHead>
+          <TableRow style={{ background: "hsl(344,80%,14%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
+            {["Email","Wallet Balance","Total Submitted","Approved","Joined"].map(h => (
+              <TableHead key={h} className="text-xs font-bold uppercase tracking-wider" style={{ color: GOLD }}>{h}</TableHead>
+            ))}
           </TableRow>
         </TableHeader>
         <TableBody>
           {users.map((user) => (
-            <TableRow key={user.id} className="hover:bg-muted/30">
-              <TableCell className="font-medium">{user.email}</TableCell>
-              <TableCell className="font-bold text-blue-600">{user.walletBalance} ETB</TableCell>
-              <TableCell>{user.totalSubmissions}</TableCell>
-              <TableCell>{user.approvedSubmissions}</TableCell>
-              <TableCell className="text-sm text-muted-foreground">
+            <TableRow key={user.id} className="luxury-row transition-colors" style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}`, background: BURGUNDY_CARD }}>
+              <TableCell className="font-semibold text-sm" style={{ color: TEXT_BODY }}>{user.email}</TableCell>
+              <TableCell className="font-extrabold text-sm" style={{ color: GOLD_BRIGHT }}>{user.walletBalance} ETB</TableCell>
+              <TableCell className="text-sm" style={{ color: TEXT_BODY }}>{user.totalSubmissions}</TableCell>
+              <TableCell className="text-sm" style={{ color: TEXT_BODY }}>{user.approvedSubmissions}</TableCell>
+              <TableCell className="text-xs" style={{ color: TEXT_SOFT }}>
                 {format(new Date(user.createdAt), "MMM d, yyyy")}
               </TableCell>
             </TableRow>
@@ -367,9 +346,7 @@ function SettingsTab() {
           priceForm.setValue("referralCommissionPct", data.referralCommissionPct);
           toast({ title: "Settings saved", description: `Price: ${data.pricePerEmail} ETB | Commission: ${data.referralCommissionPct}%` });
         },
-        onError: () => {
-          toast({ title: "Error", description: "Failed to save settings.", variant: "destructive" });
-        },
+        onError: () => toast({ title: "Error", description: "Failed to save settings.", variant: "destructive" }),
       }
     );
   };
@@ -390,141 +367,136 @@ function SettingsTab() {
     );
   };
 
+  const cardStyle = {
+    background: BURGUNDY_CARD,
+    border: "1px solid hsl(43,30%,24%,0.4)",
+    boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+  };
+
   return (
     <div className="space-y-6 max-w-md">
-      <Card>
-        <CardHeader>
-          <CardTitle>Price Per Email</CardTitle>
-          <CardDescription>
-            Set how much users earn per approved email account submission (in ETB).
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...priceForm}>
-            <form onSubmit={priceForm.handleSubmit(onPriceSubmit)} className="space-y-4">
-              <FormField
-                control={priceForm.control}
-                name="pricePerEmail"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Price (ETB)</FormLabel>
-                    <FormControl>
-                      <div className="flex gap-2">
-                        <Input
-                          type="number"
-                          min={1}
-                          placeholder="20"
-                          {...field}
-                          data-testid="input-price-per-email"
-                        />
-                        <span className="flex items-center text-sm text-muted-foreground px-3 border rounded-md bg-muted">
-                          ETB
-                        </span>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={priceForm.control}
-                name="referralCommissionPct"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Referral Commission (%)</FormLabel>
-                    <FormControl>
-                      <div className="flex gap-2">
-                        <Input
-                          type="number"
-                          min={0}
-                          max={100}
-                          placeholder="10"
-                          {...field}
-                        />
-                        <span className="flex items-center text-sm text-muted-foreground px-3 border rounded-md bg-muted">
-                          %
-                        </span>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={updateSettings.isPending} data-testid="button-save-settings">
-                {updateSettings.isPending ? (
-                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</>
-                ) : (
-                  "Save Settings"
-                )}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+      <div className="rounded-2xl p-6" style={cardStyle}>
+        <h3 className="text-sm font-bold mb-0.5" style={{ color: GOLD }}>Price Per Email</h3>
+        <p className="text-xs mb-5" style={{ color: TEXT_SOFT }}>
+          Set how much users earn per approved email account submission (in ETB).
+        </p>
+        <Form {...priceForm}>
+          <form onSubmit={priceForm.handleSubmit(onPriceSubmit)} className="space-y-4">
+            <FormField
+              control={priceForm.control}
+              name="pricePerEmail"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>Price (ETB)</FormLabel>
+                  <FormControl>
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        min={1}
+                        placeholder="20"
+                        className="luxury-input h-10 rounded-lg"
+                        {...field}
+                        data-testid="input-price-per-email"
+                      />
+                      <span
+                        className="flex items-center text-xs font-bold px-3 rounded-lg"
+                        style={{ background: "hsl(344,70%,18%)", border: "1px solid hsl(43,30%,28%,0.4)", color: GOLD }}
+                      >
+                        ETB
+                      </span>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={priceForm.control}
+              name="referralCommissionPct"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>Referral Commission (%)</FormLabel>
+                  <FormControl>
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        min={0}
+                        max={100}
+                        placeholder="10"
+                        className="luxury-input h-10 rounded-lg"
+                        {...field}
+                      />
+                      <span
+                        className="flex items-center text-xs font-bold px-3 rounded-lg"
+                        style={{ background: "hsl(344,70%,18%)", border: "1px solid hsl(43,30%,28%,0.4)", color: GOLD }}
+                      >
+                        %
+                      </span>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <button
+              type="submit"
+              className="gold-btn rounded-lg px-5 h-9 text-sm font-bold"
+              disabled={updateSettings.isPending}
+              data-testid="button-save-settings"
+            >
+              {updateSettings.isPending ? (
+                <span className="flex items-center gap-2"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving...</span>
+              ) : "Save Settings"}
+            </button>
+          </form>
+        </Form>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <KeyRound className="h-5 w-5 text-muted-foreground" />
-            <CardTitle>Change Admin Password</CardTitle>
-          </div>
-          <CardDescription>
-            Update the secret password used to access this admin panel.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...pwForm}>
-            <form onSubmit={pwForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
+      <div className="rounded-2xl p-6" style={cardStyle}>
+        <div className="flex items-center gap-2 mb-0.5">
+          <KeyRound className="h-4 w-4" style={{ color: GOLD }} />
+          <h3 className="text-sm font-bold" style={{ color: GOLD }}>Change Admin Password</h3>
+        </div>
+        <p className="text-xs mb-5" style={{ color: TEXT_SOFT }}>
+          Update the secret password used to access this admin panel.
+        </p>
+        <Form {...pwForm}>
+          <form onSubmit={pwForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
+            {(["currentPassword", "newPassword", "confirmPassword"] as const).map((name) => (
               <FormField
+                key={name}
                 control={pwForm.control}
-                name="currentPassword"
+                name={name}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Current Password</FormLabel>
+                    <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                      {name === "currentPassword" ? "Current Password" : name === "newPassword" ? "New Password" : "Confirm New Password"}
+                    </FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <Input type="password" placeholder="••••••••" className="luxury-input h-10 rounded-lg" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <FormField
-                control={pwForm.control}
-                name="newPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>New Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={pwForm.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm New Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={changePassword.isPending} variant="outline">
-                {changePassword.isPending ? (
-                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Changing...</>
-                ) : (
-                  "Change Password"
-                )}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+            ))}
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 rounded-lg px-5 h-9 text-sm font-semibold transition-all"
+              style={{
+                background: "hsl(344,70%,18%)",
+                border: "1.5px solid hsl(43,40%,35%)",
+                color: "hsl(43,60%,65%)",
+              }}
+              disabled={changePassword.isPending}
+            >
+              {changePassword.isPending ? (
+                <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Changing...</>
+              ) : "Change Password"}
+            </button>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 }
@@ -533,123 +505,98 @@ export default function Admin() {
   const { data: stats, isLoading: statsLoading } = useAdminGetStats();
 
   const statCards = [
-    { label: "Total Users", value: stats?.totalUsers, icon: Users, color: "text-blue-600" },
-    { label: "Emails Bought", value: stats?.totalEmailsBought, icon: Mail, color: "text-green-600" },
-    { label: "Pending Review", value: stats?.pendingSubmissions, icon: Clock, color: "text-yellow-600" },
-    { label: "Total Paid (ETB)", value: stats?.totalPayoutsBirr, icon: TrendingUp, color: "text-blue-600" },
-    { label: "Pending Payouts", value: stats?.pendingWithdrawals, icon: AlertCircle, color: "text-red-600" },
+    { label: "Total Users", value: stats?.totalUsers, icon: Users, color: GOLD },
+    { label: "Emails Bought", value: stats?.totalEmailsBought, icon: Mail, color: "hsl(136,60%,58%)" },
+    { label: "Pending Review", value: stats?.pendingSubmissions, icon: Clock, color: GOLD },
+    { label: "Total Paid (ETB)", value: stats?.totalPayoutsBirr, icon: TrendingUp, color: GOLD_BRIGHT },
+    { label: "Pending Payouts", value: stats?.pendingWithdrawals, icon: AlertCircle, color: "hsl(5,75%,62%)" },
   ];
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <header className="bg-white border-b sticky top-0 z-10">
+    <div
+      className="min-h-screen"
+      style={{ background: "hsl(344,90%,10%)" }}
+    >
+      {/* Header */}
+      <header
+        className="sticky top-0 z-10"
+        style={{
+          background: "linear-gradient(180deg, hsl(344,90%,9%) 0%, hsl(344,88%,12%) 100%)",
+          borderBottom: "1px solid hsl(43,40%,28%,0.3)",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
+        }}
+      >
         <div className="container mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-blue-600" />
-            <span className="font-bold text-lg">Admin Panel</span>
+            <ShieldCheck className="h-5 w-5" style={{ color: GOLD }} />
+            <span className="font-extrabold text-lg" style={{ color: GOLD }}>Admin Panel</span>
           </div>
-          <a href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <a
+            href="/"
+            className="text-sm font-medium transition-colors"
+            style={{ color: "hsl(43,40%,58%)" }}
+          >
             View Site
           </a>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold tracking-tight mb-1">Dashboard</h1>
-          <p className="text-muted-foreground text-sm">Manage email submissions, withdrawals, and platform settings.</p>
+      <main className="container mx-auto px-4 py-7 max-w-7xl">
+        <div className="mb-7">
+          <h1 className="text-2xl font-extrabold tracking-tight mb-1" style={{ color: GOLD }}>Dashboard</h1>
+          <p className="text-sm" style={{ color: "hsl(43,30%,50%)" }}>
+            Manage email submissions, withdrawals, and platform settings.
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        {/* Stat cards */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-7">
           {statCards.map((stat) => (
-            <Card key={stat.label} className="bg-white border-none shadow-sm">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs text-muted-foreground font-medium">{stat.label}</p>
-                  <stat.icon className={`h-4 w-4 ${stat.color}`} />
-                </div>
-                {statsLoading ? (
-                  <Skeleton className="h-8 w-16" />
-                ) : (
-                  <p className={`text-2xl font-bold ${stat.color}`}>{stat.value ?? 0}</p>
-                )}
-              </CardContent>
-            </Card>
+            <div key={stat.label} className="stat-card rounded-2xl p-4">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(43,30%,50%)" }}>{stat.label}</p>
+                <stat.icon className="h-4 w-4" style={{ color: stat.color }} />
+              </div>
+              {statsLoading ? (
+                <Skeleton className="h-8 w-16 rounded-lg" style={{ background: "hsl(344,65%,20%)" }} />
+              ) : (
+                <p className="text-2xl font-extrabold" style={{ color: stat.color }}>{stat.value ?? 0}</p>
+              )}
+            </div>
           ))}
         </div>
 
-        <Tabs defaultValue="submissions" className="space-y-4">
-          <TabsList className="bg-white border">
-            <TabsTrigger value="submissions" className="gap-2">
-              <Mail className="h-4 w-4" />
-              Submissions
-              {stats?.pendingSubmissions ? (
-                <Badge className="ml-1 bg-yellow-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-                  {stats.pendingSubmissions}
-                </Badge>
-              ) : null}
-            </TabsTrigger>
-            <TabsTrigger value="withdrawals" className="gap-2">
-              <Wallet className="h-4 w-4" />
-              Withdrawals
-              {stats?.pendingWithdrawals ? (
-                <Badge className="ml-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-                  {stats.pendingWithdrawals}
-                </Badge>
-              ) : null}
-            </TabsTrigger>
-            <TabsTrigger value="users" className="gap-2">
-              <Users className="h-4 w-4" />
-              Users
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="gap-2">
-              <ShieldCheck className="h-4 w-4" />
-              Settings
-            </TabsTrigger>
+        {/* Tabs */}
+        <Tabs defaultValue="submissions" className="space-y-5">
+          <TabsList
+            className="rounded-xl p-1 h-auto"
+            style={{
+              background: "hsl(344,80%,14%)",
+              border: "1px solid hsl(43,30%,24%,0.4)",
+            }}
+          >
+            {[
+              { value: "submissions", icon: Mail, label: "Submissions" },
+              { value: "withdrawals", icon: Wallet, label: "Withdrawals" },
+              { value: "users", icon: Users, label: "Users" },
+              { value: "settings", icon: ShieldCheck, label: "Settings" },
+            ].map(tab => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                className="flex items-center gap-1.5 rounded-lg text-sm font-semibold px-4 py-2 data-[state=active]:text-[hsl(344_90%_10%)]"
+                style={{ color: "hsl(43,40%,58%)" }}
+              >
+                <tab.icon className="h-4 w-4" />
+                {tab.label}
+              </TabsTrigger>
+            ))}
           </TabsList>
 
-          <TabsContent value="submissions">
-            <Card className="bg-white border-none shadow-sm">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">Email Submissions</CardTitle>
-                <CardDescription>
-                  Review each submitted email account. Approve to credit the seller's wallet, or reject to decline.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <SubmissionsTab />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="withdrawals">
-            <Card className="bg-white border-none shadow-sm">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">Withdrawal Requests</CardTitle>
-                <CardDescription>
-                  Pay users via Telebirr and mark requests as completed.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <WithdrawalsTab />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="users">
-            <Card className="bg-white border-none shadow-sm">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">All Users</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <UsersTab />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="settings">
-            <SettingsTab />
-          </TabsContent>
+          <TabsContent value="submissions"><SubmissionsTab /></TabsContent>
+          <TabsContent value="withdrawals"><WithdrawalsTab /></TabsContent>
+          <TabsContent value="users"><UsersTab /></TabsContent>
+          <TabsContent value="settings"><SettingsTab /></TabsContent>
         </Tabs>
       </main>
     </div>

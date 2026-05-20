@@ -38,7 +38,7 @@
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
   --color-destructive-border: hsl(var(--destructive-border));
-  
+
   --color-success: hsl(var(--success));
   --color-success-foreground: hsl(var(--success-foreground));
   --color-warning: hsl(var(--warning));
@@ -65,110 +65,67 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* LIGHT MODE */
+/* LUXURY BURGUNDY & GOLD THEME */
 :root {
-  --background: 0 0% 98%;
-  --foreground: 222 47% 11%;
-  --border: 214 32% 91%;
-  --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --card-border: 214 32% 91%;
-  
-  --sidebar: 0 0% 98%;
-  --sidebar-foreground: 222 47% 11%;
-  --sidebar-border: 214 32% 91%;
-  --sidebar-primary: 217 89% 61%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 214 32% 91%;
-  --sidebar-accent-foreground: 222 47% 11%;
-  --sidebar-ring: 217 89% 61%;
+  /* Deep velvety burgundy background */
+  --background: 344 90% 12%;
+  --foreground: 46 68% 82%;
 
-  --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
-  --popover-border: 214 32% 91%;
+  /* Slightly lighter card surfaces */
+  --card: 348 85% 17%;
+  --card-foreground: 46 68% 82%;
+  --card-border: 344 60% 28%;
 
-  --primary: 217 89% 61%; /* Google Blue #4285F4 */
-  --primary-foreground: 0 0% 100%;
+  /* Glistening gold primary */
+  --primary: 43 62% 52%;
+  --primary-foreground: 344 90% 10%;
+  --primary-border: 43 62% 52%;
 
-  --secondary: 214 32% 91%;
-  --secondary-foreground: 222 47% 11%;
+  --border: 344 55% 26%;
+  --input: 344 70% 19%;
+  --ring: 43 62% 52%;
 
-  --muted: 214 32% 91%;
-  --muted-foreground: 215 16% 47%;
+  --secondary: 344 65% 22%;
+  --secondary-foreground: 46 68% 82%;
+  --secondary-border: 344 55% 30%;
 
-  --accent: 214 32% 91%;
-  --accent-foreground: 222 47% 11%;
+  --muted: 344 60% 18%;
+  --muted-foreground: 43 35% 62%;
+  --muted-border: 344 50% 26%;
 
-  --destructive: 5 73% 56%; /* Google Red #EA4335 */
+  --accent: 344 65% 22%;
+  --accent-foreground: 46 68% 82%;
+  --accent-border: 344 55% 28%;
+
+  --popover: 348 88% 15%;
+  --popover-foreground: 46 68% 82%;
+  --popover-border: 344 55% 28%;
+
+  --destructive: 5 75% 52%;
   --destructive-foreground: 0 0% 100%;
-  
-  --success: 136 53% 43%; /* Google Green #34A853 */
-  --success-foreground: 0 0% 100%;
-  
-  --warning: 45 98% 50%; /* Google Yellow #FBBC04 */
-  --warning-foreground: 0 0% 0%;
+  --destructive-border: 5 75% 52%;
 
-  --input: 214 32% 91%;
-  --ring: 217 89% 61%;
+  --success: 136 48% 38%;
+  --success-foreground: 0 0% 100%;
+
+  --warning: 43 62% 52%;
+  --warning-foreground: 344 90% 10%;
+
+  --sidebar: 344 90% 11%;
+  --sidebar-foreground: 46 68% 82%;
+  --sidebar-border: 344 55% 26%;
+  --sidebar-primary: 43 62% 52%;
+  --sidebar-primary-foreground: 344 90% 10%;
+  --sidebar-primary-border: 43 62% 52%;
+  --sidebar-accent: 344 65% 22%;
+  --sidebar-accent-foreground: 46 68% 82%;
+  --sidebar-accent-border: 344 55% 28%;
+  --sidebar-ring: 43 62% 52%;
 
   --app-font-sans: 'Inter', sans-serif;
   --app-font-serif: Georgia, serif;
   --app-font-mono: Menlo, monospace;
-  --radius: 0.5rem;
-
-  --sidebar-primary-border: var(--sidebar-primary);
-  --sidebar-accent-border: var(--sidebar-accent);
-  --primary-border: var(--primary);
-  --secondary-border: var(--secondary);
-  --muted-border: var(--muted);
-  --accent-border: var(--accent);
-  --destructive-border: var(--destructive);
-}
-
-.dark {
-  --background: 222 47% 11%;
-  --foreground: 210 40% 98%;
-  --border: 217 33% 17%;
-  --card: 222 47% 11%;
-  --card-foreground: 210 40% 98%;
-  --card-border: 217 33% 17%;
-  
-  --sidebar: 222 47% 11%;
-  --sidebar-foreground: 210 40% 98%;
-  --sidebar-border: 217 33% 17%;
-  --sidebar-primary: 217 89% 61%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 217 33% 17%;
-  --sidebar-accent-foreground: 210 40% 98%;
-  --sidebar-ring: 217 89% 61%;
-
-  --popover: 222 47% 11%;
-  --popover-foreground: 210 40% 98%;
-  --popover-border: 217 33% 17%;
-
-  --primary: 217 89% 61%;
-  --primary-foreground: 0 0% 100%;
-
-  --secondary: 217 33% 17%;
-  --secondary-foreground: 210 40% 98%;
-
-  --muted: 217 33% 17%;
-  --muted-foreground: 215 20.2% 65.1%;
-
-  --accent: 217 33% 17%;
-  --accent-foreground: 210 40% 98%;
-
-  --destructive: 5 73% 56%;
-  --destructive-foreground: 0 0% 100%;
-
-  --success: 136 53% 43%;
-  --success-foreground: 0 0% 100%;
-  
-  --warning: 45 98% 50%;
-  --warning-foreground: 0 0% 0%;
-
-  --input: 217 33% 17%;
-  --ring: 217 89% 61%;
+  --radius: 0.625rem;
 }
 
 @layer base {
@@ -179,4 +136,130 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(344 90% 12%);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(43 62% 40%);
+    border-radius: 3px;
+  }
+}
+
+/* ── Gold gradient utilities ── */
+.gold-gradient {
+  background: linear-gradient(145deg, #FFD700, #D4AF37, #B8962E);
+}
+
+.gold-gradient-text {
+  background: linear-gradient(145deg, #FFD700, #D4AF37, #C9A227);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── 3D floating card ── */
+.luxury-card {
+  background: linear-gradient(145deg, hsl(348 85% 19%), hsl(344 80% 15%));
+  border: 1px solid hsl(43 40% 35% / 0.4);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 2px 8px rgba(212, 175, 55, 0.12),
+    inset 0 1px 0 rgba(212, 175, 55, 0.15);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.luxury-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.6),
+    0 4px 16px rgba(212, 175, 55, 0.25),
+    inset 0 1px 0 rgba(212, 175, 55, 0.2);
+}
+
+/* ── Gold button ── */
+.gold-btn {
+  background: linear-gradient(145deg, #FFD700, #D4AF37, #B8962E);
+  color: hsl(344 90% 10%);
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+.gold-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.55);
+  filter: brightness(1.08);
+}
+
+.gold-btn:active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* ── Burgundy border glow on focus ── */
+.luxury-input {
+  background: hsl(344 70% 14%) !important;
+  border-color: hsl(344 55% 30%) !important;
+  color: hsl(46 68% 82%) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.luxury-input::placeholder {
+  color: hsl(43 25% 48%);
+}
+
+.luxury-input:focus {
+  border-color: hsl(43 62% 52%) !important;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.25) !important;
+  outline: none !important;
+}
+
+/* ── Stat card lift ── */
+.stat-card {
+  background: linear-gradient(135deg, hsl(348 88% 18%), hsl(344 80% 14%));
+  border: 1px solid hsl(43 40% 30% / 0.35);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.45), 0 1px 0 rgba(212,175,55,0.1) inset;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.55), 0 0 12px rgba(212,175,55,0.18);
+}
+
+/* ── Divider ── */
+.gold-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, hsl(43 62% 45% / 0.5), transparent);
+}
+
+/* ── Badge overrides ── */
+.badge-approved {
+  background: hsl(136 48% 15%) !important;
+  color: hsl(136 60% 65%) !important;
+  border-color: hsl(136 48% 28% / 0.5) !important;
+}
+
+.badge-rejected {
+  background: hsl(5 60% 15%) !important;
+  color: hsl(5 75% 65%) !important;
+  border-color: hsl(5 60% 28% / 0.5) !important;
+}
+
+.badge-pending {
+  background: hsl(43 62% 15%) !important;
+  color: hsl(43 80% 68%) !important;
+  border-color: hsl(43 55% 28% / 0.5) !important;
+}
+
+/* ── Table rows ── */
+.luxury-row:hover {
+  background: hsl(344 70% 20% / 0.6) !important;
 }

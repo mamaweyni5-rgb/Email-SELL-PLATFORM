@@ -6,11 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Layout } from "@/components/layout";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Lock, CheckCircle2, ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
@@ -69,45 +66,78 @@ export default function Submit() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-10 max-w-lg">
-        <Link href="/dashboard" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
-          <ArrowLeft className="h-4 w-4" /> {t("submit_back")}
-        </Link>
+      <div
+        className="flex flex-1 items-center justify-center p-4"
+        style={{
+          background: "radial-gradient(ellipse at 50% 0%, hsl(344,80%,15%) 0%, hsl(344,90%,11%) 65%)",
+        }}
+      >
+        <div className="w-full max-w-md">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 text-sm font-medium mb-6 transition-colors"
+            style={{ color: "hsl(43,50%,60%)" }}
+          >
+            <ArrowLeft className="h-4 w-4" /> {t("submit_back")}
+          </Link>
 
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold tracking-tight">{t("submit_title")}</h1>
-          <p className="text-muted-foreground mt-1">
-            {t("submit_subtitle_pre")}{" "}
-            <span className="font-semibold text-blue-600">{settings?.pricePerEmail ?? 20} ETB</span>{" "}
-            {t("submit_subtitle_post")}
-          </p>
-        </div>
+          <div className="mb-6">
+            <h1 className="text-2xl font-extrabold tracking-tight mb-1" style={{ color: "#D4AF37" }}>
+              {t("submit_title")}
+            </h1>
+            <p className="text-sm" style={{ color: "hsl(43,35%,58%)" }}>
+              {t("submit_subtitle_pre")}{" "}
+              <span className="font-extrabold" style={{ color: "#FFD700" }}>
+                {settings?.pricePerEmail ?? 20} ETB
+              </span>{" "}
+              {t("submit_subtitle_post")}
+            </p>
+          </div>
 
-        {success && (
-          <Alert className="mb-6 border-green-200 bg-green-50 text-green-800">
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
-            <AlertDescription>{t("submit_success_desc")}</AlertDescription>
-          </Alert>
-        )}
+          {success && (
+            <div
+              className="flex items-center gap-3 rounded-xl p-4 mb-5"
+              style={{
+                background: "hsl(136,40%,12%)",
+                border: "1px solid hsl(136,48%,28%,0.5)",
+                color: "hsl(136,60%,65%)",
+              }}
+            >
+              <CheckCircle2 className="h-5 w-5 shrink-0" />
+              <p className="text-sm font-medium">{t("submit_success_desc")}</p>
+            </div>
+          )}
 
-        <Card className="border-none shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base">{t("submit_card_title")}</CardTitle>
-            <CardDescription>{t("submit_card_desc")}</CardDescription>
-          </CardHeader>
-          <CardContent>
+          <div
+            className="rounded-2xl p-7"
+            style={{
+              background: "linear-gradient(145deg, hsl(348,85%,18%), hsl(344,80%,14%))",
+              border: "1px solid hsl(43,40%,30%,0.4)",
+              boxShadow: "0 16px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(212,175,55,0.1)",
+            }}
+          >
+            <h2 className="text-sm font-bold mb-1" style={{ color: "hsl(46,68%,78%)" }}>{t("submit_card_title")}</h2>
+            <p className="text-xs mb-5" style={{ color: "hsl(43,30%,52%)" }}>{t("submit_card_desc")}</p>
+
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                 <FormField
                   control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("submit_email_label")}</FormLabel>
+                      <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                        {t("submit_email_label")}
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input className="pl-9" placeholder={t("submit_email_placeholder")} data-testid="input-email" {...field} />
+                          <Mail className="absolute left-3 top-3 h-4 w-4" style={{ color: "#D4AF37" }} />
+                          <Input
+                            className="luxury-input pl-9 h-11 rounded-lg"
+                            placeholder={t("submit_email_placeholder")}
+                            data-testid="input-email"
+                            {...field}
+                          />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -119,12 +149,14 @@ export default function Submit() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("submit_password_label")}</FormLabel>
+                      <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                        {t("submit_password_label")}
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Lock className="absolute left-3 top-3 h-4 w-4" style={{ color: "#D4AF37" }} />
                           <Input
-                            className="pl-9 pr-9"
+                            className="luxury-input pl-9 pr-10 h-11 rounded-lg"
                             type={showPassword ? "text" : "password"}
                             placeholder={t("submit_password_placeholder")}
                             data-testid="input-password"
@@ -133,7 +165,8 @@ export default function Submit() {
                           <button
                             type="button"
                             onClick={() => setShowPassword((v) => !v)}
-                            className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                            className="absolute right-3 top-3 transition-colors"
+                            style={{ color: "hsl(43,40%,55%)" }}
                           >
                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </button>
@@ -143,22 +176,25 @@ export default function Submit() {
                     </FormItem>
                   )}
                 />
-                <Button
+                <button
                   type="submit"
-                  className="w-full"
+                  className="gold-btn w-full h-11 rounded-xl font-bold text-sm"
                   disabled={createSubmission.isPending}
                   data-testid="button-submit"
                 >
                   {createSubmission.isPending ? (
-                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t("submit_submitting")}</>
+                    <span className="flex items-center justify-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      {t("submit_submitting")}
+                    </span>
                   ) : (
                     t("submit_btn")
                   )}
-                </Button>
+                </button>
               </form>
             </Form>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </Layout>
   );

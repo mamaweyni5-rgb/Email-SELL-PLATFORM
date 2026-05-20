@@ -6,11 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Layout } from "@/components/layout";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { Wallet, Phone, User, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
@@ -70,44 +67,79 @@ export default function Withdraw() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-10 max-w-lg">
-        <Link href="/dashboard" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
-          <ArrowLeft className="h-4 w-4" /> {t("wd_back")}
-        </Link>
+      <div
+        className="flex flex-1 items-center justify-center p-4"
+        style={{
+          background: "radial-gradient(ellipse at 50% 0%, hsl(344,80%,15%) 0%, hsl(344,90%,11%) 65%)",
+        }}
+      >
+        <div className="w-full max-w-md">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 text-sm font-medium mb-6 transition-colors"
+            style={{ color: "hsl(43,50%,60%)" }}
+          >
+            <ArrowLeft className="h-4 w-4" /> {t("wd_back")}
+          </Link>
 
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold tracking-tight">{t("wd_title")}</h1>
-          <p className="text-muted-foreground mt-1">
-            {t("wd_balance_label")}{" "}
-            <span className="font-bold text-blue-600">{profile?.walletBalance ?? 0} ETB</span>
-          </p>
-        </div>
+          <div className="mb-6">
+            <h1 className="text-2xl font-extrabold tracking-tight mb-1" style={{ color: "#D4AF37" }}>
+              {t("wd_title")}
+            </h1>
+            <p className="text-sm" style={{ color: "hsl(43,35%,58%)" }}>
+              {t("wd_balance_label")}{" "}
+              <span className="font-extrabold" style={{ color: "#FFD700" }}>
+                {profile?.walletBalance ?? 0} ETB
+              </span>
+            </p>
+          </div>
 
-        {success && (
-          <Alert className="mb-6 border-green-200 bg-green-50 text-green-800">
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
-            <AlertDescription>{t("wd_success_desc")}</AlertDescription>
-          </Alert>
-        )}
+          {success && (
+            <div
+              className="flex items-center gap-3 rounded-xl p-4 mb-5"
+              style={{
+                background: "hsl(136,40%,12%)",
+                border: "1px solid hsl(136,48%,28%,0.5)",
+                color: "hsl(136,60%,65%)",
+              }}
+            >
+              <CheckCircle2 className="h-5 w-5 shrink-0" />
+              <p className="text-sm font-medium">{t("wd_success_desc")}</p>
+            </div>
+          )}
 
-        <Card className="border-none shadow-md">
-          <CardHeader>
-            <CardTitle className="text-base">{t("wd_card_title")}</CardTitle>
-            <CardDescription>{t("wd_card_desc")}</CardDescription>
-          </CardHeader>
-          <CardContent>
+          <div
+            className="rounded-2xl p-7"
+            style={{
+              background: "linear-gradient(145deg, hsl(348,85%,18%), hsl(344,80%,14%))",
+              border: "1px solid hsl(43,40%,30%,0.4)",
+              boxShadow: "0 16px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(212,175,55,0.1)",
+            }}
+          >
+            <h2 className="text-sm font-bold mb-1" style={{ color: "hsl(46,68%,78%)" }}>{t("wd_card_title")}</h2>
+            <p className="text-xs mb-5" style={{ color: "hsl(43,30%,52%)" }}>{t("wd_card_desc")}</p>
+
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                 <FormField
                   control={form.control}
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("wd_amount_label")}</FormLabel>
+                      <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                        {t("wd_amount_label")}
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Wallet className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input className="pl-9" type="number" min={1} placeholder={t("wd_amount_placeholder")} data-testid="input-amount" {...field} />
+                          <Wallet className="absolute left-3 top-3 h-4 w-4" style={{ color: "#D4AF37" }} />
+                          <Input
+                            className="luxury-input pl-9 h-11 rounded-lg"
+                            type="number"
+                            min={1}
+                            placeholder={t("wd_amount_placeholder")}
+                            data-testid="input-amount"
+                            {...field}
+                          />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -119,11 +151,18 @@ export default function Withdraw() {
                   name="telebirrNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("wd_telebirr_label")}</FormLabel>
+                      <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                        {t("wd_telebirr_label")}
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input className="pl-9" placeholder={t("wd_telebirr_placeholder")} data-testid="input-telebirr-number" {...field} />
+                          <Phone className="absolute left-3 top-3 h-4 w-4" style={{ color: "#D4AF37" }} />
+                          <Input
+                            className="luxury-input pl-9 h-11 rounded-lg"
+                            placeholder={t("wd_telebirr_placeholder")}
+                            data-testid="input-telebirr-number"
+                            {...field}
+                          />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -135,36 +174,46 @@ export default function Withdraw() {
                   name="telebirrName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("wd_name_label")}</FormLabel>
+                      <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                        {t("wd_name_label")}
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input className="pl-9" placeholder={t("wd_name_placeholder")} data-testid="input-telebirr-name" {...field} />
+                          <User className="absolute left-3 top-3 h-4 w-4" style={{ color: "#D4AF37" }} />
+                          <Input
+                            className="luxury-input pl-9 h-11 rounded-lg"
+                            placeholder={t("wd_name_placeholder")}
+                            data-testid="input-telebirr-name"
+                            {...field}
+                          />
                         </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button
+                <button
                   type="submit"
-                  className="w-full"
+                  className="gold-btn w-full h-11 rounded-xl font-bold text-sm"
                   disabled={createWithdrawal.isPending || (profile?.walletBalance ?? 0) === 0}
                   data-testid="button-withdraw"
                 >
                   {createWithdrawal.isPending ? (
-                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t("wd_submitting")}</>
+                    <span className="flex items-center justify-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      {t("wd_submitting")}
+                    </span>
                   ) : (
                     t("wd_btn")
                   )}
-                </Button>
+                </button>
                 {(profile?.walletBalance ?? 0) === 0 && (
-                  <p className="text-xs text-muted-foreground text-center">{t("wd_no_balance")}</p>
+                  <p className="text-xs text-center" style={{ color: "hsl(43,30%,50%)" }}>{t("wd_no_balance")}</p>
                 )}
               </form>
             </Form>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </Layout>
   );

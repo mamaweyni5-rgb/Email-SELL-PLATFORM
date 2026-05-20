@@ -76,26 +76,55 @@ export function Navbar() {
     });
   };
 
+  const navLinkClass = (path: string) =>
+    `px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
+      location === path
+        ? "gold-gradient text-[hsl(344_90%_10%)] shadow-sm"
+        : "text-[hsl(46_68%_70%)] hover:text-[hsl(43_80%_68%)] hover:bg-[hsl(344_65%_20%)]"
+    }`;
+
   return (
     <>
-      <nav className="border-b bg-card sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="font-bold text-xl tracking-tight text-primary flex items-center gap-2">
+      <nav
+        className="sticky top-0 z-50"
+        style={{
+          background: "linear-gradient(180deg, hsl(344,90%,10%) 0%, hsl(344,88%,13%) 100%)",
+          borderBottom: "1px solid hsl(43,40%,30%,0.35)",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.5), 0 1px 0 rgba(212,175,55,0.1)",
+        }}
+      >
+        <div className="container mx-auto px-4 h-15 flex items-center justify-between" style={{ height: "3.75rem" }}>
+          <div className="flex items-center gap-5">
+            <Link href="/" className="flex items-center gap-2.5 no-underline">
               <div
-                className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground cursor-pointer select-none"
+                className="w-9 h-9 rounded-lg flex items-center justify-center cursor-pointer select-none text-sm font-bold"
+                style={{
+                  background: "linear-gradient(145deg, #FFD700, #D4AF37, #B8962E)",
+                  color: "hsl(344 90% 10%)",
+                  boxShadow: "0 3px 12px rgba(212,175,55,0.45)",
+                }}
                 onClick={handleLogoTap}
               >
                 M
               </div>
-              MailTrade
+              <span
+                className="font-bold text-xl tracking-tight"
+                style={{
+                  background: "linear-gradient(145deg, #FFD700, #D4AF37)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                MailTrade
+              </span>
             </Link>
 
             {!isLoading && !isError && user && (
-              <div className="hidden md:flex items-center gap-1 text-sm font-medium text-muted-foreground">
-                <Link href="/dashboard" className={`px-3 py-2 rounded-md hover:text-foreground transition-colors ${location === '/dashboard' ? 'bg-secondary text-foreground' : ''}`}>{t("nav_dashboard")}</Link>
-                <Link href="/submit" className={`px-3 py-2 rounded-md hover:text-foreground transition-colors ${location === '/submit' ? 'bg-secondary text-foreground' : ''}`}>{t("nav_sell")}</Link>
-                <Link href="/withdraw" className={`px-3 py-2 rounded-md hover:text-foreground transition-colors ${location === '/withdraw' ? 'bg-secondary text-foreground' : ''}`}>{t("nav_withdraw")}</Link>
+              <div className="hidden md:flex items-center gap-1">
+                <Link href="/dashboard" className={navLinkClass("/dashboard")}>{t("nav_dashboard")}</Link>
+                <Link href="/submit" className={navLinkClass("/submit")}>{t("nav_sell")}</Link>
+                <Link href="/withdraw" className={navLinkClass("/withdraw")}>{t("nav_withdraw")}</Link>
               </div>
             )}
           </div>
@@ -103,44 +132,74 @@ export function Navbar() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setLang(lang === "en" ? "am" : "en")}
-              className="text-xs font-semibold px-2.5 py-1.5 rounded-md border bg-secondary/50 hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground"
+              className="text-xs font-semibold px-2.5 py-1.5 rounded-md transition-all duration-200"
+              style={{
+                border: "1px solid hsl(43,40%,30%,0.5)",
+                background: "hsl(344,65%,18%)",
+                color: "hsl(43,60%,65%)",
+              }}
               title={lang === "en" ? "Switch to Amharic" : "Switch to English"}
             >
               {lang === "en" ? "አማ" : "EN"}
             </button>
 
             {isLoading ? (
-              <Skeleton className="h-9 w-24" />
+              <Skeleton className="h-9 w-24 rounded-full" style={{ background: "hsl(344,65%,22%)" }} />
             ) : !isError && user ? (
-              <div className="flex items-center gap-3">
-                <div className="hidden sm:flex items-center gap-2 bg-secondary/50 px-3 py-1.5 rounded-full border">
-                  <Wallet className="w-4 h-4 text-warning" />
-                  <span className="font-semibold text-sm">{user.walletBalance} ETB</span>
+              <div className="flex items-center gap-2.5">
+                <div
+                  className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold"
+                  style={{
+                    background: "hsl(344,70%,18%)",
+                    border: "1px solid hsl(43,40%,30%,0.4)",
+                    color: "hsl(43,80%,68%)",
+                  }}
+                >
+                  <Wallet className="w-3.5 h-3.5" style={{ color: "#D4AF37" }} />
+                  {user.walletBalance} ETB
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                    <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0 hover:bg-transparent">
                       <Avatar className="h-9 w-9">
-                        <AvatarFallback className="bg-primary/10 text-primary uppercase">
+                        <AvatarFallback
+                          className="uppercase text-sm font-bold"
+                          style={{
+                            background: "linear-gradient(145deg, #D4AF37, #B8962E)",
+                            color: "hsl(344 90% 10%)",
+                          }}
+                        >
                           {user.email.substring(0, 2)}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <div className="flex items-center justify-start gap-2 p-2">
-                      <div className="flex flex-col space-y-1 leading-none">
-                        <p className="font-medium text-sm truncate">{user.email}</p>
-                        <p className="text-xs text-muted-foreground">{t("nav_wallet")}: {user.walletBalance} ETB</p>
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-56"
+                    style={{
+                      background: "hsl(348,88%,15%)",
+                      border: "1px solid hsl(43,40%,28%,0.4)",
+                      boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
+                    }}
+                  >
+                    <div className="flex items-center justify-start gap-2 p-2 border-b border-[hsl(344,55%,26%)]">
+                      <div className="flex flex-col space-y-0.5 leading-none">
+                        <p className="font-semibold text-sm truncate" style={{ color: "#D4AF37" }}>{user.email}</p>
+                        <p className="text-xs" style={{ color: "hsl(43,35%,55%)" }}>{t("nav_wallet")}: {user.walletBalance} ETB</p>
                       </div>
                     </div>
-                    <DropdownMenuItem asChild>
-                      <Link href="/profile" className="cursor-pointer flex items-center w-full">
-                        <User className="mr-2 h-4 w-4" />
+                    <DropdownMenuItem asChild className="cursor-pointer mt-1">
+                      <Link href="/profile" className="flex items-center w-full" style={{ color: "hsl(46,68%,78%)" }}>
+                        <User className="mr-2 h-4 w-4" style={{ color: "#D4AF37" }} />
                         <span>{t("nav_profile")}</span>
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer">
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="cursor-pointer"
+                      style={{ color: "hsl(5,75%,62%)" }}
+                    >
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>{t("nav_logout")}</span>
                     </DropdownMenuItem>
@@ -149,10 +208,17 @@ export function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground px-3 py-2">
+                <Link
+                  href="/login"
+                  className="text-sm font-medium px-3 py-2 transition-colors"
+                  style={{ color: "hsl(43,60%,65%)" }}
+                >
                   {t("nav_signin")}
                 </Link>
-                <Link href="/register" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2">
+                <Link
+                  href="/register"
+                  className="gold-btn inline-flex items-center justify-center rounded-lg text-sm font-bold h-9 px-4"
+                >
                   {t("nav_get_started")}
                 </Link>
               </div>
@@ -162,10 +228,17 @@ export function Navbar() {
       </nav>
 
       <Dialog open={showAdminDialog} onOpenChange={(open) => { setShowAdminDialog(open); setAdminPassword(""); }}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent
+          className="sm:max-w-sm"
+          style={{
+            background: "hsl(348,88%,14%)",
+            border: "1px solid hsl(43,40%,30%,0.4)",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.7)",
+          }}
+        >
           <DialogHeader>
-            <DialogTitle>{t("nav_admin_title")}</DialogTitle>
-            <DialogDescription>{t("nav_admin_desc")}</DialogDescription>
+            <DialogTitle style={{ color: "#D4AF37" }}>{t("nav_admin_title")}</DialogTitle>
+            <DialogDescription style={{ color: "hsl(43,35%,58%)" }}>{t("nav_admin_desc")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <Input
@@ -175,10 +248,15 @@ export function Navbar() {
               onChange={(e) => setAdminPassword(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") handleAdminLogin(); }}
               autoFocus
+              className="luxury-input"
             />
-            <Button className="w-full" onClick={handleAdminLogin} disabled={verifyPassword.isPending || !adminPassword}>
+            <button
+              className="gold-btn w-full h-10 rounded-lg font-bold text-sm"
+              onClick={handleAdminLogin}
+              disabled={verifyPassword.isPending || !adminPassword}
+            >
               {verifyPassword.isPending ? t("nav_admin_checking") : t("nav_admin_enter")}
-            </Button>
+            </button>
           </div>
         </DialogContent>
       </Dialog>

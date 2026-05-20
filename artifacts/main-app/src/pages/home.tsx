@@ -1,9 +1,7 @@
 import { useGetMe, useGetSettings, getGetMeQueryKey } from "@workspace/api-client-react";
 import { Link, useLocation } from "wouter";
 import { Layout } from "@/components/layout";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, CheckCircle2, ShieldCheck, Banknote } from "lucide-react";
+import { ArrowRight, CheckCircle2, ShieldCheck, Banknote, Star } from "lucide-react";
 import { useEffect } from "react";
 import { useLanguage } from "@/lib/i18n";
 
@@ -19,78 +17,163 @@ export default function Home() {
     }
   }, [user, authLoading, setLocation]);
 
+  const steps = [
+    {
+      icon: ShieldCheck,
+      title: t("home_step1_title"),
+      desc: t("home_step1_desc"),
+    },
+    {
+      icon: CheckCircle2,
+      title: t("home_step2_title"),
+      desc: t("home_step2_desc"),
+    },
+    {
+      icon: Banknote,
+      title: t("home_step3_title"),
+      desc: t("home_step3_desc"),
+    },
+  ];
+
   return (
     <Layout>
-      <div className="flex-1">
-        <section className="bg-gradient-to-b from-primary/10 to-background py-20 lg:py-32 border-b">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground max-w-4xl mx-auto mb-6">
-              {t("home_hero_title")} <span className="text-primary">{t("home_hero_highlight")}</span>.
+      <div className="flex-1 flex flex-col">
+        {/* ── Hero ── */}
+        <section
+          className="flex-1 flex flex-col items-center justify-center text-center px-4 py-16 relative overflow-hidden"
+          style={{
+            background: "radial-gradient(ellipse at 50% 0%, hsl(344,80%,18%) 0%, hsl(344,90%,10%) 70%)",
+          }}
+        >
+          {/* Decorative gold orb */}
+          <div
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full pointer-events-none"
+            style={{
+              background: "radial-gradient(ellipse, rgba(212,175,55,0.08) 0%, transparent 70%)",
+            }}
+          />
+
+          <div className="relative z-10 max-w-4xl mx-auto">
+            <div
+              className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold mb-8 uppercase tracking-widest"
+              style={{
+                background: "hsl(344,70%,18%)",
+                border: "1px solid hsl(43,40%,30%,0.5)",
+                color: "#D4AF37",
+              }}
+            >
+              <Star className="w-3 h-3 fill-current" />
+              {t("home_hero_highlight")} · Ethiopia&apos;s #1 Email Marketplace
+            </div>
+
+            <h1
+              className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight"
+              style={{
+                background: "linear-gradient(170deg, #FFD700 10%, #D4AF37 50%, #F1E5AC 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              {t("home_hero_title")}{" "}
+              <br className="hidden sm:block" />
+              {t("home_hero_highlight")}.
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
+
+            <p
+              className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
+              style={{ color: "hsl(46,55%,72%)" }}
+            >
               {t("home_hero_subtitle")}
             </p>
 
             {settings && (
-              <div className="mb-10 inline-flex items-center justify-center bg-card shadow-sm border rounded-full px-6 py-3">
-                <span className="text-lg font-medium">
-                  {t("home_rate_label")} <span className="text-success font-bold">{settings.pricePerEmail} ETB</span> {t("home_rate_suffix")}
-                </span>
+              <div
+                className="inline-flex items-center justify-center rounded-full px-6 py-3 mb-10 text-lg font-semibold"
+                style={{
+                  background: "hsl(344,70%,18%)",
+                  border: "1px solid hsl(43,40%,30%,0.5)",
+                  color: "hsl(46,68%,82%)",
+                  boxShadow: "0 4px 20px rgba(212,175,55,0.15)",
+                }}
+              >
+                {t("home_rate_label")}{" "}
+                <span
+                  className="font-extrabold ml-2 mr-1"
+                  style={{ color: "#FFD700" }}
+                >
+                  {settings.pricePerEmail} ETB
+                </span>{" "}
+                {t("home_rate_suffix")}
               </div>
             )}
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" asChild className="text-lg h-14 px-8 w-full sm:w-auto">
-                <Link href="/register">
-                  {t("home_cta_earn")} <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild className="text-lg h-14 px-8 w-full sm:w-auto">
-                <Link href="/login">{t("home_cta_signin")}</Link>
-              </Button>
+              <Link
+                href="/register"
+                className="gold-btn inline-flex items-center justify-center gap-2 rounded-xl text-base font-bold h-13 px-8 w-full sm:w-auto"
+                style={{ height: "3.25rem" }}
+              >
+                {t("home_cta_earn")}
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center rounded-xl text-base font-semibold h-13 px-8 w-full sm:w-auto transition-all duration-200"
+                style={{
+                  height: "3.25rem",
+                  background: "transparent",
+                  border: "1.5px solid hsl(43,40%,38%)",
+                  color: "hsl(43,60%,68%)",
+                }}
+              >
+                {t("home_cta_signin")}
+              </Link>
             </div>
           </div>
         </section>
 
-        <section className="py-20 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold tracking-tight mb-4">{t("home_how_title")}</h2>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+        {/* ── How it works ── */}
+        <section
+          className="py-16 px-4"
+          style={{ background: "hsl(344,90%,11%)", borderTop: "1px solid hsl(43,30%,22%,0.3)" }}
+        >
+          <div className="container mx-auto max-w-5xl">
+            <div className="text-center mb-12">
+              <h2
+                className="text-2xl sm:text-3xl font-bold tracking-tight mb-3"
+                style={{ color: "#D4AF37" }}
+              >
+                {t("home_how_title")}
+              </h2>
+              <p style={{ color: "hsl(46,50%,65%)" }} className="text-base max-w-xl mx-auto">
                 {t("home_how_subtitle")}
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              <Card className="border-none shadow-md bg-card">
-                <CardContent className="pt-8 text-center">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-6">
-                    <ShieldCheck className="h-8 w-8" />
+            <div className="grid sm:grid-cols-3 gap-6">
+              {steps.map((step, i) => (
+                <div key={i} className="luxury-card rounded-2xl p-6 text-center">
+                  <div
+                    className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5"
+                    style={{
+                      background: "linear-gradient(145deg, rgba(212,175,55,0.2), rgba(212,175,55,0.05))",
+                      border: "1px solid rgba(212,175,55,0.3)",
+                      boxShadow: "0 0 20px rgba(212,175,55,0.1)",
+                    }}
+                  >
+                    <step.icon className="h-7 w-7" style={{ color: "#D4AF37" }} />
                   </div>
-                  <h3 className="text-xl font-bold mb-3">{t("home_step1_title")}</h3>
-                  <p className="text-muted-foreground">{t("home_step1_desc")}</p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-none shadow-md bg-card">
-                <CardContent className="pt-8 text-center">
-                  <div className="w-16 h-16 rounded-full bg-warning/10 text-warning flex items-center justify-center mx-auto mb-6">
-                    <CheckCircle2 className="h-8 w-8" />
+                  <div
+                    className="text-xs font-bold uppercase tracking-widest mb-2"
+                    style={{ color: "hsl(43,40%,50%)" }}
+                  >
+                    Step {i + 1}
                   </div>
-                  <h3 className="text-xl font-bold mb-3">{t("home_step2_title")}</h3>
-                  <p className="text-muted-foreground">{t("home_step2_desc")}</p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-none shadow-md bg-card">
-                <CardContent className="pt-8 text-center">
-                  <div className="w-16 h-16 rounded-full bg-success/10 text-success flex items-center justify-center mx-auto mb-6">
-                    <Banknote className="h-8 w-8" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-3">{t("home_step3_title")}</h3>
-                  <p className="text-muted-foreground">{t("home_step3_desc")}</p>
-                </CardContent>
-              </Card>
+                  <h3 className="text-lg font-bold mb-2" style={{ color: "#D4AF37" }}>{step.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: "hsl(46,50%,65%)" }}>{step.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
