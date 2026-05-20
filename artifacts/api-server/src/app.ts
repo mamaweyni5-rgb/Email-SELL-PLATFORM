@@ -52,7 +52,7 @@ app.use("/api", router);
 if (process.env.NODE_ENV === "production") {
   const staticPath = path.resolve(__dirname, "../../main-app/dist/public");
   app.use(express.static(staticPath));
-  app.get("*", (_req, res) => {
+  app.get("{*path}", (_req, res) => {
     res.sendFile(path.join(staticPath, "index.html"));
   });
 }
