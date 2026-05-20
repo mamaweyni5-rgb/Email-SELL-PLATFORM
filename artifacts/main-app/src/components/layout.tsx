@@ -61,7 +61,7 @@ function TelegramHeader() {
             backgroundClip: "text",
           }}
         >
-          ሜል ማርት
+          MailMart
         </span>
       </div>
     </div>
