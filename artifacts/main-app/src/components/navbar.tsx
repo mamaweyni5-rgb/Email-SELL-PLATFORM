@@ -29,9 +29,7 @@ export function Navbar() {
   const [adminPassword, setAdminPassword] = useState("");
   const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleLogoTap = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleLogoTap = (_e: React.MouseEvent) => {
     const newCount = tapCount + 1;
     setTapCount(newCount);
     if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
@@ -95,7 +93,7 @@ export function Navbar() {
       >
         <div className="container mx-auto px-4 h-15 flex items-center justify-between" style={{ height: "3.75rem" }}>
           <div className="flex items-center gap-5">
-            <Link href="/" className="flex items-center gap-2.5 no-underline">
+            <div className="flex items-center gap-2.5">
               <div
                 className="w-9 h-9 rounded-lg flex items-center justify-center cursor-pointer select-none text-sm font-bold"
                 style={{
@@ -107,18 +105,20 @@ export function Navbar() {
               >
                 M
               </div>
-              <span
-                className="font-bold text-xl tracking-tight"
-                style={{
-                  background: "linear-gradient(145deg, #FFD700, #D4AF37)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                ሜል ማርት
-              </span>
-            </Link>
+              <Link href="/" className="no-underline">
+                <span
+                  className="font-bold text-xl tracking-tight"
+                  style={{
+                    background: "linear-gradient(145deg, #FFD700, #D4AF37)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                >
+                  Mail Mart
+                </span>
+              </Link>
+            </div>
 
             {!isLoading && !isError && user && (
               <div className="hidden md:flex items-center gap-1">
