@@ -1,0 +1,25 @@
+Please redesign the current application into an ultra-luxury, sophisticated "Deep Burgundy & Glistening Gold" theme. All white and light colors must be completely removed. Create a high-end, premium marketplace aesthetic. Follow these strict UI/UX and design guidelines:
+
+1. Color Palette (Strictly Luxury Burgundy & Gold):
+   - Primary Background: A deep, rich, velvety Burgundy Red (#560319) or Wine color (#4D0F1F).
+   - Component & Card Backgrounds: A slightly lighter or textured tone of Deep Burgundy (#660011) to create depth against the main background, but definitely NO WHITE.
+   - Accents & Actions: Glistening, Metallic Gold (#D4AF37). Use this gold for ALL primary action buttons ("Buy Now"), icons, titles, and key highlights. It should look bright and polished.
+   - Text Colors: Use polished Glistening Gold for headings and a muted, soft Gold or Beige (#F1E5AC) for body text and secondary descriptions to ensure readability against the dark burgundy.
+
+2. Premium 3D Effects, Shadows & Textures:
+   - Implement a strong 3D floating effect for account listings and buttons using advanced, deep shadows.
+   - Apply metallic gradients to all gold elements to make them look like real, glistening, polished gold (e.g., `background: linear-gradient(145deg, #FFD700, #D4AF37);`).
+   - Use soft, glowing gold box-shadows to make elements appear to float over the burgundy background (`box-shadow: 0 15px 40px rgba(212, 175, 55, 0.2);`).
+   - Add subtle metallic "lift-up" hover effects (`transform: translateY(-8px) scale(1.02); transition: transform 0.4s ease;`).
+
+3. Strict Single-Screen / Minimal Scrolling Layout:
+   - The UI must be highly compact and designed to fit perfectly within a single viewport/screen without unnecessary vertical scrolling.
+   - Organize all key information (filters, account list, account details) into fixed, neatly arranged components. Use inner scroll containers only where absolutely necessary.
+   - Use smart collapsible tabs or clean pop-up modals for "View Details" to avoid making the page longer.
+
+4. 100% Fully Responsive (Adapts to All Devices):
+   - The design must automatically adapt perfectly to mobiles (especially Telegram Mini App sizes), tablets, and desktops.
+   - Use flexible CSS grid and flexbox layouts with relative units (vh, %, rem).
+   - Ensure a "Mobile-First" native-app feel on all smaller screens.
+
+Please refactor the existing code (React/Vite/CSS) immediately to apply this magnificent, deep burgundy and glistening gold 3D look. The entire UI should scream luxury and exclusivity.
