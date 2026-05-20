@@ -9,20 +9,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { Layout } from "@/components/layout";
 import { useLanguage } from "@/lib/i18n";
-import { Loader2, Mail, User } from "lucide-react";
+import { Loader2, User } from "lucide-react";
 import { tgHaptic, tgSuccess, tgError } from "@/lib/telegram";
 
-const registerSchema = z
-  .object({
-    email: z.string().optional(),
-    name: z.string().optional(),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    referralCode: z.string().optional(),
-  })
-  .refine((d) => (d.email?.trim() ?? "") !== "" || (d.name?.trim() ?? "") !== "", {
-    message: "Please enter either an email or a display name.",
-    path: ["email"],
-  });
+const registerSchema = z.object({
+  name: z.string().min(2, "Display name must be at least 2 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  referralCode: z.string().optional(),
+});
 
 export default function Register() {
   const { data: user, isLoading } = useGetMe({ query: { retry: false, queryKey: getGetMeQueryKey() } });
@@ -42,7 +36,7 @@ export default function Register() {
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { email: "", name: "", password: "", referralCode: refFromUrl },
+    defaultValues: { name: "", password: "", referralCode: refFromUrl },
   });
 
   const onSubmit = (data: z.infer<typeof registerSchema>) => {
@@ -50,8 +44,7 @@ export default function Register() {
     registerMutation.mutate(
       {
         data: {
-          email: data.email?.trim() || undefined,
-          name: data.name?.trim() || undefined,
+          name: data.name.trim(),
           password: data.password,
           referralCode: data.referralCode?.trim() || undefined,
         },
@@ -115,43 +108,6 @@ export default function Register() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 
-              {/* ── Email field ── */}
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ color: LABEL_COLOR, fontSize: "0.8rem", fontWeight: 600 }}>
-                      <span className="flex items-center gap-1.5">
-                        <Mail className="h-3.5 w-3.5" />
-                        {t("register_email")}
-                        <span className="text-xs font-normal" style={{ color: SOFT }}>({t("register_or_divider")} {t("register_name")})</span>
-                      </span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t("register_email_placeholder")}
-                        type="email"
-                        autoComplete="email"
-                        className="luxury-input h-11 rounded-lg"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* ── OR divider ── */}
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-px" style={{ background: "hsl(43,30%,25%,0.5)" }} />
-                <span className="text-xs font-bold px-2 rounded-full py-0.5"
-                  style={{ color: GOLD, background: "hsl(344,70%,16%)", border: "1px solid hsl(43,30%,28%,0.4)" }}>
-                  {t("register_or_divider")}
-                </span>
-                <div className="flex-1 h-px" style={{ background: "hsl(43,30%,25%,0.5)" }} />
-              </div>
-
               {/* ── Name field ── */}
               <FormField
                 control={form.control}
@@ -177,11 +133,6 @@ export default function Register() {
                   </FormItem>
                 )}
               />
-
-              {/* hint */}
-              <p className="text-xs -mt-1" style={{ color: SOFT }}>
-                💡 {t("register_either_hint")}
-              </p>
 
               {/* ── Password ── */}
               <FormField
