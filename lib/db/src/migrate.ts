@@ -70,6 +70,15 @@ export async function runMigrations(): Promise<void> {
         END IF;
       END$$;
     `);
+
+    await client.query(`
+      ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS payment_method TEXT NOT NULL DEFAULT 'telebirr';
+      ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS bank_name TEXT;
+      ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS bank_account_number TEXT;
+      ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS bank_account_name TEXT;
+      ALTER TABLE withdrawals ALTER COLUMN telebirr_number SET DEFAULT '';
+      ALTER TABLE withdrawals ALTER COLUMN telebirr_name SET DEFAULT '';
+    `);
   } finally {
     client.release();
   }

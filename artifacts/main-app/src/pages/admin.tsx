@@ -231,12 +231,14 @@ function WithdrawalsTab() {
     if (!withdrawals?.length) return;
     downloadCSV(
       `withdrawals-${new Date().toISOString().slice(0, 10)}.csv`,
-      ["ID", "User", "Telebirr Number", "Name", "Amount (ETB)", "Date", "Status", "Note"],
+      ["ID", "User", "Method", "Telebirr/Account Number", "Name", "Bank", "Amount (ETB)", "Date", "Status", "Note"],
       withdrawals.map((w) => [
         w.id,
         w.userEmail,
-        w.telebirrNumber,
-        w.telebirrName,
+        w.paymentMethod,
+        w.paymentMethod === "bank" ? (w.bankAccountNumber ?? "") : w.telebirrNumber,
+        w.paymentMethod === "bank" ? (w.bankAccountName ?? "") : w.telebirrName,
+        w.bankName ?? "",
         w.amount,
         format(new Date(w.createdAt), "yyyy-MM-dd HH:mm"),
         w.status,
@@ -290,7 +292,7 @@ function WithdrawalsTab() {
       <Table>
         <TableHeader>
           <TableRow style={{ background: "hsl(344,80%,14%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
-            {["User","Telebirr","Name","Amount","Date","Status","Note","Actions"].map(h => (
+            {["User","Method","Payment Info","Amount","Date","Status","Note","Actions"].map(h => (
               <TableHead key={h} className="text-xs font-bold uppercase tracking-wider" style={{ color: GOLD }}>{h}</TableHead>
             ))}
           </TableRow>
@@ -299,8 +301,32 @@ function WithdrawalsTab() {
           {withdrawals.map((wd) => (
             <TableRow key={wd.id} className="luxury-row transition-colors" style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}`, background: BURGUNDY_CARD }}>
               <TableCell className="text-xs" style={{ color: TEXT_SOFT }}>{wd.userEmail}</TableCell>
-              <TableCell className="font-mono font-semibold text-sm" style={{ color: TEXT_BODY }}>{wd.telebirrNumber}</TableCell>
-              <TableCell className="text-sm" style={{ color: TEXT_BODY }}>{wd.telebirrName}</TableCell>
+              <TableCell>
+                <span
+                  className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold border"
+                  style={
+                    wd.paymentMethod === "bank"
+                      ? { background: "hsl(220,50%,18%)", border: "1px solid hsl(220,50%,32%,0.5)", color: "hsl(220,80%,75%)" }
+                      : { background: "hsl(136,40%,14%)", border: "1px solid hsl(136,48%,28%,0.5)", color: "hsl(136,60%,65%)" }
+                  }
+                >
+                  {wd.paymentMethod === "bank" ? "🏦 ባንክ" : "📱 ቴሌብር"}
+                </span>
+              </TableCell>
+              <TableCell className="text-xs" style={{ color: TEXT_BODY }}>
+                {wd.paymentMethod === "bank" ? (
+                  <div className="space-y-0.5">
+                    <div className="font-bold text-xs" style={{ color: "hsl(220,80%,75%)" }}>{wd.bankName}</div>
+                    <div className="font-mono">{wd.bankAccountNumber}</div>
+                    <div style={{ color: TEXT_SOFT }}>{wd.bankAccountName}</div>
+                  </div>
+                ) : (
+                  <div className="space-y-0.5">
+                    <div className="font-mono font-semibold">{wd.telebirrNumber}</div>
+                    <div style={{ color: TEXT_SOFT }}>{wd.telebirrName}</div>
+                  </div>
+                )}
+              </TableCell>
               <TableCell className="font-extrabold text-sm" style={{ color: GOLD_BRIGHT }}>{wd.amount} ETB</TableCell>
               <TableCell className="text-xs whitespace-nowrap" style={{ color: TEXT_SOFT }}>
                 {format(new Date(wd.createdAt), "MMM d, yyyy")}

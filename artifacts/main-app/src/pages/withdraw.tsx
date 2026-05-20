@@ -9,15 +9,51 @@ import { Layout } from "@/components/layout";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { Wallet, Phone, User, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
+import { Wallet, Phone, User, ArrowLeft, CheckCircle2, Loader2, Building2, Hash } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { tgHaptic, tgSuccess, tgError } from "@/lib/telegram";
+const ETHIOPIAN_BANKS = [
+  "ኢትዮጵያ ንግድ ባንክ (CBE)",
+  "አዋሽ ባንክ",
+  "ዳሽን ባንክ",
+  "አቢሲኒያ ባንክ",
+  "ዩናይትድ ባንክ",
+  "ንብ ኢንተርናሽናል ባንክ",
+  "ወጋገን ባንክ",
+  "ኦሮሚያ ኮኦፐሬቲቭ ባንክ",
+  "ሊዮን ኢንተርናሽናል ባንክ",
+  "ዘሜን ባንክ",
+  "በርሃን ባንክ",
+  "ቡና ኢንተርናሽናል ባንክ",
+  "አማራ ባንክ",
+  "ሂጅራ ባንክ",
+  "ሲንቄ ባንክ",
+  "ፀሃይ ባንክ",
+  "ሻቤሌ ባንክ",
+] as const;
 
-const withdrawSchema = z.object({
-  amount: z.coerce.number().min(1, "Amount must be at least 1 ETB"),
-  telebirrNumber: z.string().min(10, "Enter a valid Telebirr number"),
-  telebirrName: z.string().min(1, "Enter your full name"),
+const telebirrSchema = z.object({
+  paymentMethod: z.literal("telebirr"),
+  amount: z.coerce.number().min(1, "ቢያንስ 1 ብር መሆን አለበት"),
+  telebirrNumber: z.string().min(10, "ትክክለኛ የቴሌብር ቁጥር አስገባ"),
+  telebirrName: z.string().min(1, "ሙሉ ስምህን አስገባ"),
 });
+
+const bankSchema = z.object({
+  paymentMethod: z.literal("bank"),
+  amount: z.coerce.number().min(1, "ቢያንስ 1 ብር መሆን አለበት"),
+  bankName: z.string().min(1, "ባንክ ምረጥ"),
+  bankAccountNumber: z.string().min(5, "ትክክለኛ የሂሳብ ቁጥር አስገባ"),
+  bankAccountName: z.string().min(1, "የሂሳብ ባለቤት ስም አስገባ"),
+});
+
+const withdrawSchema = z.discriminatedUnion("paymentMethod", [telebirrSchema, bankSchema]);
+
+type WithdrawForm = z.infer<typeof withdrawSchema>;
+
+const GOLD = "#D4AF37";
+const LABEL_COLOR = "hsl(46,55%,72%)";
+const SOFT = "hsl(43,35%,58%)";
 
 export default function Withdraw() {
   const queryClient = useQueryClient();
@@ -25,6 +61,7 @@ export default function Withdraw() {
   const { data: profile } = useGetProfile({ query: { enabled: !!user } });
   const [, setLocation] = useLocation();
   const [success, setSuccess] = useState(false);
+  const [method, setMethod] = useState<"telebirr" | "bank">("telebirr");
   const { toast } = useToast();
   const createWithdrawal = useCreateWithdrawal();
   const { t } = useLanguage();
@@ -33,12 +70,26 @@ export default function Withdraw() {
     if (!authLoading && !user) setLocation("/login");
   }, [user, authLoading, setLocation]);
 
-  const form = useForm<z.infer<typeof withdrawSchema>>({
+  const form = useForm<WithdrawForm>({
     resolver: zodResolver(withdrawSchema),
-    defaultValues: { amount: 0, telebirrNumber: "", telebirrName: "" },
+    defaultValues: {
+      paymentMethod: "telebirr",
+      amount: 0,
+      telebirrNumber: "",
+      telebirrName: "",
+    } as WithdrawForm,
   });
 
-  const onSubmit = (values: z.infer<typeof withdrawSchema>) => {
+  const switchMethod = (m: "telebirr" | "bank") => {
+    setMethod(m);
+    if (m === "telebirr") {
+      form.reset({ paymentMethod: "telebirr", amount: form.getValues("amount") as number, telebirrNumber: "", telebirrName: "" });
+    } else {
+      form.reset({ paymentMethod: "bank", amount: form.getValues("amount") as number, bankName: "", bankAccountNumber: "", bankAccountName: "" });
+    }
+  };
+
+  const onSubmit = (values: WithdrawForm) => {
     const balance = profile?.walletBalance ?? 0;
     if (values.amount > balance) {
       tgError();
@@ -48,12 +99,12 @@ export default function Withdraw() {
     tgHaptic("medium");
     setSuccess(false);
     createWithdrawal.mutate(
-      { data: values },
+      { data: values as any },
       {
         onSuccess: () => {
           tgSuccess();
           setSuccess(true);
-          form.reset();
+          switchMethod(method);
           queryClient.invalidateQueries({ queryKey: getListWithdrawalsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetProfileQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetMeQueryKey() });
@@ -88,10 +139,10 @@ export default function Withdraw() {
           </Link>
 
           <div className="mb-6">
-            <h1 className="text-2xl font-extrabold tracking-tight mb-1" style={{ color: "#D4AF37" }}>
+            <h1 className="text-2xl font-extrabold tracking-tight mb-1" style={{ color: GOLD }}>
               {t("wd_title")}
             </h1>
-            <p className="text-sm" style={{ color: "hsl(43,35%,58%)" }}>
+            <p className="text-sm" style={{ color: SOFT }}>
               {t("wd_balance_label")}{" "}
               <span className="font-extrabold" style={{ color: "#FFD700" }}>
                 {profile?.walletBalance ?? 0} ETB
@@ -113,6 +164,39 @@ export default function Withdraw() {
             </div>
           )}
 
+          {/* Payment Method Selector */}
+          <div
+            className="flex rounded-xl p-1 mb-5 gap-1"
+            style={{ background: "hsl(344,80%,14%)", border: "1px solid hsl(43,30%,24%,0.5)" }}
+          >
+            <button
+              type="button"
+              onClick={() => switchMethod("telebirr")}
+              className="flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold transition-all"
+              style={
+                method === "telebirr"
+                  ? { background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "hsl(344,90%,10%)" }
+                  : { color: SOFT }
+              }
+            >
+              <Phone className="h-4 w-4" />
+              {t("wd_method_telebirr")}
+            </button>
+            <button
+              type="button"
+              onClick={() => switchMethod("bank")}
+              className="flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold transition-all"
+              style={
+                method === "bank"
+                  ? { background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "hsl(344,90%,10%)" }
+                  : { color: SOFT }
+              }
+            >
+              <Building2 className="h-4 w-4" />
+              {t("wd_method_bank")}
+            </button>
+          </div>
+
           <div
             className="rounded-2xl p-7"
             style={{
@@ -121,28 +205,33 @@ export default function Withdraw() {
               boxShadow: "0 16px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(212,175,55,0.1)",
             }}
           >
-            <h2 className="text-sm font-bold mb-1" style={{ color: "hsl(46,68%,78%)" }}>{t("wd_card_title")}</h2>
-            <p className="text-xs mb-5" style={{ color: "hsl(43,30%,52%)" }}>{t("wd_card_desc")}</p>
+            <h2 className="text-sm font-bold mb-1" style={{ color: "hsl(46,68%,78%)" }}>
+              {method === "telebirr" ? t("wd_card_title") : t("wd_bank_card_title")}
+            </h2>
+            <p className="text-xs mb-5" style={{ color: "hsl(43,30%,52%)" }}>
+              {method === "telebirr" ? t("wd_card_desc") : t("wd_bank_card_desc")}
+            </p>
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+
+                {/* Amount — always shown */}
                 <FormField
                   control={form.control}
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                      <FormLabel style={{ color: LABEL_COLOR, fontSize: "0.8rem", fontWeight: 600 }}>
                         {t("wd_amount_label")}
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Wallet className="absolute left-3 top-3 h-4 w-4" style={{ color: "#D4AF37" }} />
+                          <Wallet className="absolute left-3 top-3 h-4 w-4" style={{ color: GOLD }} />
                           <Input
                             className="luxury-input pl-9 h-11 rounded-lg"
                             type="number"
                             min={1}
                             placeholder={t("wd_amount_placeholder")}
-                            data-testid="input-amount"
                             {...field}
                           />
                         </div>
@@ -151,57 +240,147 @@ export default function Withdraw() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="telebirrNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>
-                        {t("wd_telebirr_label")}
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Phone className="absolute left-3 top-3 h-4 w-4" style={{ color: "#D4AF37" }} />
-                          <Input
-                            className="luxury-input pl-9 h-11 rounded-lg"
-                            placeholder={t("wd_telebirr_placeholder")}
-                            data-testid="input-telebirr-number"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="telebirrName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>
-                        {t("wd_name_label")}
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <User className="absolute left-3 top-3 h-4 w-4" style={{ color: "#D4AF37" }} />
-                          <Input
-                            className="luxury-input pl-9 h-11 rounded-lg"
-                            placeholder={t("wd_name_placeholder")}
-                            data-testid="input-telebirr-name"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
+                {/* Telebirr fields */}
+                {method === "telebirr" && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="telebirrNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel style={{ color: LABEL_COLOR, fontSize: "0.8rem", fontWeight: 600 }}>
+                            {t("wd_telebirr_label")}
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Phone className="absolute left-3 top-3 h-4 w-4" style={{ color: GOLD }} />
+                              <Input
+                                className="luxury-input pl-9 h-11 rounded-lg"
+                                placeholder={t("wd_telebirr_placeholder")}
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="telebirrName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel style={{ color: LABEL_COLOR, fontSize: "0.8rem", fontWeight: 600 }}>
+                            {t("wd_name_label")}
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <User className="absolute left-3 top-3 h-4 w-4" style={{ color: GOLD }} />
+                              <Input
+                                className="luxury-input pl-9 h-11 rounded-lg"
+                                placeholder={t("wd_name_placeholder")}
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
+
+                {/* Bank fields */}
+                {method === "bank" && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="bankName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel style={{ color: LABEL_COLOR, fontSize: "0.8rem", fontWeight: 600 }}>
+                            {t("wd_bank_name_label")}
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Building2 className="absolute left-3 top-3 h-4 w-4 z-10" style={{ color: GOLD }} />
+                              <select
+                                className="luxury-input pl-9 h-11 rounded-lg w-full text-sm appearance-none pr-4"
+                                style={{
+                                  background: "hsl(344,75%,16%)",
+                                  border: "1px solid hsl(43,30%,25%,0.5)",
+                                  color: field.value ? "hsl(46,68%,82%)" : "hsl(43,30%,50%)",
+                                }}
+                                value={field.value ?? ""}
+                                onChange={(e) => field.onChange(e.target.value)}
+                              >
+                                <option value="" disabled style={{ background: "hsl(344,80%,14%)" }}>
+                                  {t("wd_bank_select_placeholder")}
+                                </option>
+                                {ETHIOPIAN_BANKS.map((bank) => (
+                                  <option key={bank} value={bank} style={{ background: "hsl(344,80%,14%)" }}>
+                                    {bank}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="bankAccountNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel style={{ color: LABEL_COLOR, fontSize: "0.8rem", fontWeight: 600 }}>
+                            {t("wd_bank_account_number_label")}
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Hash className="absolute left-3 top-3 h-4 w-4" style={{ color: GOLD }} />
+                              <Input
+                                className="luxury-input pl-9 h-11 rounded-lg"
+                                placeholder={t("wd_bank_account_number_placeholder")}
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="bankAccountName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel style={{ color: LABEL_COLOR, fontSize: "0.8rem", fontWeight: 600 }}>
+                            {t("wd_bank_account_name_label")}
+                          </FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <User className="absolute left-3 top-3 h-4 w-4" style={{ color: GOLD }} />
+                              <Input
+                                className="luxury-input pl-9 h-11 rounded-lg"
+                                placeholder={t("wd_bank_account_name_placeholder")}
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
+
                 <button
                   type="submit"
                   className="gold-btn w-full h-11 rounded-xl font-bold text-sm"
                   disabled={createWithdrawal.isPending || (profile?.walletBalance ?? 0) === 0}
-                  data-testid="button-withdraw"
                 >
                   {createWithdrawal.isPending ? (
                     <span className="flex items-center justify-center gap-2">

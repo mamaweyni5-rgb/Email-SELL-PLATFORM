@@ -12,8 +12,12 @@ router.get("/withdrawals", requireAuth, async (req, res): Promise<void> => {
     .select({
       id: withdrawalsTable.id,
       amount: withdrawalsTable.amount,
+      paymentMethod: withdrawalsTable.paymentMethod,
       telebirrNumber: withdrawalsTable.telebirrNumber,
       telebirrName: withdrawalsTable.telebirrName,
+      bankName: withdrawalsTable.bankName,
+      bankAccountNumber: withdrawalsTable.bankAccountNumber,
+      bankAccountName: withdrawalsTable.bankAccountName,
       status: withdrawalsTable.status,
       adminNote: withdrawalsTable.adminNote,
       createdAt: withdrawalsTable.createdAt,
@@ -32,37 +36,63 @@ router.post("/withdrawals", requireAuth, async (req, res): Promise<void> => {
     return;
   }
 
-  const { amount, telebirrNumber, telebirrName } = parsed.data;
+  const data = parsed.data;
 
   const [user] = await db
     .select({ walletBalance: usersTable.walletBalance })
     .from(usersTable)
     .where(eq(usersTable.id, userId));
 
-  if (!user || user.walletBalance < amount) {
+  if (!user || user.walletBalance < data.amount) {
     res.status(400).json({ error: "Insufficient wallet balance" });
     return;
   }
 
   await db
     .update(usersTable)
-    .set({ walletBalance: user.walletBalance - amount })
+    .set({ walletBalance: user.walletBalance - data.amount })
     .where(eq(usersTable.id, userId));
+
+  const insertValues =
+    data.paymentMethod === "telebirr"
+      ? {
+          userId,
+          amount: data.amount,
+          paymentMethod: "telebirr" as const,
+          telebirrNumber: data.telebirrNumber,
+          telebirrName: data.telebirrName,
+          status: "pending" as const,
+        }
+      : {
+          userId,
+          amount: data.amount,
+          paymentMethod: "bank" as const,
+          telebirrNumber: "",
+          telebirrName: "",
+          bankName: data.bankName,
+          bankAccountNumber: data.bankAccountNumber,
+          bankAccountName: data.bankAccountName,
+          status: "pending" as const,
+        };
 
   const [row] = await db
     .insert(withdrawalsTable)
-    .values({ userId, amount, telebirrNumber, telebirrName, status: "pending" })
+    .values(insertValues)
     .returning({
       id: withdrawalsTable.id,
       amount: withdrawalsTable.amount,
+      paymentMethod: withdrawalsTable.paymentMethod,
       telebirrNumber: withdrawalsTable.telebirrNumber,
       telebirrName: withdrawalsTable.telebirrName,
+      bankName: withdrawalsTable.bankName,
+      bankAccountNumber: withdrawalsTable.bankAccountNumber,
+      bankAccountName: withdrawalsTable.bankAccountName,
       status: withdrawalsTable.status,
       adminNote: withdrawalsTable.adminNote,
       createdAt: withdrawalsTable.createdAt,
     });
 
-  req.log.info({ userId, withdrawalId: row.id, amount }, "Withdrawal requested");
+  req.log.info({ userId, withdrawalId: row.id, amount: data.amount, paymentMethod: data.paymentMethod }, "Withdrawal requested");
   res.status(201).json(row);
 });
 

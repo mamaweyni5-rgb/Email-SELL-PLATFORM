@@ -194,6 +194,18 @@ const translations = {
     // Register referral
     register_ref_label: "Referral Code (optional)",
     register_ref_placeholder: "e.g. ABC12345",
+
+    // Withdraw — payment method
+    wd_method_telebirr: "Telebirr",
+    wd_method_bank: "Bank Transfer",
+    wd_bank_card_title: "Bank Payment Info",
+    wd_bank_card_desc: "Enter your Ethiopian bank account details to receive payment.",
+    wd_bank_name_label: "Bank Name",
+    wd_bank_select_placeholder: "Select your bank",
+    wd_bank_account_number_label: "Account Number",
+    wd_bank_account_number_placeholder: "e.g. 1000123456789",
+    wd_bank_account_name_label: "Account Holder Name",
+    wd_bank_account_name_placeholder: "Full name on bank account",
   },
 
   am: {
@@ -388,6 +400,18 @@ const translations = {
     // Register referral
     register_ref_label: "የምልክት ኮድ (አስፈላጊ ካልሆነ ይተው)",
     register_ref_placeholder: "ምሳሌ ABC12345",
+
+    // Withdraw — payment method
+    wd_method_telebirr: "ቴሌብር",
+    wd_method_bank: "ባንክ ዝውውር",
+    wd_bank_card_title: "የባንክ ክፍያ መረጃ",
+    wd_bank_card_desc: "ክፍያ ለመቀበል የባንክ አካውንት ዝርዝሮችህን አስገባ።",
+    wd_bank_name_label: "ባንክ ስም",
+    wd_bank_select_placeholder: "ባንክህን ምረጥ",
+    wd_bank_account_number_label: "የሂሳብ ቁጥር",
+    wd_bank_account_number_placeholder: "ምሳሌ 1000123456789",
+    wd_bank_account_name_label: "የሂሳብ ባለቤት ስም",
+    wd_bank_account_name_placeholder: "በባንክ ላይ ያለ ሙሉ ስምህ",
   },
 } as const;
 

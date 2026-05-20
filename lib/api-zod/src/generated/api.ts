@@ -102,8 +102,12 @@ export const CreateSubmissionBody = zod.object({
 export const ListWithdrawalsResponseItem = zod.object({
   "id": zod.number(),
   "amount": zod.number(),
+  "paymentMethod": zod.string(),
   "telebirrNumber": zod.string(),
   "telebirrName": zod.string(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountName": zod.string().nullish(),
   "status": zod.enum(['pending', 'completed', 'rejected']),
   "adminNote": zod.string().nullish(),
   "createdAt": zod.coerce.date()
@@ -117,14 +121,41 @@ export const ListWithdrawalsResponse = zod.array(ListWithdrawalsResponseItem)
 
 export const createWithdrawalBodyTelebirrNumberMin = 10;
 
+export const ETHIOPIAN_BANKS = [
+  "ኢትዮጵያ ንግድ ባንክ (CBE)",
+  "አዋሽ ባንክ",
+  "ዳሽን ባንክ",
+  "አቢሲኒያ ባንክ",
+  "ዩናይትድ ባንክ",
+  "ንብ ኢንተርናሽናል ባንክ",
+  "ወጋገን ባንክ",
+  "ኦሮሚያ ኮኦፐሬቲቭ ባንክ",
+  "ሊዮን ኢንተርናሽናል ባንክ",
+  "ዘሜን ባንክ",
+  "በርሃን ባንክ",
+  "ቡና ኢንተርናሽናል ባንክ",
+  "አማራ ባንክ",
+  "ሂጅራ ባንክ",
+  "ሲንቄ ባንክ",
+  "ፀሃይ ባንክ",
+  "ሻቤሌ ባንክ",
+] as const;
 
-
-
-export const CreateWithdrawalBody = zod.object({
-  "amount": zod.number().min(1),
-  "telebirrNumber": zod.string().min(createWithdrawalBodyTelebirrNumberMin),
-  "telebirrName": zod.string().min(1)
-})
+export const CreateWithdrawalBody = zod.discriminatedUnion("paymentMethod", [
+  zod.object({
+    paymentMethod: zod.literal("telebirr"),
+    amount: zod.number().min(1),
+    telebirrNumber: zod.string().min(createWithdrawalBodyTelebirrNumberMin),
+    telebirrName: zod.string().min(1),
+  }),
+  zod.object({
+    paymentMethod: zod.literal("bank"),
+    amount: zod.number().min(1),
+    bankName: zod.string().min(1),
+    bankAccountNumber: zod.string().min(5),
+    bankAccountName: zod.string().min(1),
+  }),
+])
 
 
 /**
@@ -193,8 +224,12 @@ export const AdminListWithdrawalsResponseItem = zod.object({
   "userId": zod.number(),
   "userEmail": zod.string(),
   "amount": zod.number(),
+  "paymentMethod": zod.string(),
   "telebirrNumber": zod.string(),
   "telebirrName": zod.string(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountName": zod.string().nullish(),
   "status": zod.enum(['pending', 'completed', 'rejected']),
   "adminNote": zod.string().nullish(),
   "createdAt": zod.coerce.date()
@@ -219,8 +254,12 @@ export const AdminUpdateWithdrawalResponse = zod.object({
   "userId": zod.number(),
   "userEmail": zod.string(),
   "amount": zod.number(),
+  "paymentMethod": zod.string(),
   "telebirrNumber": zod.string(),
   "telebirrName": zod.string(),
+  "bankName": zod.string().nullish(),
+  "bankAccountNumber": zod.string().nullish(),
+  "bankAccountName": zod.string().nullish(),
   "status": zod.enum(['pending', 'completed', 'rejected']),
   "adminNote": zod.string().nullish(),
   "createdAt": zod.coerce.date()
