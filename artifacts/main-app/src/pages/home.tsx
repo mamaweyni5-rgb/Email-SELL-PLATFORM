@@ -175,6 +175,11 @@ export default function Home() {
                 </div>
               ))}
             </div>
+
+            {/* closing note */}
+            <p className="text-center mt-10 text-base font-semibold" style={{ color: "#D4AF37" }}>
+              {t("home_how_closing")}
+            </p>
           </div>
         </section>
       </div>
