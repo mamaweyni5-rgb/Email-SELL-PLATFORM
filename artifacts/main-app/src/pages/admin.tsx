@@ -415,7 +415,17 @@ function UsersTab() {
 
   return (
     <div>
-      <div className="flex justify-end mb-3">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "hsl(43,35%,55%)" }}>ጠቅላላ ተጠቃሚዎች</span>
+          <span
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-0.5 text-sm font-extrabold"
+            style={{ background: "linear-gradient(135deg, hsl(344,80%,20%), hsl(344,70%,16%))", border: "1px solid hsl(43,50%,35%,0.5)", color: GOLD_BRIGHT }}
+          >
+            <Users className="h-3.5 w-3.5" />
+            {users.length.toLocaleString()} ዩዘር
+          </span>
+        </div>
         <button
           onClick={handleExport}
           className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all"

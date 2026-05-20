@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { Layout } from "@/components/layout";
 import { useLanguage } from "@/lib/i18n";
-import { Loader2, User } from "lucide-react";
+import { Loader2, User, Users } from "lucide-react";
 import { tgHaptic, tgSuccess, tgError } from "@/lib/telegram";
 
 const registerSchema = z.object({
@@ -103,6 +103,10 @@ export default function Register() {
               {t("register_title")}
             </h1>
             <p className="text-sm" style={{ color: SOFT }}>{t("register_subtitle")}</p>
+            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1" style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)" }}>
+              <Users className="h-3.5 w-3.5" style={{ color: GOLD }} />
+              <span className="text-xs font-bold" style={{ color: GOLD }}>10,426+ ተጠቃሚዎች ተቀላቅለዋል</span>
+            </div>
           </div>
 
           <Form {...form}>
