@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { Layout } from "@/components/layout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
-import { ArrowRight, Mail, Wallet, Clock, CheckCircle, Users, Gift, Copy, Check } from "lucide-react";
+import { ArrowRight, Mail, Wallet, Clock, CheckCircle, Users, Gift, Copy, Check, Send } from "lucide-react";
 import { format } from "date-fns";
 import { useLanguage } from "@/lib/i18n";
+import { tg, tgHaptic, isTelegram } from "@/lib/telegram";
 
 function StatusPill({ status }: { status: string }) {
   const { t } = useLanguage();
@@ -59,6 +60,19 @@ export default function Dashboard() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
+  };
+
+  const handleTelegramShare = () => {
+    if (!referralLink) return;
+    tgHaptic("medium");
+    const msg = t("referral_share_tg_msg");
+    const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(msg)}`;
+    const webApp = tg();
+    if (webApp && isTelegram()) {
+      webApp.openTelegramLink(shareUrl);
+    } else {
+      window.open(shareUrl, "_blank");
+    }
   };
 
   if (authLoading || (user && !profile && profileLoading)) {
@@ -237,6 +251,21 @@ export default function Dashboard() {
                 {copied ? t("referral_copied") : t("referral_copy")}
               </button>
             </div>
+
+            {/* ── Telegram Share Button ── */}
+            <button
+              onClick={handleTelegramShare}
+              className="mt-3 w-full inline-flex items-center justify-center gap-2 rounded-xl h-11 font-bold text-sm transition-all duration-200 active:scale-[0.98]"
+              style={{
+                background: "linear-gradient(135deg, #229ED9 0%, #1a85b8 100%)",
+                boxShadow: "0 4px 16px rgba(34,158,217,0.35), 0 0 0 1px rgba(34,158,217,0.2) inset",
+                color: "#ffffff",
+              }}
+            >
+              <Send className="h-4 w-4" />
+              {t("referral_share_tg")}
+            </button>
+
             <p className="text-xs mt-3" style={{ color: "hsl(43,30%,50%)" }}>{t("referral_how")}</p>
           </div>
         )}

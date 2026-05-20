@@ -160,6 +160,8 @@ const translations = {
     referral_friends: "Friends Referred",
     referral_earned: "Total Commission Earned",
     referral_how: "How it works: your friend registers with your link → submits a Gmail account → gets approved → you earn commission automatically.",
+    referral_share_tg: "Share on Telegram",
+    referral_share_tg_msg: "Join ሜል ማርት and earn money by selling unused email accounts! Register with my link:",
 
     // Register referral
     register_ref_label: "Referral Code (optional)",
@@ -323,6 +325,8 @@ const translations = {
     referral_friends: "የጋበዟቸው ሰዎች",
     referral_earned: "ጠቅላላ ኮሚሽን",
     referral_how: "እንዴት ይሰራል: ጓደኛህ ሊንክህ ተጠቅሞ ይመዘገባል → Gmail ያቀርባል → ሲጸድቅ → ኮሚሽን ወዲያው ወደ ቦርሳህ ይገባል።",
+    referral_share_tg: "ቴሌግራም ላይ አጋራ",
+    referral_share_tg_msg: "ሜል ማርት ተቀላቀልና ያልተጠቀሙ ኢሜይሎቸን ሸጠህ ገንዘብ አግኝ! የእኔ ሊንክ ተጠቀም:",
 
     // Register referral
     register_ref_label: "የምልክት ኮድ (አስፈላጊ ካልሆነ ይተው)",
