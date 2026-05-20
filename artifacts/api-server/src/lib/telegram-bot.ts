@@ -88,7 +88,7 @@ export async function handleUpdate(update: TelegramUpdate): Promise<void> {
     const welcomeText =
       `👋 <b>ሰላም ${firstName}!</b>\n\n` +
       `🌟 <b>ሜል ማርት</b> እንኳን ደህና መጡ!\n\n` +
-      `📧 ያልተጠቀሙባቸው ኢሜይሎቻቸውን አቅርቡ — ለእያንዳንዱ ጸድቆ ቦርሳዎ ላይ <b>ክፍያ</b> ይጨምራሉ።\n\n` +
+      `💡 የማይጠቀሙበትን፣ ከፍተው የረሱት ወይም አዲስ የጂሜል አካውንት በመክፈት ኢሜሎችዎን በብርሃን ፍጥነት ወደ ገንዘብ ይቀይሩ — ለእያንዳንዱ ትክክለኛ ኢሜል <b>ተከፋይ ይሁኑ</b>።\n\n` +
       `👇 ታች ያለውን ቁልፍ ይጫኑ ወደ አፕሊኬሽኑ ለመግባት።`;
 
     if (appUrl) {
