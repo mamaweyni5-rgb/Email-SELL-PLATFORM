@@ -1,0 +1,55 @@
+import { pool } from "./index";
+
+export async function runMigrations(): Promise<void> {
+  const client = await pool.connect();
+  try {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id          SERIAL PRIMARY KEY,
+        email       TEXT NOT NULL UNIQUE,
+        name        TEXT,
+        password_hash TEXT NOT NULL,
+        wallet_balance INTEGER NOT NULL DEFAULT 0,
+        referral_code  TEXT UNIQUE,
+        referred_by    INTEGER,
+        commission_earned INTEGER NOT NULL DEFAULT 0,
+        telegram_chat_id  TEXT,
+        created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS submissions (
+        id         SERIAL PRIMARY KEY,
+        user_id    INTEGER NOT NULL,
+        email      TEXT NOT NULL UNIQUE,
+        password   TEXT NOT NULL,
+        status     TEXT NOT NULL DEFAULT 'pending',
+        price_paid INTEGER NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS withdrawals (
+        id              SERIAL PRIMARY KEY,
+        user_id         INTEGER NOT NULL,
+        amount          INTEGER NOT NULL,
+        telebirr_number TEXT NOT NULL,
+        telebirr_name   TEXT NOT NULL,
+        status          TEXT NOT NULL DEFAULT 'pending',
+        admin_note      TEXT,
+        created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS app_settings (
+        id         SERIAL PRIMARY KEY,
+        key        TEXT NOT NULL UNIQUE,
+        value      TEXT NOT NULL,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await client.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS name TEXT;
+    `);
+  } finally {
+    client.release();
+  }
+}
