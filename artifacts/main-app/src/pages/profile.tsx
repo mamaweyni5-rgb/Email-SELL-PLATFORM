@@ -64,7 +64,7 @@ export default function Profile() {
           <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "#D4AF37" }}>
             {t("profile_title")}
           </h1>
-          <p className="text-sm mt-1" style={{ color: "hsl(43,35%,55%)" }}>{user.email}</p>
+          <p className="text-sm mt-1" style={{ color: "hsl(43,35%,55%)" }}>{user.name ?? user.email ?? ""}</p>
         </div>
 
         {/* Stat cards */}

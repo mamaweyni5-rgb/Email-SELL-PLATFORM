@@ -40,7 +40,7 @@ export const LoginBody = zod.object({
 
 export const LoginResponse = zod.object({
   "id": zod.number(),
-  "email": zod.string(),
+  "email": zod.string().nullish(),
   "name": zod.string().nullish(),
   "walletBalance": zod.number()
 })
@@ -51,7 +51,7 @@ export const LoginResponse = zod.object({
  */
 export const GetMeResponse = zod.object({
   "id": zod.number(),
-  "email": zod.string(),
+  "email": zod.string().nullish(),
   "name": zod.string().nullish(),
   "walletBalance": zod.number()
 })
@@ -62,7 +62,7 @@ export const GetMeResponse = zod.object({
  */
 export const GetProfileResponse = zod.object({
   "id": zod.number(),
-  "email": zod.string(),
+  "email": zod.string().nullish(),
   "name": zod.string().nullish(),
   "walletBalance": zod.number(),
   "totalSubmissions": zod.number(),
@@ -271,7 +271,7 @@ export const AdminUpdateWithdrawalResponse = zod.object({
  */
 export const AdminListUsersResponseItem = zod.object({
   "id": zod.number(),
-  "email": zod.string(),
+  "email": zod.string().nullish(),
   "walletBalance": zod.number(),
   "totalSubmissions": zod.number(),
   "approvedSubmissions": zod.number(),

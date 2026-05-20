@@ -169,7 +169,7 @@ export function Navbar() {
                             color: "hsl(344 90% 10%)",
                           }}
                         >
-                          {user.email.substring(0, 2)}
+                          {(user.name ?? user.email ?? "?").substring(0, 2)}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
@@ -185,7 +185,7 @@ export function Navbar() {
                   >
                     <div className="flex items-center justify-start gap-2 p-2 border-b border-[hsl(344,55%,26%)]">
                       <div className="flex flex-col space-y-0.5 leading-none">
-                        <p className="font-semibold text-sm truncate" style={{ color: "#D4AF37" }}>{user.email}</p>
+                        <p className="font-semibold text-sm truncate" style={{ color: "#D4AF37" }}>{user.name ?? user.email ?? ""}</p>
                         <p className="text-xs" style={{ color: "hsl(43,35%,55%)" }}>{t("nav_wallet")}: {user.walletBalance} ETB</p>
                       </div>
                     </div>

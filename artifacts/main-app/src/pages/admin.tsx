@@ -440,7 +440,7 @@ function UsersTab() {
           <TableBody>
             {users.map((user) => (
               <TableRow key={user.id} className="luxury-row transition-colors" style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}`, background: BURGUNDY_CARD }}>
-                <TableCell className="font-semibold text-sm" style={{ color: TEXT_BODY }}>{user.email}</TableCell>
+                <TableCell className="font-semibold text-sm" style={{ color: TEXT_BODY }}>{user.email ?? user.id}</TableCell>
                 <TableCell className="font-extrabold text-sm" style={{ color: GOLD_BRIGHT }}>{user.walletBalance} ETB</TableCell>
                 <TableCell className="text-sm" style={{ color: TEXT_BODY }}>{user.totalSubmissions}</TableCell>
                 <TableCell className="text-sm" style={{ color: TEXT_BODY }}>{user.approvedSubmissions}</TableCell>
