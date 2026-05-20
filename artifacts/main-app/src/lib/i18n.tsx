@@ -429,7 +429,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(() => {
     try {
       const stored = localStorage.getItem("lang");
-      return stored === "am" || stored === "en" ? stored : "en";
+      return stored === "am" || stored === "en" ? stored : "am";
     } catch {
       return "am";
     }
