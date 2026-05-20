@@ -277,6 +277,31 @@ export const AdminUpdateSettingsResponse = zod.object({
 
 
 /**
+ * @summary Send a broadcast message to all users
+ */
+
+
+
+
+export const AdminSendBroadcastBody = zod.object({
+  "title": zod.string().min(1),
+  "message": zod.string().min(1)
+})
+
+
+/**
+ * @summary List recent broadcast announcements
+ */
+export const ListBroadcastsResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "message": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+export const ListBroadcastsResponse = zod.array(ListBroadcastsResponseItem)
+
+
+/**
  * @summary Verify the admin panel password
  */
 export const AdminVerifyPasswordBody = zod.object({

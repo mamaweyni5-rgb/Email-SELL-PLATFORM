@@ -410,6 +410,46 @@ paths:
               schema:
                 $ref: "#/components/schemas/PlatformSettings"
 
+  /admin/broadcast:
+    post:
+      operationId: adminSendBroadcast
+      tags: [admin]
+      summary: Send a broadcast message to all users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BroadcastInput"
+      responses:
+        "201":
+          description: Broadcast sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Broadcast"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /broadcasts:
+    get:
+      operationId: listBroadcasts
+      tags: [profile]
+      summary: List recent broadcast announcements
+      responses:
+        "200":
+          description: Recent broadcasts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Broadcast"
+
   /admin/verify-password:
     post:
       operationId: adminVerifyPassword
@@ -726,6 +766,31 @@ components:
           type: integer
         commissionEarned:
           type: integer
+
+    BroadcastInput:
+      type: object
+      required: [title, message]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        message:
+          type: string
+          minLength: 1
+
+    Broadcast:
+      type: object
+      required: [id, title, message, createdAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        message:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
 
     AdminVerifyPasswordInput:
       type: object

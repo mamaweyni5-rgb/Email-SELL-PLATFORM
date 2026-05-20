@@ -16,6 +16,8 @@ export * from './adminVerifyPasswordInput';
 export * from './adminWithdrawal';
 export * from './adminWithdrawalStatus';
 export * from './authUser';
+export * from './broadcast';
+export * from './broadcastInput';
 export * from './errorResponse';
 export * from './healthStatus';
 export * from './loginInput';

@@ -10,11 +10,14 @@ import {
   useAdminGetStats,
   useAdminUpdateSettings,
   useAdminChangePassword,
+  useAdminSendBroadcast,
+  useListBroadcasts,
   getAdminListSubmissionsQueryKey,
   getAdminListWithdrawalsQueryKey,
   getAdminListUsersQueryKey,
   getAdminGetStatsQueryKey,
   getGetSettingsQueryKey,
+  getListBroadcastsQueryKey,
 } from "@workspace/api-client-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,6 +41,8 @@ import {
   Loader2,
   KeyRound,
   FileDown,
+  Megaphone,
+  Send,
 } from "lucide-react";
 
 function downloadCSV(filename: string, headers: string[], rows: (string | number)[][]) {
@@ -425,6 +430,145 @@ function UsersTab() {
   );
 }
 
+const broadcastSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  message: z.string().min(1, "Message is required"),
+});
+
+function BroadcastTab() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const sendBroadcast = useAdminSendBroadcast();
+  const { data: broadcasts, isLoading: historyLoading } = useListBroadcasts();
+
+  const form = useForm<z.infer<typeof broadcastSchema>>({
+    resolver: zodResolver(broadcastSchema),
+    defaultValues: { title: "", message: "" },
+  });
+
+  const onSubmit = (values: z.infer<typeof broadcastSchema>) => {
+    sendBroadcast.mutate(
+      { data: values },
+      {
+        onSuccess: () => {
+          form.reset();
+          queryClient.invalidateQueries({ queryKey: getListBroadcastsQueryKey() });
+          toast({ title: "Broadcast sent!", description: "Message delivered to all users." });
+        },
+        onError: () => toast({ title: "Error", description: "Failed to send broadcast.", variant: "destructive" }),
+      }
+    );
+  };
+
+  const cardStyle = {
+    background: BURGUNDY_CARD,
+    border: "1px solid hsl(43,30%,24%,0.4)",
+    boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+  };
+
+  return (
+    <div className="space-y-6 max-w-2xl">
+      <div className="rounded-2xl p-6" style={cardStyle}>
+        <div className="flex items-center gap-2 mb-1">
+          <Megaphone className="h-4 w-4" style={{ color: GOLD }} />
+          <h3 className="text-sm font-bold" style={{ color: GOLD }}>Send Announcement</h3>
+        </div>
+        <p className="text-xs mb-5" style={{ color: TEXT_SOFT }}>
+          Sends to all users in-app + via Telegram bot for those who have connected.
+        </p>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>Title</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g. New feature available"
+                      className="luxury-input h-10 rounded-lg"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="message"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>Message</FormLabel>
+                  <FormControl>
+                    <textarea
+                      rows={4}
+                      placeholder="Write your announcement here..."
+                      className="luxury-input w-full rounded-lg px-3 py-2.5 text-sm resize-none"
+                      style={{
+                        background: "hsl(344,70%,13%)",
+                        border: "1px solid hsl(43,30%,28%,0.5)",
+                        color: "hsl(46,68%,82%)",
+                        outline: "none",
+                      }}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <button
+              type="submit"
+              className="gold-btn inline-flex items-center gap-2 rounded-lg px-5 h-10 text-sm font-bold"
+              disabled={sendBroadcast.isPending}
+            >
+              {sendBroadcast.isPending ? (
+                <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Sending...</>
+              ) : (
+                <><Send className="h-3.5 w-3.5" /> Send to All Users</>
+              )}
+            </button>
+          </form>
+        </Form>
+      </div>
+
+      {/* History */}
+      <div className="rounded-2xl p-6" style={cardStyle}>
+        <h3 className="text-sm font-bold mb-4" style={{ color: GOLD }}>Past Announcements</h3>
+        {historyLoading ? (
+          <div className="space-y-3">
+            {[0,1,2].map(i => <Skeleton key={i} className="h-16 w-full rounded-xl" style={{ background: "hsl(344,65%,18%)" }} />)}
+          </div>
+        ) : !broadcasts || broadcasts.length === 0 ? (
+          <p className="text-sm text-center py-6" style={{ color: TEXT_SOFT }}>No announcements yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {broadcasts.map((b) => (
+              <div
+                key={b.id}
+                className="rounded-xl px-4 py-3"
+                style={{ background: "hsl(344,75%,13%)", border: "1px solid hsl(43,30%,22%,0.4)" }}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm" style={{ color: TEXT_BODY }}>{b.title}</p>
+                    <p className="text-xs mt-1 leading-relaxed" style={{ color: TEXT_SOFT }}>{b.message}</p>
+                  </div>
+                  <span className="text-xs shrink-0 mt-0.5" style={{ color: TEXT_SOFT }}>
+                    {format(new Date(b.createdAt), "MMM d, yyyy")}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function SettingsTab() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -674,7 +818,7 @@ export default function Admin() {
         {/* Tabs */}
         <Tabs defaultValue="submissions" className="space-y-5">
           <TabsList
-            className="rounded-xl p-1 h-auto"
+            className="rounded-xl p-1 h-auto flex-wrap"
             style={{
               background: "hsl(344,80%,14%)",
               border: "1px solid hsl(43,30%,24%,0.4)",
@@ -684,6 +828,7 @@ export default function Admin() {
               { value: "submissions", icon: Mail, label: "Submissions" },
               { value: "withdrawals", icon: Wallet, label: "Withdrawals" },
               { value: "users", icon: Users, label: "Users" },
+              { value: "broadcast", icon: Megaphone, label: "Broadcast" },
               { value: "settings", icon: ShieldCheck, label: "Settings" },
             ].map(tab => (
               <TabsTrigger
@@ -701,6 +846,7 @@ export default function Admin() {
           <TabsContent value="submissions"><SubmissionsTab /></TabsContent>
           <TabsContent value="withdrawals"><WithdrawalsTab /></TabsContent>
           <TabsContent value="users"><UsersTab /></TabsContent>
+          <TabsContent value="broadcast"><BroadcastTab /></TabsContent>
           <TabsContent value="settings"><SettingsTab /></TabsContent>
         </Tabs>
       </main>

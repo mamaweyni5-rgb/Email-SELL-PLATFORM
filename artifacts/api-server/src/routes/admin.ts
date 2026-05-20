@@ -1,13 +1,14 @@
 import { Router, type IRouter } from "express";
 import { eq, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
-import { db, usersTable, submissionsTable, withdrawalsTable, settingsTable } from "@workspace/db";
+import { db, usersTable, submissionsTable, withdrawalsTable, settingsTable, broadcastsTable } from "@workspace/db";
 import { getSettingValue } from "./settings";
 import {
   notifySubmissionApproved,
   notifySubmissionRejected,
   notifyWithdrawalCompleted,
   notifyWithdrawalRejected,
+  sendBroadcastMessage,
 } from "../lib/telegram-bot";
 import {
   AdminListSubmissionsResponse,
@@ -25,6 +26,7 @@ import {
   AdminVerifyPasswordBody,
   AdminVerifyPasswordResponse,
   AdminChangePasswordBody,
+  AdminSendBroadcastBody,
 } from "@workspace/api-zod";
 
 const DEFAULT_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "mailtrade@admin2024";
@@ -320,6 +322,37 @@ router.patch("/admin/settings", async (req, res): Promise<void> => {
 
   req.log.info({ pricePerEmail, referralCommissionPct }, "Settings updated");
   res.json(AdminUpdateSettingsResponse.parse({ pricePerEmail, referralCommissionPct }));
+});
+
+router.post("/admin/broadcast", async (req, res): Promise<void> => {
+  const parsed = AdminSendBroadcastBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+
+  const { title, message } = parsed.data;
+
+  const [broadcast] = await db
+    .insert(broadcastsTable)
+    .values({ title, message })
+    .returning();
+
+  const users = await db
+    .select({ telegramChatId: usersTable.telegramChatId })
+    .from(usersTable);
+
+  const telegramUsers = users.filter((u) => u.telegramChatId);
+  req.log.info({ count: telegramUsers.length, broadcastId: broadcast!.id }, "Sending broadcast via Telegram");
+
+  await Promise.allSettled(
+    telegramUsers.map((u) =>
+      sendBroadcastMessage(u.telegramChatId!, title, message).catch(() => {})
+    )
+  );
+
+  req.log.info({ broadcastId: broadcast!.id, telegramCount: telegramUsers.length }, "Broadcast sent");
+  res.status(201).json(broadcast);
 });
 
 router.post("/admin/verify-password", async (req, res): Promise<void> => {

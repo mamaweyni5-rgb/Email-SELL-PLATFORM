@@ -44,6 +44,13 @@ export async function runMigrations(): Promise<void> {
         value      TEXT NOT NULL,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
+
+      CREATE TABLE IF NOT EXISTS broadcasts (
+        id         SERIAL PRIMARY KEY,
+        title      TEXT NOT NULL,
+        message    TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
     `);
 
     await client.query(`

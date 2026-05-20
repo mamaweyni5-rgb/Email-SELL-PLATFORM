@@ -144,6 +144,26 @@ const translations = {
     profile_no_wd: "No withdrawals yet.",
     profile_request_wd: "Request a withdrawal",
 
+    // Broadcast
+    broadcast_tab: "Broadcast",
+    broadcast_title: "Send Announcement",
+    broadcast_desc: "Send a message to all users — shown in-app and via Telegram bot.",
+    broadcast_msg_title: "Message Title",
+    broadcast_msg_title_placeholder: "e.g. New feature available",
+    broadcast_msg_body: "Message",
+    broadcast_msg_body_placeholder: "Write your announcement here...",
+    broadcast_send: "Send to All Users",
+    broadcast_sending: "Sending...",
+    broadcast_success: "Broadcast sent!",
+    broadcast_success_desc: "Your message has been delivered to all users.",
+    broadcast_error: "Failed to send broadcast.",
+    broadcast_history: "Past Announcements",
+    broadcast_no_history: "No announcements yet.",
+    broadcast_telegram_note: "Users with Telegram connected will also receive this via bot.",
+
+    // Dashboard announcements
+    dash_announcements: "Announcements",
+
     // Not found
     notfound_title: "404 Page Not Found",
     notfound_desc: "Did you forget to add the page to the router?",
@@ -312,6 +332,26 @@ const translations = {
     profile_wd_history: "የወጪ ታሪክ",
     profile_no_wd: "እስካሁን ወጪ የለም።",
     profile_request_wd: "የወጪ ጥያቄ አቅርብ",
+
+    // Broadcast
+    broadcast_tab: "ብሮድካስት",
+    broadcast_title: "ማስታወቂያ ላክ",
+    broadcast_desc: "ለሁሉም ተጠቃሚዎች መልዕክት ላክ — በአፕ ላይ ይታያል፣ ቴሌግራም ቦት ያለቸውም በቦቱ ይቀበላሉ።",
+    broadcast_msg_title: "የመልዕክቱ ርዕስ",
+    broadcast_msg_title_placeholder: "ምሳሌ: አዲስ ዝማኔ",
+    broadcast_msg_body: "መልዕክት",
+    broadcast_msg_body_placeholder: "ማስታወቂያዎን እዚህ ይጻፉ...",
+    broadcast_send: "ለሁሉም ተጠቃሚዎች ላክ",
+    broadcast_sending: "እየላከ ነው...",
+    broadcast_success: "ብሮድካስት ተላከ!",
+    broadcast_success_desc: "መልዕክቱ ለሁሉም ተጠቃሚዎች ደርሷል።",
+    broadcast_error: "ብሮድካስት መላክ አልተሳካም።",
+    broadcast_history: "ያለፉ ማስታወቂያዎች",
+    broadcast_no_history: "እስካሁን ምንም ማስታወቂያ የለም።",
+    broadcast_telegram_note: "ቴሌግራም ያለቸው ተጠቃሚዎች ደግሞ በቦቱ ይቀበላሉ።",
+
+    // Dashboard announcements
+    dash_announcements: "ማስታወቂያዎች",
 
     // Not found
     notfound_title: "404 ፔጅ አልተገኘም",

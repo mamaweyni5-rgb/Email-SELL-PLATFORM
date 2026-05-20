@@ -203,6 +203,20 @@ export interface ReferralInfo {
   commissionEarned: number;
 }
 
+export interface BroadcastInput {
+  /** @minLength 1 */
+  title: string;
+  /** @minLength 1 */
+  message: string;
+}
+
+export interface Broadcast {
+  id: number;
+  title: string;
+  message: string;
+  createdAt: string;
+}
+
 export interface AdminVerifyPasswordInput {
   password: string;
 }

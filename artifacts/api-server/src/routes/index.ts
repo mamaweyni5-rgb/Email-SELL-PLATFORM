@@ -8,6 +8,7 @@ import settingsRouter from "./settings";
 import adminRouter from "./admin";
 import referralRouter from "./referral";
 import telegramRouter from "./telegram";
+import broadcastsRouter from "./broadcasts";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(settingsRouter);
 router.use(adminRouter);
 router.use(referralRouter);
 router.use(telegramRouter);
+router.use(broadcastsRouter);
 
 export default router;

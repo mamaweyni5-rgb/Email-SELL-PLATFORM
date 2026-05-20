@@ -163,6 +163,17 @@ export async function notifyWithdrawalCompleted(
   );
 }
 
+export async function sendBroadcastMessage(
+  chatId: string,
+  title: string,
+  message: string
+): Promise<void> {
+  await sendMessage(
+    chatId,
+    `📢 <b>${title}</b>\n\n${message}`
+  );
+}
+
 export async function notifyWithdrawalRejected(
   chatId: string | null | undefined,
   amount: number,

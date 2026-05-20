@@ -1,10 +1,10 @@
-import { useGetMe, useGetProfile, useListSubmissions, useListWithdrawals, useGetReferralInfo } from "@workspace/api-client-react";
+import { useGetMe, useGetProfile, useListSubmissions, useListWithdrawals, useGetReferralInfo, useListBroadcasts } from "@workspace/api-client-react";
 import { Link, useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { Layout } from "@/components/layout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
-import { ArrowRight, Mail, Wallet, Clock, CheckCircle, Users, Gift, Copy, Check, Send } from "lucide-react";
+import { ArrowRight, Mail, Wallet, Clock, CheckCircle, Users, Gift, Copy, Check, Send, Megaphone, X } from "lucide-react";
 import { format } from "date-fns";
 import { useLanguage } from "@/lib/i18n";
 import { tg, tgHaptic, isTelegram } from "@/lib/telegram";
@@ -49,6 +49,9 @@ export default function Dashboard() {
   const { data: submissions, isLoading: submissionsLoading } = useListSubmissions({ query: { enabled: !!user, retry: false } });
   const { data: withdrawals, isLoading: withdrawalsLoading } = useListWithdrawals({ query: { enabled: !!user, retry: false } });
   const { data: referral } = useGetReferralInfo({ query: { enabled: !!user, retry: false } });
+  const { data: broadcasts } = useListBroadcasts({ query: { enabled: !!user, retry: false } });
+  const [dismissedIds, setDismissedIds] = useState<Set<number>>(new Set());
+  const visibleBroadcasts = (broadcasts ?? []).slice(0, 3).filter((b) => !dismissedIds.has(b.id));
 
   const referralLink = referral?.referralCode
     ? `${window.location.origin}/register?ref=${referral.referralCode}`
@@ -124,6 +127,44 @@ export default function Dashboard() {
             </Link>
           </div>
         </div>
+
+        {/* ── Announcements ── */}
+        {visibleBroadcasts.length > 0 && (
+          <div className="mb-7 space-y-2">
+            {visibleBroadcasts.map((b) => (
+              <div
+                key={b.id}
+                className="flex items-start gap-3 rounded-2xl px-4 py-3"
+                style={{
+                  background: "linear-gradient(135deg, hsl(40,70%,14%), hsl(344,80%,16%))",
+                  border: "1px solid hsl(43,50%,28%,0.5)",
+                  boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
+                }}
+              >
+                <div
+                  className="mt-0.5 shrink-0 w-7 h-7 rounded-lg flex items-center justify-center"
+                  style={{ background: "rgba(212,175,55,0.18)", border: "1px solid rgba(212,175,55,0.3)" }}
+                >
+                  <Megaphone className="h-3.5 w-3.5" style={{ color: "#D4AF37" }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-sm leading-snug" style={{ color: "#D4AF37" }}>{b.title}</p>
+                  <p className="text-xs mt-0.5 leading-relaxed" style={{ color: "hsl(43,40%,62%)" }}>{b.message}</p>
+                  <p className="text-xs mt-1" style={{ color: "hsl(43,30%,45%)" }}>
+                    {format(new Date(b.createdAt), "MMM d, yyyy")}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setDismissedIds((s) => new Set([...s, b.id]))}
+                  className="shrink-0 mt-0.5 rounded-lg p-1 transition-colors"
+                  style={{ color: "hsl(43,30%,45%)" }}
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* ── Stat cards ── */}
         <div className="grid md:grid-cols-3 gap-5 mb-7">
