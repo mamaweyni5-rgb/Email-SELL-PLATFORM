@@ -195,7 +195,7 @@ const translations = {
     home_cta_signin: "ወደ ዳሽቦርድ ግባ",
     home_how_title: "እንዴት ይሰራል",
     home_how_subtitle:
-      "አካውንቶችዎን ለማትረፍ ቀላልና ደህንነቱ የተጠበቀ ሂደት በሦስት ቀላል ደረጃዎች።",
+      "በGmail አካውንችዎ ለማትረፍ ቀላልና ደህንነቱ የተጠበቀ ሂደት በሦስት ቀላል ደረጃዎች",
     home_hero_badge: "የኢትዮጵያ ቁጥር 1 ኢሜይል ገበያ",
     home_step_label: "ደረጃ",
     home_step1_title: "1. በደህንነት አቅርብ",
