@@ -7,6 +7,7 @@ import { useLocation } from "wouter";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/lib/i18n";
 
 const ADMIN_TAP_COUNT = 5;
 
@@ -40,6 +41,7 @@ function TelegramHeader() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const verifyPassword = useAdminVerifyPassword();
+  const { lang, setLang } = useLanguage();
 
   const [tapCount, setTapCount] = useState(0);
   const [showAdminDialog, setShowAdminDialog] = useState(false);
@@ -85,7 +87,7 @@ function TelegramHeader() {
   return (
     <>
       <div
-        className="flex items-center justify-center py-3 px-4"
+        className="flex items-center justify-between py-3 px-4"
         style={{
           background: "linear-gradient(180deg, hsl(344,90%,10%) 0%, hsl(344,88%,13%) 100%)",
           borderBottom: "1px solid hsl(43,40%,30%,0.35)",
@@ -116,6 +118,17 @@ function TelegramHeader() {
             MailMart
           </span>
         </div>
+        <button
+          onClick={() => setLang(lang === "en" ? "am" : "en")}
+          className="text-xs font-semibold px-2.5 py-1.5 rounded-md transition-all duration-200"
+          style={{
+            border: "1px solid hsl(43,40%,30%,0.5)",
+            background: "hsl(344,65%,18%)",
+            color: "hsl(43,60%,65%)",
+          }}
+        >
+          {lang === "en" ? "አማ" : "EN"}
+        </button>
       </div>
 
       <Dialog open={showAdminDialog} onOpenChange={(open) => { setShowAdminDialog(open); setAdminPassword(""); }}>
