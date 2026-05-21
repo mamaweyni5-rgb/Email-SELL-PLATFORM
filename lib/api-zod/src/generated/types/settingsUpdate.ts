@@ -14,4 +14,5 @@ export interface SettingsUpdate {
      * @maximum 100
      */
   referralCommissionPct: number;
+  telegramBotUsername?: string;
 }

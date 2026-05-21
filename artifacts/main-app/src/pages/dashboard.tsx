@@ -1,4 +1,4 @@
-import { useGetMe, useGetProfile, useListSubmissions, useListWithdrawals, useGetReferralInfo, useListBroadcasts } from "@workspace/api-client-react";
+import { useGetMe, useGetProfile, useListSubmissions, useListWithdrawals, useGetReferralInfo, useListBroadcasts, useGetSettings } from "@workspace/api-client-react";
 import { Link, useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { Layout } from "@/components/layout";
@@ -50,6 +50,7 @@ export default function Dashboard() {
   const { data: withdrawals, isLoading: withdrawalsLoading } = useListWithdrawals({ query: { enabled: !!user, retry: false } });
   const { data: referral } = useGetReferralInfo({ query: { enabled: !!user, retry: false } });
   const { data: broadcasts } = useListBroadcasts({ query: { enabled: !!user, retry: false } });
+  const { data: settings } = useGetSettings({ query: { enabled: !!user, retry: false } });
   const [dismissedIds, setDismissedIds] = useState<Set<number>>(new Set());
   const visibleBroadcasts = (broadcasts ?? []).slice(0, 3).filter((b) => !dismissedIds.has(b.id));
 
@@ -127,6 +128,36 @@ export default function Dashboard() {
             </Link>
           </div>
         </div>
+
+        {/* ── Telegram Bot Banner ── */}
+        {settings?.telegramBotUsername && (
+          <a
+            href={`https://t.me/${settings.telegramBotUsername}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 rounded-2xl px-4 py-3 mb-4 transition-all duration-200 hover:brightness-110 cursor-pointer"
+            style={{
+              background: "linear-gradient(135deg, hsl(200,80%,14%), hsl(344,80%,16%))",
+              border: "1px solid hsl(200,60%,30%,0.5)",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
+              textDecoration: "none",
+            }}
+          >
+            <div
+              className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: "rgba(41,182,246,0.2)", border: "1px solid rgba(41,182,246,0.35)" }}
+            >
+              <Send className="h-4 w-4" style={{ color: "#29B6F6" }} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold" style={{ color: "#29B6F6" }}>Open MailMart on Telegram</p>
+              <p className="text-xs truncate" style={{ color: "hsl(200,50%,65%)" }}>
+                @{settings.telegramBotUsername} — sell accounts &amp; get notified instantly
+              </p>
+            </div>
+            <ArrowRight className="h-4 w-4 shrink-0" style={{ color: "hsl(200,50%,55%)" }} />
+          </a>
+        )}
 
         {/* ── Announcements ── */}
         {visibleBroadcasts.length > 0 && (

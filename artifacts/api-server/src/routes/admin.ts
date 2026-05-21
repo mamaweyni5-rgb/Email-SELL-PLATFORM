@@ -2,7 +2,7 @@ import { Router, type IRouter } from "express";
 import { eq, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { db, usersTable, submissionsTable, withdrawalsTable, settingsTable, broadcastsTable } from "@workspace/db";
-import { getSettingValue } from "./settings";
+import { getSettingValue, getSettingString } from "./settings";
 import {
   notifySubmissionApproved,
   notifySubmissionRejected,
@@ -321,7 +321,7 @@ router.patch("/admin/settings", async (req, res): Promise<void> => {
     return;
   }
 
-  const { pricePerEmail, referralCommissionPct } = body.data;
+  const { pricePerEmail, referralCommissionPct, telegramBotUsername } = body.data;
 
   await db
     .insert(settingsTable)
@@ -333,8 +333,16 @@ router.patch("/admin/settings", async (req, res): Promise<void> => {
     .values({ key: "referral_commission_pct", value: String(referralCommissionPct) })
     .onConflictDoUpdate({ target: settingsTable.key, set: { value: String(referralCommissionPct) } });
 
+  if (telegramBotUsername !== undefined) {
+    await db
+      .insert(settingsTable)
+      .values({ key: "telegram_bot_username", value: telegramBotUsername })
+      .onConflictDoUpdate({ target: settingsTable.key, set: { value: telegramBotUsername } });
+  }
+
+  const savedBotUsername = await getSettingString("telegram_bot_username", "");
   req.log.info({ pricePerEmail, referralCommissionPct }, "Settings updated");
-  res.json(AdminUpdateSettingsResponse.parse({ pricePerEmail, referralCommissionPct }));
+  res.json(AdminUpdateSettingsResponse.parse({ pricePerEmail, referralCommissionPct, telegramBotUsername: savedBotUsername }));
 });
 
 router.post("/admin/broadcast", async (req, res): Promise<void> => {

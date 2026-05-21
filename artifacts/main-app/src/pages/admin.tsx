@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -12,6 +12,7 @@ import {
   useAdminChangePassword,
   useAdminSendBroadcast,
   useListBroadcasts,
+  useGetSettings,
   getAdminListSubmissionsQueryKey,
   getAdminListWithdrawalsQueryKey,
   getAdminListUsersQueryKey,
@@ -65,6 +66,7 @@ function downloadCSV(filename: string, headers: string[], rows: (string | number
 const priceSchema = z.object({
   pricePerEmail: z.coerce.number().min(1, "Price must be at least 1 ETB"),
   referralCommissionPct: z.coerce.number().min(0, "Min 0%").max(100, "Max 100%"),
+  telegramBotUsername: z.string().optional(),
 });
 
 const changePasswordSchema = z.object({
@@ -626,11 +628,22 @@ function SettingsTab() {
   const { toast } = useToast();
   const updateSettings = useAdminUpdateSettings();
   const changePassword = useAdminChangePassword();
+  const { data: currentSettings } = useGetSettings();
 
   const priceForm = useForm<z.infer<typeof priceSchema>>({
     resolver: zodResolver(priceSchema),
-    defaultValues: { pricePerEmail: 20, referralCommissionPct: 10 },
+    defaultValues: { pricePerEmail: 20, referralCommissionPct: 10, telegramBotUsername: "" },
   });
+
+  useEffect(() => {
+    if (currentSettings) {
+      priceForm.reset({
+        pricePerEmail: currentSettings.pricePerEmail,
+        referralCommissionPct: currentSettings.referralCommissionPct,
+        telegramBotUsername: currentSettings.telegramBotUsername ?? "",
+      });
+    }
+  }, [currentSettings]);
 
   const pwForm = useForm<z.infer<typeof changePasswordSchema>>({
     resolver: zodResolver(changePasswordSchema),
@@ -639,12 +652,13 @@ function SettingsTab() {
 
   const onPriceSubmit = (values: z.infer<typeof priceSchema>) => {
     updateSettings.mutate(
-      { data: { pricePerEmail: values.pricePerEmail, referralCommissionPct: values.referralCommissionPct } },
+      { data: { pricePerEmail: values.pricePerEmail, referralCommissionPct: values.referralCommissionPct, telegramBotUsername: values.telegramBotUsername } },
       {
         onSuccess: (data) => {
           queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
           priceForm.setValue("pricePerEmail", data.pricePerEmail);
           priceForm.setValue("referralCommissionPct", data.referralCommissionPct);
+          if (data.telegramBotUsername !== undefined) priceForm.setValue("telegramBotUsername", data.telegramBotUsername);
           toast({ title: "Settings saved", description: `Price: ${data.pricePerEmail} ETB | Commission: ${data.referralCommissionPct}%` });
         },
         onError: () => toast({ title: "Error", description: "Failed to save settings.", variant: "destructive" }),
@@ -735,6 +749,30 @@ function SettingsTab() {
                       </span>
                     </div>
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={priceForm.control}
+              name="telegramBotUsername"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>Telegram Bot Username</FormLabel>
+                  <FormControl>
+                    <div className="flex gap-2 items-center">
+                      <span className="text-sm font-semibold" style={{ color: "hsl(43,40%,50%)" }}>@</span>
+                      <Input
+                        placeholder="YourBotUsername"
+                        className="luxury-input h-10 rounded-lg"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </div>
+                  </FormControl>
+                  <p className="text-xs mt-1" style={{ color: "hsl(43,30%,45%)" }}>
+                    The bot username (without @) shown to users on the dashboard as a link.
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}

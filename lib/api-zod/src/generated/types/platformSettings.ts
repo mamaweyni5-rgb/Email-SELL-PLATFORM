@@ -9,4 +9,5 @@
 export interface PlatformSettings {
   pricePerEmail: number;
   referralCommissionPct: number;
+  telegramBotUsername?: string;
 }

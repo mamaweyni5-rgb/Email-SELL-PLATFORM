@@ -164,7 +164,8 @@ export const CreateWithdrawalBody = zod.discriminatedUnion("paymentMethod", [
  */
 export const GetSettingsResponse = zod.object({
   "pricePerEmail": zod.number(),
-  "referralCommissionPct": zod.number()
+  "referralCommissionPct": zod.number(),
+  "telegramBotUsername": zod.string().optional()
 })
 
 
@@ -309,12 +310,14 @@ export const adminUpdateSettingsBodyReferralCommissionPctMax = 100;
 
 export const AdminUpdateSettingsBody = zod.object({
   "pricePerEmail": zod.number().min(1),
-  "referralCommissionPct": zod.number().min(adminUpdateSettingsBodyReferralCommissionPctMin).max(adminUpdateSettingsBodyReferralCommissionPctMax)
+  "referralCommissionPct": zod.number().min(adminUpdateSettingsBodyReferralCommissionPctMin).max(adminUpdateSettingsBodyReferralCommissionPctMax),
+  "telegramBotUsername": zod.string().optional()
 })
 
 export const AdminUpdateSettingsResponse = zod.object({
   "pricePerEmail": zod.number(),
-  "referralCommissionPct": zod.number()
+  "referralCommissionPct": zod.number(),
+  "telegramBotUsername": zod.string().optional()
 })
 
 

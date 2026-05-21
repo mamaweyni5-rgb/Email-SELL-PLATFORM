@@ -1,7 +1,7 @@
 import { useGetMe, useGetSettings, getGetMeQueryKey } from "@workspace/api-client-react";
 import { Link, useLocation } from "wouter";
 import { Layout } from "@/components/layout";
-import { ArrowRight, CheckCircle2, ShieldCheck, Banknote, Star } from "lucide-react";
+import { ArrowRight, CheckCircle2, ShieldCheck, Banknote, Star, Send } from "lucide-react";
 import { useEffect } from "react";
 import { useLanguage } from "@/lib/i18n";
 
@@ -129,6 +129,25 @@ export default function Home() {
               >
                 {t("home_cta_signin")}
               </Link>
+              {settings?.telegramBotUsername && (
+                <a
+                  href={`https://t.me/${settings.telegramBotUsername}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl text-base font-semibold w-full sm:w-auto transition-all duration-200 hover:brightness-110"
+                  style={{
+                    height: "3.25rem",
+                    paddingLeft: "2rem",
+                    paddingRight: "2rem",
+                    background: "hsl(200,80%,14%)",
+                    border: "1.5px solid hsl(200,60%,30%,0.6)",
+                    color: "#29B6F6",
+                  }}
+                >
+                  <Send className="h-4 w-4" />
+                  Open in Telegram
+                </a>
+              )}
             </div>
           </div>
         </section>

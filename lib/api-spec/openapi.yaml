@@ -749,6 +749,8 @@ components:
           type: integer
         referralCommissionPct:
           type: integer
+        telegramBotUsername:
+          type: string
 
     SettingsUpdate:
       type: object
@@ -761,6 +763,8 @@ components:
           type: integer
           minimum: 0
           maximum: 100
+        telegramBotUsername:
+          type: string
 
     ReferralInfo:
       type: object
