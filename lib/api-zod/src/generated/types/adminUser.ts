@@ -8,7 +8,8 @@
 
 export interface AdminUser {
   id: number;
-  email: string;
+  email?: string | null;
+  name?: string | null;
   walletBalance: number;
   totalSubmissions: number;
   approvedSubmissions: number;

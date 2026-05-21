@@ -460,7 +460,7 @@ function UsersTab() {
         <Table>
           <TableHeader>
             <TableRow style={{ background: "hsl(344,80%,14%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
-              {["Email","Wallet Balance","Total Submitted","Approved","Joined"].map(h => (
+              {["Name","Email","Wallet Balance","Total Submitted","Approved","Joined"].map(h => (
                 <TableHead key={h} className="text-xs font-bold uppercase tracking-wider" style={{ color: GOLD }}>{h}</TableHead>
               ))}
             </TableRow>
@@ -468,7 +468,8 @@ function UsersTab() {
           <TableBody>
             {users.map((user) => (
               <TableRow key={user.id} className="luxury-row transition-colors" style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}`, background: BURGUNDY_CARD }}>
-                <TableCell className="font-semibold text-sm" style={{ color: TEXT_BODY }}>{user.email ?? user.id}</TableCell>
+                <TableCell className="font-semibold text-sm" style={{ color: TEXT_BODY }}>{user.name ?? <span style={{ color: "hsl(43,30%,45%)" }}>—</span>}</TableCell>
+                <TableCell className="text-sm" style={{ color: TEXT_BODY }}>{user.email ?? <span style={{ color: "hsl(43,30%,45%)" }}>—</span>}</TableCell>
                 <TableCell className="font-extrabold text-sm" style={{ color: GOLD_BRIGHT }}>{user.walletBalance} ETB</TableCell>
                 <TableCell className="text-sm" style={{ color: TEXT_BODY }}>{user.totalSubmissions}</TableCell>
                 <TableCell className="text-sm" style={{ color: TEXT_BODY }}>{user.approvedSubmissions}</TableCell>

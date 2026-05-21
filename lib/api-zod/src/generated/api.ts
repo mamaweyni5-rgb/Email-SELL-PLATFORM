@@ -277,6 +277,7 @@ export const AdminUpdateWithdrawalResponse = zod.object({
 export const AdminListUsersResponseItem = zod.object({
   "id": zod.number(),
   "email": zod.string().nullish(),
+  "name": zod.string().nullish(),
   "walletBalance": zod.number(),
   "totalSubmissions": zod.number(),
   "approvedSubmissions": zod.number(),

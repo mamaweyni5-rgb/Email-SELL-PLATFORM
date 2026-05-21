@@ -255,6 +255,7 @@ router.get("/admin/users", async (_req, res): Promise<void> => {
     .select({
       id: usersTable.id,
       email: usersTable.email,
+      name: usersTable.name,
       walletBalance: usersTable.walletBalance,
       createdAt: usersTable.createdAt,
     })
