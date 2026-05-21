@@ -142,16 +142,18 @@ export const ETHIOPIAN_BANKS = [
   "ሻቤሌ ባንክ",
 ] as const;
 
+export const createWithdrawalBodyAmountMin = 100;
+
 export const CreateWithdrawalBody = zod.discriminatedUnion("paymentMethod", [
   zod.object({
     paymentMethod: zod.literal("telebirr"),
-    amount: zod.number().min(1),
+    amount: zod.number().min(createWithdrawalBodyAmountMin),
     telebirrNumber: zod.string().min(createWithdrawalBodyTelebirrNumberMin),
     telebirrName: zod.string().min(1),
   }),
   zod.object({
     paymentMethod: zod.literal("bank"),
-    amount: zod.number().min(1),
+    amount: zod.number().min(createWithdrawalBodyAmountMin),
     bankName: zod.string().min(1),
     bankAccountNumber: zod.string().min(5),
     bankAccountName: zod.string().min(1),

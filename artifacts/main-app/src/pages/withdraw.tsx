@@ -34,14 +34,14 @@ const ETHIOPIAN_BANKS = [
 
 const telebirrSchema = z.object({
   paymentMethod: z.literal("telebirr"),
-  amount: z.coerce.number().min(1, "ቢያንስ 1 ብር መሆን አለበት"),
+  amount: z.coerce.number().min(100, "ቢያንስ 100 ብር መሆን አለበት"),
   telebirrNumber: z.string().min(10, "ትክክለኛ የቴሌብር ቁጥር አስገባ"),
   telebirrName: z.string().min(1, "ሙሉ ስምህን አስገባ"),
 });
 
 const bankSchema = z.object({
   paymentMethod: z.literal("bank"),
-  amount: z.coerce.number().min(1, "ቢያንስ 1 ብር መሆን አለበት"),
+  amount: z.coerce.number().min(100, "ቢያንስ 100 ብር መሆን አለበት"),
   bankName: z.string().min(1, "ባንክ ምረጥ"),
   bankAccountNumber: z.string().min(5, "ትክክለኛ የሂሳብ ቁጥር አስገባ"),
   bankAccountName: z.string().min(1, "የሂሳብ ባለቤት ስም አስገባ"),

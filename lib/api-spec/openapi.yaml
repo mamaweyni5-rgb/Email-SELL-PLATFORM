@@ -661,7 +661,7 @@ components:
       properties:
         amount:
           type: integer
-          minimum: 1
+          minimum: 100
         telebirrNumber:
           type: string
           minLength: 10
