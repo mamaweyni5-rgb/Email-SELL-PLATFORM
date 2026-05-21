@@ -440,7 +440,11 @@ export default function Dashboard() {
                           <Wallet className="h-3.5 w-3.5" style={{ color: "#D4AF37" }} />
                         </div>
                         <div className="min-w-0">
-                          <p className="font-semibold text-sm truncate" style={{ color: "hsl(46,68%,82%)" }}>{wd.telebirrNumber}</p>
+                          <p className="font-semibold text-sm truncate" style={{ color: "hsl(46,68%,82%)" }}>
+                            {wd.paymentMethod === "bank"
+                              ? `🏦 ${wd.bankAccountNumber ?? wd.bankName ?? ""}`
+                              : `📱 ${wd.telebirrNumber}`}
+                          </p>
                           <p className="text-xs" style={{ color: "hsl(43,30%,50%)" }}>{format(new Date(wd.createdAt), "MMM d, yyyy")}</p>
                         </div>
                       </div>

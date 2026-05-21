@@ -111,8 +111,12 @@ export const WithdrawalStatus = {
 export interface Withdrawal {
   id: number;
   amount: number;
+  paymentMethod: string;
   telebirrNumber: string;
   telebirrName: string;
+  bankName?: string | null;
+  bankAccountNumber?: string | null;
+  bankAccountName?: string | null;
   status: WithdrawalStatus;
   /** @nullable */
   adminNote?: string | null;
@@ -142,8 +146,12 @@ export interface AdminWithdrawal {
   userId: number;
   userEmail: string;
   amount: number;
+  paymentMethod: string;
   telebirrNumber: string;
   telebirrName: string;
+  bankName?: string | null;
+  bankAccountNumber?: string | null;
+  bankAccountName?: string | null;
   status: AdminWithdrawalStatus;
   /** @nullable */
   adminNote?: string | null;

@@ -232,7 +232,9 @@ export default function Profile() {
                       >
                         <div>
                           <p className="font-semibold text-sm" style={{ color: "hsl(46,68%,82%)" }}>
-                            {wd.telebirrNumber} — {wd.telebirrName}
+                            {wd.paymentMethod === "bank"
+                              ? `🏦 ${wd.bankName ?? ""} — ${wd.bankAccountNumber ?? ""}`
+                              : `📱 ${wd.telebirrNumber} — ${wd.telebirrName}`}
                           </p>
                           <p className="text-xs mt-0.5" style={{ color: "hsl(43,30%,50%)" }}>
                             {format(new Date(wd.createdAt), "MMM d, yyyy")}
