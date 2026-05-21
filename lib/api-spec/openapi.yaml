@@ -582,6 +582,8 @@ components:
           enum: [pending, approved, rejected]
         pricePaid:
           type: integer
+        rejectionNote:
+          type: ["string", "null"]
         createdAt:
           type: string
           format: date-time
@@ -616,6 +618,8 @@ components:
           enum: [pending, approved, rejected]
         pricePaid:
           type: integer
+        rejectionNote:
+          type: ["string", "null"]
         createdAt:
           type: string
           format: date-time
@@ -627,6 +631,8 @@ components:
         status:
           type: string
           enum: [approved, rejected]
+        rejectionNote:
+          type: string
 
     Withdrawal:
       type: object

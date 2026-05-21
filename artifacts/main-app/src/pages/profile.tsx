@@ -179,6 +179,9 @@ export default function Profile() {
                           <p className="text-xs mt-0.5" style={{ color: "hsl(43,30%,50%)" }}>
                             {format(new Date(sub.createdAt), "MMM d, yyyy")}
                           </p>
+                          {sub.status === "rejected" && sub.rejectionNote && (
+                            <p className="text-xs mt-1" style={{ color: "hsl(5,75%,65%)" }}>⚠ {sub.rejectionNote}</p>
+                          )}
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="font-bold text-sm" style={{ color: "#D4AF37" }}>{sub.pricePaid} ETB</span>

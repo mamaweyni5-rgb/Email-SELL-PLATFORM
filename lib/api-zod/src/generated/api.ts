@@ -79,6 +79,7 @@ export const ListSubmissionsResponseItem = zod.object({
   "email": zod.string(),
   "status": zod.enum(['pending', 'approved', 'rejected']),
   "pricePaid": zod.number(),
+  "rejectionNote": zod.string().nullish(),
   "createdAt": zod.coerce.date()
 })
 export const ListSubmissionsResponse = zod.array(ListSubmissionsResponseItem)
@@ -188,6 +189,7 @@ export const AdminListSubmissionsResponseItem = zod.object({
   "password": zod.string(),
   "status": zod.enum(['pending', 'approved', 'rejected']),
   "pricePaid": zod.number(),
+  "rejectionNote": zod.string().nullish(),
   "createdAt": zod.coerce.date()
 })
 export const AdminListSubmissionsResponse = zod.array(AdminListSubmissionsResponseItem)
@@ -201,7 +203,8 @@ export const AdminUpdateSubmissionParams = zod.object({
 })
 
 export const AdminUpdateSubmissionBody = zod.object({
-  "status": zod.enum(['approved', 'rejected'])
+  "status": zod.enum(['approved', 'rejected']),
+  "rejectionNote": zod.string().optional()
 })
 
 export const AdminUpdateSubmissionResponse = zod.object({
@@ -212,6 +215,7 @@ export const AdminUpdateSubmissionResponse = zod.object({
   "password": zod.string(),
   "status": zod.enum(['pending', 'approved', 'rejected']),
   "pricePaid": zod.number(),
+  "rejectionNote": zod.string().nullish(),
   "createdAt": zod.coerce.date()
 })
 

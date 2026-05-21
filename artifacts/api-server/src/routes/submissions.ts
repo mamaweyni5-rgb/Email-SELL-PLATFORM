@@ -23,6 +23,7 @@ router.get("/submissions", requireAuth, async (req, res): Promise<void> => {
       email: submissionsTable.email,
       status: submissionsTable.status,
       pricePaid: submissionsTable.pricePaid,
+      rejectionNote: submissionsTable.rejectionNote,
       createdAt: submissionsTable.createdAt,
     })
     .from(submissionsTable)

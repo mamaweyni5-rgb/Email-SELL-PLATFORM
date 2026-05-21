@@ -102,6 +102,7 @@ function SubmissionsTab() {
   const { toast } = useToast();
   const { data: submissions, isLoading } = useAdminListSubmissions();
   const updateSubmission = useAdminUpdateSubmission();
+  const [rejectNoteMap, setRejectNoteMap] = useState<Record<number, string>>({});
 
   const handleExport = () => {
     if (!submissions?.length) return;
@@ -121,8 +122,9 @@ function SubmissionsTab() {
   };
 
   const handleUpdate = (id: number, status: "approved" | "rejected") => {
+    const rejectionNote = rejectNoteMap[id]?.trim() || undefined;
     updateSubmission.mutate(
-      { id, data: { status } },
+      { id, data: { status, ...(status === "rejected" && rejectionNote ? { rejectionNote } : {}) } },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getAdminListSubmissionsQueryKey() });
@@ -165,7 +167,7 @@ function SubmissionsTab() {
       <Table>
         <TableHeader>
           <TableRow style={{ background: "hsl(344,80%,14%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
-            {["Seller","Email Account","Password","Price","Date","Status","Actions"].map(h => (
+            {["Seller","Email Account","Password","Price","Date","Status","Rejection Note","Actions"].map(h => (
               <TableHead key={h} className="text-xs font-bold uppercase tracking-wider" style={{ color: GOLD }}>{h}</TableHead>
             ))}
           </TableRow>
@@ -181,6 +183,20 @@ function SubmissionsTab() {
                 {format(new Date(sub.createdAt), "MMM d, yyyy")}
               </TableCell>
               <TableCell><StatusPill status={sub.status} /></TableCell>
+              <TableCell>
+                {sub.status === "pending" ? (
+                  <Input
+                    className="luxury-input h-7 text-xs w-36 rounded-lg"
+                    placeholder="ምክንያት (ለሪጄክት)"
+                    value={rejectNoteMap[sub.id] ?? ""}
+                    onChange={(e) => setRejectNoteMap((m) => ({ ...m, [sub.id]: e.target.value }))}
+                  />
+                ) : sub.status === "rejected" && sub.rejectionNote ? (
+                  <span className="text-xs italic" style={{ color: "hsl(5,75%,65%)" }}>{sub.rejectionNote}</span>
+                ) : (
+                  <span className="text-xs italic" style={{ color: TEXT_SOFT }}>—</span>
+                )}
+              </TableCell>
               <TableCell className="text-right">
                 {sub.status === "pending" ? (
                   <div className="flex items-center justify-end gap-2">

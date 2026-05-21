@@ -7,6 +7,7 @@ export const submissionsTable = pgTable("submissions", {
   password: text("password").notNull(),
   status: text("status").notNull().default("pending"),
   pricePaid: integer("price_paid").notNull().default(0),
+  rejectionNote: text("rejection_note"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

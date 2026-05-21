@@ -9,4 +9,5 @@ import type { SubmissionStatusUpdateStatus } from './submissionStatusUpdateStatu
 
 export interface SubmissionStatusUpdate {
   status: SubmissionStatusUpdateStatus;
+  rejectionNote?: string;
 }

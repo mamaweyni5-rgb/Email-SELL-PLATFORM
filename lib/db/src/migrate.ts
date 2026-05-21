@@ -79,6 +79,10 @@ export async function runMigrations(): Promise<void> {
       ALTER TABLE withdrawals ALTER COLUMN telebirr_number SET DEFAULT '';
       ALTER TABLE withdrawals ALTER COLUMN telebirr_name SET DEFAULT '';
     `);
+
+    await client.query(`
+      ALTER TABLE submissions ADD COLUMN IF NOT EXISTS rejection_note TEXT;
+    `);
   } finally {
     client.release();
   }

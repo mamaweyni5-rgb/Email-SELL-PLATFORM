@@ -52,6 +52,7 @@ router.get("/admin/submissions", async (req, res): Promise<void> => {
       password: submissionsTable.password,
       status: submissionsTable.status,
       pricePaid: submissionsTable.pricePaid,
+      rejectionNote: submissionsTable.rejectionNote,
       createdAt: submissionsTable.createdAt,
     })
     .from(submissionsTable)
@@ -75,7 +76,7 @@ router.patch("/admin/submissions/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  const { status } = body.data;
+  const { status, rejectionNote } = body.data;
   const { id } = params.data;
 
   const [existing] = await db
@@ -127,7 +128,10 @@ router.patch("/admin/submissions/:id", async (req, res): Promise<void> => {
     notifySubmissionRejected(owner?.telegramChatId, existing.email).catch(() => {});
   }
 
-  await db.update(submissionsTable).set({ status }).where(eq(submissionsTable.id, id));
+  await db
+    .update(submissionsTable)
+    .set({ status, rejectionNote: status === "rejected" ? (rejectionNote ?? null) : null })
+    .where(eq(submissionsTable.id, id));
 
   const [updated] = await db
     .select({
@@ -138,6 +142,7 @@ router.patch("/admin/submissions/:id", async (req, res): Promise<void> => {
       password: submissionsTable.password,
       status: submissionsTable.status,
       pricePaid: submissionsTable.pricePaid,
+      rejectionNote: submissionsTable.rejectionNote,
       createdAt: submissionsTable.createdAt,
     })
     .from(submissionsTable)

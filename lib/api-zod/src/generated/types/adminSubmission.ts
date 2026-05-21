@@ -15,5 +15,6 @@ export interface AdminSubmission {
   password: string;
   status: AdminSubmissionStatus;
   pricePaid: number;
+  rejectionNote?: string | null;
   createdAt: Date;
 }

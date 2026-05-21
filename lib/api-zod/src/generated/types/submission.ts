@@ -12,5 +12,6 @@ export interface Submission {
   email: string;
   status: SubmissionStatus;
   pricePaid: number;
+  rejectionNote?: string | null;
   createdAt: Date;
 }

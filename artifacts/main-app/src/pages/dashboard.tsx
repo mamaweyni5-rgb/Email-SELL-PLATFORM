@@ -351,6 +351,9 @@ export default function Dashboard() {
                         <div className="min-w-0">
                           <p className="font-semibold text-sm truncate" style={{ color: "hsl(46,68%,82%)" }}>{sub.email}</p>
                           <p className="text-xs" style={{ color: "hsl(43,30%,50%)" }}>{format(new Date(sub.createdAt), "MMM d, yyyy")}</p>
+                          {sub.status === "rejected" && sub.rejectionNote && (
+                            <p className="text-xs mt-0.5 truncate" style={{ color: "hsl(5,75%,65%)" }}>⚠ {sub.rejectionNote}</p>
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center gap-3 shrink-0 ml-3">
