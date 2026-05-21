@@ -12,6 +12,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Wallet, Phone, User, ArrowLeft, CheckCircle2, Loader2, Building2, Hash } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { tgHaptic, tgSuccess, tgError } from "@/lib/telegram";
+
+const MIN_WITHDRAWAL = 100;
+
 const ETHIOPIAN_BANKS = [
   "ኢትዮጵያ ንግድ ባንክ (CBE)",
   "አዋሽ ባንክ",
@@ -149,6 +152,30 @@ export default function Withdraw() {
               </span>
             </p>
           </div>
+
+          {(profile?.walletBalance ?? 0) < MIN_WITHDRAWAL && (
+            <div
+              className="rounded-xl p-4 mb-5"
+              style={{
+                background: "hsl(38,55%,12%)",
+                border: "1px solid hsl(38,60%,32%,0.6)",
+              }}
+            >
+              <p className="text-sm font-bold mb-1" style={{ color: "hsl(46,90%,68%)" }}>
+                ⚠️ {t("wd_low_balance_title")}
+              </p>
+              <p className="text-xs mb-3" style={{ color: "hsl(43,40%,56%)" }}>
+                {t("wd_low_balance_desc")}
+              </p>
+              <Link
+                href="/submit"
+                className="inline-flex items-center gap-1.5 text-xs font-bold rounded-lg px-3 py-2 transition-opacity hover:opacity-80"
+                style={{ background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "hsl(344,90%,10%)" }}
+              >
+                {t("wd_low_balance_cta")} →
+              </Link>
+            </div>
+          )}
 
           {success && (
             <div
@@ -380,7 +407,7 @@ export default function Withdraw() {
                 <button
                   type="submit"
                   className="gold-btn w-full h-11 rounded-xl font-bold text-sm"
-                  disabled={createWithdrawal.isPending || (profile?.walletBalance ?? 0) === 0}
+                  disabled={createWithdrawal.isPending || (profile?.walletBalance ?? 0) < MIN_WITHDRAWAL}
                 >
                   {createWithdrawal.isPending ? (
                     <span className="flex items-center justify-center gap-2">
@@ -391,7 +418,7 @@ export default function Withdraw() {
                     t("wd_btn")
                   )}
                 </button>
-                {(profile?.walletBalance ?? 0) === 0 && (
+                {(profile?.walletBalance ?? 0) < MIN_WITHDRAWAL && (
                   <p className="text-xs text-center" style={{ color: "hsl(43,30%,50%)" }}>{t("wd_no_balance")}</p>
                 )}
               </form>
