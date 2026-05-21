@@ -42,7 +42,8 @@ export const LoginResponse = zod.object({
   "id": zod.number(),
   "email": zod.string().nullish(),
   "name": zod.string().nullish(),
-  "walletBalance": zod.number()
+  "walletBalance": zod.number(),
+  "telegramJoined": zod.boolean().optional()
 })
 
 
@@ -53,7 +54,8 @@ export const GetMeResponse = zod.object({
   "id": zod.number(),
   "email": zod.string().nullish(),
   "name": zod.string().nullish(),
-  "walletBalance": zod.number()
+  "walletBalance": zod.number(),
+  "telegramJoined": zod.boolean().optional()
 })
 
 
@@ -184,10 +186,21 @@ export const GetReferralInfoResponse = zod.object({
 /**
  * @summary List all submitted email accounts
  */
+export const ListMessagesResponseItem = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "fromAdmin": zod.boolean(),
+  "body": zod.string(),
+  "isRead": zod.boolean(),
+  "createdAt": zod.coerce.date()
+})
+export const ListMessagesResponse = zod.array(ListMessagesResponseItem)
+
 export const AdminListSubmissionsResponseItem = zod.object({
   "id": zod.number(),
   "userId": zod.number(),
   "userEmail": zod.string(),
+  "userName": zod.string().optional(),
   "email": zod.string(),
   "password": zod.string(),
   "status": zod.enum(['pending', 'approved', 'rejected']),
@@ -214,6 +227,7 @@ export const AdminUpdateSubmissionResponse = zod.object({
   "id": zod.number(),
   "userId": zod.number(),
   "userEmail": zod.string(),
+  "userName": zod.string().optional(),
   "email": zod.string(),
   "password": zod.string(),
   "status": zod.enum(['pending', 'approved', 'rejected']),
@@ -281,6 +295,7 @@ export const AdminListUsersResponseItem = zod.object({
   "email": zod.string().nullish(),
   "name": zod.string().nullish(),
   "walletBalance": zod.number(),
+  "isBanned": zod.boolean().optional(),
   "totalSubmissions": zod.number(),
   "approvedSubmissions": zod.number(),
   "createdAt": zod.coerce.date()

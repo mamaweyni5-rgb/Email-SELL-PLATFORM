@@ -19,6 +19,13 @@ import {
   getAdminGetStatsQueryKey,
   getGetSettingsQueryKey,
   getListBroadcastsQueryKey,
+  useAdminListConversations,
+  useAdminGetConversation,
+  useAdminSendMessage,
+  useAdminBanUser,
+  useAdminSearchUsers,
+  getAdminListConversationsQueryKey,
+  getAdminGetConversationQueryKey,
 } from "@workspace/api-client-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -44,6 +51,11 @@ import {
   FileDown,
   Megaphone,
   Send,
+  MessageSquare,
+  Search,
+  Ban,
+  UserCheck,
+  ArrowLeft,
 } from "lucide-react";
 
 function downloadCSV(filename: string, headers: string[], rows: (string | number)[][]) {
@@ -113,12 +125,29 @@ function SubmissionsTab() {
       ["ID", "Seller", "Email Account", "Password", "Price (ETB)", "Date", "Status"],
       submissions.map((s) => [
         s.id,
-        s.userEmail,
+        s.userName || s.userEmail,
         s.email,
         s.password,
         s.pricePaid,
         format(new Date(s.createdAt), "yyyy-MM-dd HH:mm"),
         s.status,
+      ]),
+    );
+  };
+
+  const handleExportApproved = () => {
+    const approved = submissions?.filter((s) => s.status === "approved") ?? [];
+    if (!approved.length) return;
+    downloadCSV(
+      `approved-accounts-${new Date().toISOString().slice(0, 10)}.csv`,
+      ["ID", "Seller", "Email Account", "Password", "Price (ETB)", "Date"],
+      approved.map((s) => [
+        s.id,
+        s.userName || s.userEmail,
+        s.email,
+        s.password,
+        s.pricePaid,
+        format(new Date(s.createdAt), "yyyy-MM-dd HH:mm"),
       ]),
     );
   };
@@ -152,14 +181,22 @@ function SubmissionsTab() {
 
   return (
     <div>
-      <div className="flex justify-end mb-3">
+      <div className="flex justify-end gap-2 mb-3">
+        <button
+          onClick={handleExportApproved}
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all"
+          style={{ background: "hsl(136,48%,14%)", border: "1px solid hsl(136,48%,28%)", color: "hsl(136,60%,65%)" }}
+        >
+          <FileDown className="h-3.5 w-3.5" />
+          Approved Only
+        </button>
         <button
           onClick={handleExport}
           className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all"
           style={{ background: "hsl(344,70%,18%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}
         >
           <FileDown className="h-3.5 w-3.5" />
-          Export CSV
+          Export All CSV
         </button>
       </div>
     <div
@@ -177,7 +214,7 @@ function SubmissionsTab() {
         <TableBody>
           {submissions.map((sub) => (
             <TableRow key={sub.id} className="luxury-row transition-colors" style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}`, background: BURGUNDY_CARD }}>
-              <TableCell className="text-xs" style={{ color: TEXT_SOFT }}>{sub.userEmail}</TableCell>
+              <TableCell className="text-xs" style={{ color: TEXT_SOFT }}>{sub.userName || sub.userEmail}</TableCell>
               <TableCell className="font-semibold text-sm" style={{ color: TEXT_BODY }}>{sub.email}</TableCell>
               <TableCell className="font-mono text-xs" style={{ color: TEXT_SOFT }}>{sub.password}</TableCell>
               <TableCell className="font-bold text-sm" style={{ color: GOLD_BRIGHT }}>{sub.pricePaid} ETB</TableCell>
@@ -402,19 +439,38 @@ function WithdrawalsTab() {
 }
 
 function UsersTab() {
-  const { data: users, isLoading } = useAdminListUsers();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 400);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  const { data: users, isLoading } = useAdminSearchUsers(debouncedSearch || undefined);
+  const banUser = useAdminBanUser();
+
+  const handleBan = (userId: number) => {
+    banUser.mutate({ id: userId }, {
+      onSuccess: (res) => {
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+        toast({ title: res.isBanned ? "User banned" : "User unbanned", description: res.isBanned ? "User can no longer log in." : "User access restored." });
+      },
+      onError: () => toast({ title: "Error", description: "Failed to update ban status.", variant: "destructive" }),
+    });
+  };
 
   const handleExport = () => {
     if (!users?.length) return;
     downloadCSV(
       `users-${new Date().toISOString().slice(0, 10)}.csv`,
-      ["ID", "Email", "Wallet Balance (ETB)", "Total Submitted", "Approved", "Joined"],
+      ["ID", "Name", "Email", "Wallet Balance (ETB)", "Total Submitted", "Approved", "Banned", "Joined"],
       users.map((u) => [
-        u.id,
-        u.email,
-        u.walletBalance,
-        u.totalSubmissions,
-        u.approvedSubmissions,
+        u.id, u.name ?? "", u.email ?? "", u.walletBalance,
+        u.totalSubmissions, u.approvedSubmissions, u.isBanned ? "Yes" : "No",
         format(new Date(u.createdAt), "yyyy-MM-dd HH:mm"),
       ]),
     );
@@ -424,63 +480,177 @@ function UsersTab() {
     <div className="space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(344,65%,18%)" }} />)}</div>
   );
 
-  if (!users || users.length === 0) return (
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5" style={{ color: "hsl(43,30%,45%)" }} />
+          <input
+            className="w-full pl-9 pr-3 h-9 rounded-xl text-sm outline-none"
+            style={{ background: "hsl(344,80%,12%)", border: "1px solid hsl(43,30%,22%)", color: "hsl(46,68%,82%)" }}
+            placeholder="Search by name or email…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <button onClick={handleExport} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-9 text-xs font-bold transition-all" style={{ background: "hsl(344,70%,18%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}>
+          <FileDown className="h-3.5 w-3.5" />Export
+        </button>
+      </div>
+      {!users || users.length === 0 ? (
+        <div className="text-center py-12 flex flex-col items-center">
+          <Users className="h-12 w-12 mb-4" style={{ color: "hsl(43,30%,30%)" }} />
+          <p className="text-base font-semibold" style={{ color: "hsl(46,50%,70%)" }}>No users found</p>
+        </div>
+      ) : (
+        <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid hsl(43,30%,24%,0.4)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}>
+          <Table>
+            <TableHeader>
+              <TableRow style={{ background: "hsl(344,80%,14%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
+                {["Name","Email","Wallet","Submissions","Approved","Status","Actions"].map(h => (
+                  <TableHead key={h} className="text-xs font-bold uppercase tracking-wider" style={{ color: GOLD }}>{h}</TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id} className="luxury-row transition-colors" style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}`, background: BURGUNDY_CARD }}>
+                  <TableCell className="font-semibold text-sm" style={{ color: TEXT_BODY }}>{user.name ?? "—"}</TableCell>
+                  <TableCell className="text-xs" style={{ color: TEXT_SOFT }}>{user.email ?? "—"}</TableCell>
+                  <TableCell className="font-bold text-sm" style={{ color: GOLD_BRIGHT }}>{user.walletBalance} ETB</TableCell>
+                  <TableCell className="text-sm text-center" style={{ color: TEXT_BODY }}>{user.totalSubmissions}</TableCell>
+                  <TableCell className="text-sm text-center" style={{ color: TEXT_BODY }}>{user.approvedSubmissions}</TableCell>
+                  <TableCell>
+                    {user.isBanned
+                      ? <span className="badge-rejected inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold border">Banned</span>
+                      : <span className="badge-approved inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold border">Active</span>}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <button
+                      onClick={() => handleBan(user.id)}
+                      disabled={banUser.isPending}
+                      className="inline-flex items-center gap-1 rounded-lg px-3 h-7 text-xs font-bold transition-all"
+                      style={user.isBanned
+                        ? { background: "hsl(136,48%,14%)", border: "1px solid hsl(136,48%,28%)", color: "hsl(136,60%,65%)" }
+                        : { background: "hsl(5,55%,16%)", border: "1px solid hsl(5,55%,28%)", color: "hsl(5,75%,65%)" }}
+                    >
+                      {user.isBanned ? <UserCheck className="h-3 w-3" /> : <Ban className="h-3 w-3" />}
+                      {user.isBanned ? "Unban" : "Ban"}
+                    </button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MessagesTab() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedUserName, setSelectedUserName] = useState("");
+  const [replyBody, setReplyBody] = useState("");
+
+  const { data: conversations, isLoading: convsLoading } = useAdminListConversations();
+  const { data: messages, isLoading: msgsLoading } = useAdminGetConversation(selectedUserId ?? 0, {
+    query: { enabled: !!selectedUserId }
+  });
+  const sendMessage = useAdminSendMessage();
+
+  const handleSend = () => {
+    if (!selectedUserId || !replyBody.trim() || sendMessage.isPending) return;
+    sendMessage.mutate({ userId: selectedUserId, data: { body: replyBody.trim() } }, {
+      onSuccess: () => {
+        setReplyBody("");
+        queryClient.invalidateQueries({ queryKey: getAdminGetConversationQueryKey(selectedUserId) });
+        queryClient.invalidateQueries({ queryKey: getAdminListConversationsQueryKey() });
+      },
+      onError: () => toast({ title: "Error", description: "Failed to send message.", variant: "destructive" }),
+    });
+  };
+
+  if (selectedUserId) {
+    return (
+      <div className="flex flex-col" style={{ height: "60vh" }}>
+        <button
+          onClick={() => { setSelectedUserId(null); setReplyBody(""); }}
+          className="flex items-center gap-2 mb-4 text-sm font-semibold"
+          style={{ color: GOLD }}
+        >
+          <ArrowLeft className="h-4 w-4" /> Back to conversations
+        </button>
+        <p className="text-sm font-bold mb-3" style={{ color: "hsl(46,68%,82%)" }}>Chat with {selectedUserName}</p>
+        <div className="flex-1 overflow-y-auto rounded-2xl p-4 space-y-3 mb-4" style={{ background: "hsl(344,80%,10%)", border: "1px solid hsl(43,30%,20%,0.4)" }}>
+          {msgsLoading ? (
+            <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10 w-3/4 rounded-xl" style={{ background: "hsl(344,65%,18%)" }} />)}</div>
+          ) : (messages ?? []).map((msg) => (
+            <div key={msg.id} className={`flex ${msg.fromAdmin ? "justify-end" : "justify-start"}`}>
+              <div className="max-w-[75%] rounded-2xl px-4 py-2.5" style={msg.fromAdmin ? { background: `linear-gradient(135deg, ${GOLD}55, hsl(43,60%,28%))`, border: `1px solid ${GOLD}40` } : { background: BURGUNDY_CARD, border: "1px solid hsl(43,30%,24%,0.4)" }}>
+                <p className="text-[10px] font-bold mb-0.5" style={{ color: msg.fromAdmin ? "#D4AF37" : "hsl(200,80%,65%)" }}>{msg.fromAdmin ? "Admin" : selectedUserName}</p>
+                <p className="text-sm whitespace-pre-wrap" style={{ color: "hsl(46,68%,82%)" }}>{msg.body}</p>
+                <p className="text-[10px] mt-1 text-right" style={{ color: "hsl(43,30%,45%)" }}>{format(new Date(msg.createdAt), "MMM d, HH:mm")}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-end gap-2 rounded-2xl p-2" style={{ background: "hsl(344,80%,12%)", border: "1px solid hsl(43,30%,22%,0.5)" }}>
+          <textarea
+            className="flex-1 resize-none bg-transparent outline-none text-sm px-2 py-1.5 max-h-28"
+            rows={1}
+            placeholder="Reply…"
+            style={{ color: "hsl(46,68%,82%)", caretColor: GOLD }}
+            value={replyBody}
+            onChange={(e) => setReplyBody(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+          />
+          <button onClick={handleSend} disabled={!replyBody.trim() || sendMessage.isPending} className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all disabled:opacity-40" style={{ background: `linear-gradient(135deg, ${GOLD}, hsl(43,50%,45%))` }}>
+            {sendMessage.isPending ? <Loader2 className="w-4 h-4 animate-spin text-black" /> : <Send className="w-4 h-4 text-black" />}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (convsLoading) return (
+    <div className="space-y-3">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(344,65%,18%)" }} />)}</div>
+  );
+
+  if (!conversations || conversations.length === 0) return (
     <div className="text-center py-16 flex flex-col items-center">
-      <Users className="h-12 w-12 mb-4" style={{ color: "hsl(43,30%,30%)" }} />
-      <p className="text-base font-semibold" style={{ color: "hsl(46,50%,70%)" }}>No users yet</p>
+      <MessageSquare className="h-12 w-12 mb-4" style={{ color: "hsl(43,30%,30%)" }} />
+      <p className="text-base font-semibold" style={{ color: "hsl(46,50%,70%)" }}>No messages yet</p>
+      <p className="text-sm mt-1" style={{ color: TEXT_SOFT }}>When users send messages, they will appear here.</p>
     </div>
   );
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "hsl(43,35%,55%)" }}>ጠቅላላ ተጠቃሚዎች</span>
-          <span
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-0.5 text-sm font-extrabold"
-            style={{ background: "linear-gradient(135deg, hsl(344,80%,20%), hsl(344,70%,16%))", border: "1px solid hsl(43,50%,35%,0.5)", color: GOLD_BRIGHT }}
-          >
-            <Users className="h-3.5 w-3.5" />
-            {users.length.toLocaleString()} ዩዘር
-          </span>
-        </div>
+    <div className="space-y-2">
+      {conversations.map((conv) => (
         <button
-          onClick={handleExport}
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all"
-          style={{ background: "hsl(344,70%,18%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}
+          key={conv.userId}
+          className="w-full text-left rounded-2xl p-4 transition-all hover:brightness-110 flex items-center gap-3"
+          style={{ background: BURGUNDY_CARD, border: "1px solid hsl(43,30%,24%,0.4)" }}
+          onClick={() => { setSelectedUserId(conv.userId); setSelectedUserName(conv.userName || conv.userEmail); }}
         >
-          <FileDown className="h-3.5 w-3.5" />
-          Export CSV
+          <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "hsl(344,70%,18%)", border: `1px solid ${GOLD}30` }}>
+            <MessageSquare className="w-4 h-4" style={{ color: GOLD }} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold truncate" style={{ color: "hsl(46,68%,82%)" }}>{conv.userName || conv.userEmail}</p>
+            <p className="text-xs truncate mt-0.5" style={{ color: TEXT_SOFT }}>{conv.lastMessage}</p>
+          </div>
+          <div className="text-right flex-shrink-0">
+            <p className="text-xs" style={{ color: TEXT_SOFT }}>{format(new Date(conv.lastMessageAt), "MMM d")}</p>
+            {conv.unreadCount > 0 && (
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold mt-1" style={{ background: GOLD, color: "hsl(344,90%,10%)" }}>{conv.unreadCount}</span>
+            )}
+          </div>
         </button>
-      </div>
-      <div
-        className="rounded-2xl overflow-hidden"
-        style={{ border: "1px solid hsl(43,30%,24%,0.4)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}
-      >
-        <Table>
-          <TableHeader>
-            <TableRow style={{ background: "hsl(344,80%,14%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
-              {["Name","Email","Wallet Balance","Total Submitted","Approved","Joined"].map(h => (
-                <TableHead key={h} className="text-xs font-bold uppercase tracking-wider" style={{ color: GOLD }}>{h}</TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id} className="luxury-row transition-colors" style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}`, background: BURGUNDY_CARD }}>
-                <TableCell className="font-semibold text-sm" style={{ color: TEXT_BODY }}>{user.name ?? <span style={{ color: "hsl(43,30%,45%)" }}>—</span>}</TableCell>
-                <TableCell className="text-sm" style={{ color: TEXT_BODY }}>{user.email ?? <span style={{ color: "hsl(43,30%,45%)" }}>—</span>}</TableCell>
-                <TableCell className="font-extrabold text-sm" style={{ color: GOLD_BRIGHT }}>{user.walletBalance} ETB</TableCell>
-                <TableCell className="text-sm" style={{ color: TEXT_BODY }}>{user.totalSubmissions}</TableCell>
-                <TableCell className="text-sm" style={{ color: TEXT_BODY }}>{user.approvedSubmissions}</TableCell>
-                <TableCell className="text-xs" style={{ color: TEXT_SOFT }}>
-                  {format(new Date(user.createdAt), "MMM d, yyyy")}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      ))}
     </div>
   );
 }
@@ -919,6 +1089,7 @@ export default function Admin() {
               { value: "submissions", icon: Mail, label: "Submissions" },
               { value: "withdrawals", icon: Wallet, label: "Withdrawals" },
               { value: "users", icon: Users, label: "Users" },
+              { value: "messages", icon: MessageSquare, label: "Messages" },
               { value: "broadcast", icon: Megaphone, label: "Broadcast" },
               { value: "settings", icon: ShieldCheck, label: "Settings" },
             ].map(tab => (
@@ -937,6 +1108,7 @@ export default function Admin() {
           <TabsContent value="submissions"><SubmissionsTab /></TabsContent>
           <TabsContent value="withdrawals"><WithdrawalsTab /></TabsContent>
           <TabsContent value="users"><UsersTab /></TabsContent>
+          <TabsContent value="messages"><MessagesTab /></TabsContent>
           <TabsContent value="broadcast"><BroadcastTab /></TabsContent>
           <TabsContent value="settings"><SettingsTab /></TabsContent>
         </Tabs>

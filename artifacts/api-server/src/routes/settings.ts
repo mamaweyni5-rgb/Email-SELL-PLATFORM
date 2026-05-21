@@ -24,7 +24,7 @@ export async function getSettingString(key: string, defaultVal: string): Promise
 router.get("/settings", async (_req, res): Promise<void> => {
   const pricePerEmail = await getSettingValue("price_per_email", 20);
   const referralCommissionPct = await getSettingValue("referral_commission_pct", 10);
-  const telegramBotUsername = await getSettingString("telegram_bot_username", "");
+  const telegramBotUsername = process.env.TELEGRAM_BOT_USERNAME || await getSettingString("telegram_bot_username", "");
   res.json(GetSettingsResponse.parse({ pricePerEmail, referralCommissionPct, telegramBotUsername }));
 });
 

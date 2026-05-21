@@ -3,6 +3,7 @@ import { eq, or } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { db, usersTable } from "@workspace/db";
 import { RegisterBody, LoginBody, LoginResponse, GetMeResponse } from "@workspace/api-zod";
+import { requireAuth } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
 
@@ -100,6 +101,11 @@ router.post("/auth/login", async (req, res): Promise<void> => {
     return;
   }
 
+  if (user.isBanned) {
+    res.status(403).json({ error: "Your account has been suspended. Please contact support." });
+    return;
+  }
+
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) {
     res.status(401).json({ error: "Invalid email/name or password" });
@@ -108,7 +114,7 @@ router.post("/auth/login", async (req, res): Promise<void> => {
 
   req.session.userId = user.id;
   req.log.info({ userId: user.id }, "User logged in");
-  res.json(LoginResponse.parse({ id: user.id, email: user.email, name: user.name, walletBalance: user.walletBalance }));
+  res.json(LoginResponse.parse({ id: user.id, email: user.email, name: user.name, walletBalance: user.walletBalance, telegramJoined: user.telegramJoined }));
 });
 
 router.post("/auth/logout", async (req, res): Promise<void> => {
@@ -123,7 +129,7 @@ router.get("/auth/me", async (req, res): Promise<void> => {
   }
 
   const [user] = await db
-    .select({ id: usersTable.id, email: usersTable.email, walletBalance: usersTable.walletBalance })
+    .select({ id: usersTable.id, email: usersTable.email, name: usersTable.name, walletBalance: usersTable.walletBalance, telegramJoined: usersTable.telegramJoined, isBanned: usersTable.isBanned })
     .from(usersTable)
     .where(eq(usersTable.id, req.session.userId));
 
@@ -133,7 +139,19 @@ router.get("/auth/me", async (req, res): Promise<void> => {
     return;
   }
 
+  if (user.isBanned) {
+    req.session.destroy(() => {});
+    res.status(403).json({ error: "Account suspended" });
+    return;
+  }
+
   res.json(GetMeResponse.parse(user));
+});
+
+router.patch("/auth/me/telegram-joined", requireAuth, async (req, res): Promise<void> => {
+  const userId = req.session.userId!;
+  await db.update(usersTable).set({ telegramJoined: true }).where(eq(usersTable.id, userId));
+  res.json({ telegramJoined: true });
 });
 
 export default router;

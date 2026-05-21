@@ -18,6 +18,25 @@ export interface AuthUser {
   email: string;
   name?: string | null;
   walletBalance: number;
+  telegramJoined?: boolean;
+}
+
+export interface Message {
+  id: number;
+  userId: number;
+  fromAdmin: boolean;
+  body: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export interface AdminConversation {
+  userId: number;
+  userName: string;
+  userEmail: string;
+  lastMessage: string;
+  lastMessageAt: string;
+  unreadCount: number;
 }
 
 export interface UserProfile {
@@ -78,6 +97,7 @@ export const AdminSubmissionStatus = {
 
 export interface AdminSubmission {
   id: number;
+  userName?: string | null;
   userId: number;
   userEmail: string;
   email: string;
@@ -173,6 +193,7 @@ export interface WithdrawalStatusUpdate {
 
 export interface AdminUser {
   id: number;
+  isBanned?: boolean;
   email: string;
   walletBalance: number;
   totalSubmissions: number;

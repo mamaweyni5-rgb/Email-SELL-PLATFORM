@@ -83,6 +83,22 @@ export async function runMigrations(): Promise<void> {
     await client.query(`
       ALTER TABLE submissions ADD COLUMN IF NOT EXISTS rejection_note TEXT;
     `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS messages (
+        id          SERIAL PRIMARY KEY,
+        user_id     INTEGER NOT NULL REFERENCES users(id),
+        from_admin  BOOLEAN NOT NULL DEFAULT FALSE,
+        body        TEXT NOT NULL,
+        is_read     BOOLEAN NOT NULL DEFAULT FALSE,
+        created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await client.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS is_banned BOOLEAN NOT NULL DEFAULT FALSE;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS telegram_joined BOOLEAN NOT NULL DEFAULT FALSE;
+    `);
   } finally {
     client.release();
   }

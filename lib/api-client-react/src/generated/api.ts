@@ -1754,3 +1754,149 @@ export const useAdminChangePassword = <TError = ErrorType<ErrorResponse>,
       return useMutation(getAdminChangePasswordMutationOptions(options));
     }
 
+
+// ─── Messages ─────────────────────────────────────────────────────────────
+import type { Message, AdminConversation } from './api.schemas';
+
+export const getListMessagesUrl = () => `/api/messages`;
+export const listMessages = async (options?: RequestInit): Promise<Message[]> =>
+  customFetch<Message[]>(getListMessagesUrl(), { ...options, method: 'GET' });
+export const getListMessagesQueryKey = () => [getListMessagesUrl()] as const;
+export const getListMessagesQueryOptions = <TData = Awaited<ReturnType<typeof listMessages>>, TError = ErrorType<unknown>>(
+  options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof listMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch> }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getListMessagesQueryKey();
+  return { queryKey, queryFn: () => listMessages(requestOptions), ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof listMessages>>, TError, TData>;
+};
+export function useListMessages<TData = Awaited<ReturnType<typeof listMessages>>, TError = ErrorType<unknown>>(
+  options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof listMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch> }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListMessagesQueryOptions(options);
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+export const createMessage = async (data: { body: string }, options?: RequestInit): Promise<Message> =>
+  customFetch<Message>(getListMessagesUrl(), { ...options, method: 'POST', headers: { 'Content-Type': 'application/json', ...options?.headers }, body: JSON.stringify(data) });
+export const useCreateMessage = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof createMessage>>, TError, { data: { body: string } }, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationResult<Awaited<ReturnType<typeof createMessage>>, TError, { data: { body: string } }, TContext> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+  return useMutation({ mutationFn: ({ data }) => createMessage(data, requestOptions), ...mutationOptions });
+};
+
+export const markMessageRead = async (id: number, options?: RequestInit): Promise<void> =>
+  customFetch<void>(`/api/messages/${id}/read`, { ...options, method: 'PATCH' });
+export const useMarkMessageRead = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof markMessageRead>>, TError, { id: number }, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationResult<Awaited<ReturnType<typeof markMessageRead>>, TError, { id: number }, TContext> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+  return useMutation({ mutationFn: ({ id }) => markMessageRead(id, requestOptions), ...mutationOptions });
+};
+
+// ─── Telegram joined ────────────────────────────────────────────────────
+export const markTelegramJoined = async (options?: RequestInit): Promise<{ telegramJoined: boolean }> =>
+  customFetch<{ telegramJoined: boolean }>('/api/auth/me/telegram-joined', { ...options, method: 'PATCH' });
+export const useMarkTelegramJoined = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof markTelegramJoined>>, TError, void, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationResult<Awaited<ReturnType<typeof markTelegramJoined>>, TError, void, TContext> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+  return useMutation({ mutationFn: () => markTelegramJoined(requestOptions), ...mutationOptions });
+};
+
+// ─── Admin messages ──────────────────────────────────────────────────────
+export const getAdminListConversationsUrl = () => `/api/admin/messages`;
+export const adminListConversations = async (options?: RequestInit): Promise<AdminConversation[]> =>
+  customFetch<AdminConversation[]>(getAdminListConversationsUrl(), { ...options, method: 'GET' });
+export const getAdminListConversationsQueryKey = () => [getAdminListConversationsUrl()] as const;
+export const getAdminListConversationsQueryOptions = <TData = Awaited<ReturnType<typeof adminListConversations>>, TError = ErrorType<unknown>>(
+  options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof adminListConversations>>, TError, TData>, request?: SecondParameter<typeof customFetch> }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAdminListConversationsQueryKey();
+  return { queryKey, queryFn: () => adminListConversations(requestOptions), ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof adminListConversations>>, TError, TData>;
+};
+export function useAdminListConversations<TData = Awaited<ReturnType<typeof adminListConversations>>, TError = ErrorType<unknown>>(
+  options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof adminListConversations>>, TError, TData>, request?: SecondParameter<typeof customFetch> }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminListConversationsQueryOptions(options);
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+export const getAdminGetConversationUrl = (userId: number) => `/api/admin/messages/${userId}`;
+export const adminGetConversation = async (userId: number, options?: RequestInit): Promise<Message[]> =>
+  customFetch<Message[]>(getAdminGetConversationUrl(userId), { ...options, method: 'GET' });
+export const getAdminGetConversationQueryKey = (userId: number) => [getAdminGetConversationUrl(userId)] as const;
+export const getAdminGetConversationQueryOptions = <TData = Awaited<ReturnType<typeof adminGetConversation>>, TError = ErrorType<unknown>>(
+  userId: number,
+  options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof adminGetConversation>>, TError, TData>, request?: SecondParameter<typeof customFetch> }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAdminGetConversationQueryKey(userId);
+  return { queryKey, queryFn: () => adminGetConversation(userId, requestOptions), ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof adminGetConversation>>, TError, TData>;
+};
+export function useAdminGetConversation<TData = Awaited<ReturnType<typeof adminGetConversation>>, TError = ErrorType<unknown>>(
+  userId: number,
+  options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof adminGetConversation>>, TError, TData>, request?: SecondParameter<typeof customFetch> }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminGetConversationQueryOptions(userId, options);
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+export const adminSendMessage = async (userId: number, data: { body: string }, options?: RequestInit): Promise<Message> =>
+  customFetch<Message>(getAdminGetConversationUrl(userId), { ...options, method: 'POST', headers: { 'Content-Type': 'application/json', ...options?.headers }, body: JSON.stringify(data) });
+export const useAdminSendMessage = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof adminSendMessage>>, TError, { userId: number; data: { body: string } }, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationResult<Awaited<ReturnType<typeof adminSendMessage>>, TError, { userId: number; data: { body: string } }, TContext> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+  return useMutation({ mutationFn: ({ userId, data }) => adminSendMessage(userId, data, requestOptions), ...mutationOptions });
+};
+
+// ─── Admin user detail & ban ─────────────────────────────────────────────
+export const getAdminGetUserDetailUrl = (id: number) => `/api/admin/users/${id}`;
+export const adminGetUserDetail = async (id: number, options?: RequestInit): Promise<AdminUser & { telegramJoined?: boolean; telegramChatId?: string; commissionEarned?: number; totalSubmissions: number; approvedSubmissions: number }> =>
+  customFetch<any>(getAdminGetUserDetailUrl(id), { ...options, method: 'GET' });
+export const getAdminGetUserDetailQueryKey = (id: number) => [getAdminGetUserDetailUrl(id)] as const;
+export const getAdminGetUserDetailQueryOptions = <TData = Awaited<ReturnType<typeof adminGetUserDetail>>, TError = ErrorType<unknown>>(
+  id: number,
+  options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof adminGetUserDetail>>, TError, TData>, request?: SecondParameter<typeof customFetch> }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAdminGetUserDetailQueryKey(id);
+  return { queryKey, queryFn: () => adminGetUserDetail(id, requestOptions), ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof adminGetUserDetail>>, TError, TData>;
+};
+export function useAdminGetUserDetail<TData = Awaited<ReturnType<typeof adminGetUserDetail>>, TError = ErrorType<unknown>>(
+  id: number,
+  options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof adminGetUserDetail>>, TError, TData>, request?: SecondParameter<typeof customFetch> }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminGetUserDetailQueryOptions(id, options);
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+export const adminBanUser = async (id: number, options?: RequestInit): Promise<{ isBanned: boolean }> =>
+  customFetch<{ isBanned: boolean }>(`/api/admin/users/${id}/ban`, { ...options, method: 'PATCH' });
+export const useAdminBanUser = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof adminBanUser>>, TError, { id: number }, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationResult<Awaited<ReturnType<typeof adminBanUser>>, TError, { id: number }, TContext> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+  return useMutation({ mutationFn: ({ id }) => adminBanUser(id, requestOptions), ...mutationOptions });
+};
+
+// ─── Admin user search ───────────────────────────────────────────────────
+export const getAdminSearchUsersQueryKey = (search?: string) => ['/api/admin/users', { search }] as const;
+export const adminSearchUsers = async (search?: string, options?: RequestInit): Promise<AdminUser[]> =>
+  customFetch<AdminUser[]>(`/api/admin/users${search ? `?search=${encodeURIComponent(search)}` : ''}`, { ...options, method: 'GET' });
+export function useAdminSearchUsers<TData = Awaited<ReturnType<typeof adminSearchUsers>>, TError = ErrorType<unknown>>(
+  search?: string,
+  options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof adminSearchUsers>>, TError, TData>, request?: SecondParameter<typeof customFetch> }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAdminSearchUsersQueryKey(search);
+  const queryOptions2 = { queryKey, queryFn: () => adminSearchUsers(search, requestOptions), ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof adminSearchUsers>>, TError, TData>;
+  const query = useQuery(queryOptions2) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  return { ...query, queryKey: queryOptions2.queryKey };
+}

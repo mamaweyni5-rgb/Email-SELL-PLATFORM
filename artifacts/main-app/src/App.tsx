@@ -15,6 +15,7 @@ import Submit from "@/pages/submit";
 import Withdraw from "@/pages/withdraw";
 import Profile from "@/pages/profile";
 import Admin from "@/pages/admin";
+import Inbox from "@/pages/inbox";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: false } },
@@ -94,6 +95,7 @@ function Router() {
       <Route path="/withdraw" component={Withdraw} />
       <Route path="/profile" component={Profile} />
       <Route path="/admin" component={Admin} />
+      <Route path="/inbox" component={Inbox} />
       <Route component={NotFound} />
     </Switch>
   );

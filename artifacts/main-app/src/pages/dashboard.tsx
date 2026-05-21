@@ -1,4 +1,4 @@
-import { useGetMe, useGetProfile, useListSubmissions, useListWithdrawals, useGetReferralInfo, useListBroadcasts, useGetSettings } from "@workspace/api-client-react";
+import { useGetMe, useGetProfile, useListSubmissions, useListWithdrawals, useGetReferralInfo, useListBroadcasts, useGetSettings, useMarkTelegramJoined, getGetMeQueryKey } from "@workspace/api-client-react";
 import { Link, useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { Layout } from "@/components/layout";
@@ -8,6 +8,7 @@ import { ArrowRight, Mail, Wallet, Clock, CheckCircle, Users, Gift, Copy, Check,
 import { format } from "date-fns";
 import { useLanguage } from "@/lib/i18n";
 import { tg, tgHaptic, isTelegram } from "@/lib/telegram";
+import { useQueryClient } from "@tanstack/react-query";
 
 function StatusPill({ status }: { status: string }) {
   const { t } = useLanguage();
@@ -33,11 +34,67 @@ function StatusPill({ status }: { status: string }) {
   );
 }
 
+function TelegramJoinGate({ botUsername, onConfirmed }: { botUsername: string; onConfirmed: () => void }) {
+  const markJoined = useMarkTelegramJoined();
+  const queryClient = useQueryClient();
+
+  const handleJoin = () => {
+    const webApp = tg();
+    const url = `https://t.me/${botUsername}`;
+    if (webApp && isTelegram()) {
+      webApp.openTelegramLink(url);
+    } else {
+      window.open(url, "_blank");
+    }
+  };
+
+  const handleConfirm = () => {
+    markJoined.mutate(undefined, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetMeQueryKey() });
+        onConfirmed();
+      },
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(4px)" }}>
+      <div className="rounded-3xl p-6 max-w-sm w-full text-center space-y-5" style={{ background: "hsl(344,85%,13%)", border: "1px solid hsl(43,40%,30%,0.6)", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
+        <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(200,80%,18%), hsl(344,80%,16%))", border: "1px solid hsl(200,60%,30%,0.5)" }}>
+          <Send className="w-7 h-7" style={{ color: "#29B6F6" }} />
+        </div>
+        <div>
+          <h2 className="text-lg font-extrabold mb-2" style={{ color: "#D4AF37" }}>Join Our Telegram Bot</h2>
+          <p className="text-sm leading-relaxed" style={{ color: "hsl(43,40%,62%)" }}>
+            To use MailMart, you must first join our Telegram bot. You'll receive payment notifications and updates there.
+          </p>
+        </div>
+        <button
+          onClick={handleJoin}
+          className="w-full rounded-xl h-11 text-sm font-bold transition-all"
+          style={{ background: "linear-gradient(135deg, hsl(200,80%,35%), hsl(200,70%,28%))", color: "#fff", border: "1px solid hsl(200,60%,45%,0.5)" }}
+        >
+          👉 Join @{botUsername}
+        </button>
+        <button
+          onClick={handleConfirm}
+          disabled={markJoined.isPending}
+          className="w-full rounded-xl h-11 text-sm font-bold transition-all"
+          style={{ background: "linear-gradient(135deg, hsl(43,70%,40%), hsl(43,60%,32%))", color: "hsl(344,90%,10%)" }}
+        >
+          {markJoined.isPending ? "Confirming…" : "✅ I've Joined"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const { data: user, isLoading: authLoading, isError } = useGetMe({ query: { retry: false } });
   const [, setLocation] = useLocation();
   const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
+  const [gateConfirmed, setGateConfirmed] = useState(false);
 
   useEffect(() => {
     if (!authLoading && (isError || !user)) {
@@ -53,6 +110,8 @@ export default function Dashboard() {
   const { data: settings } = useGetSettings({ query: { enabled: !!user, retry: false } });
   const [dismissedIds, setDismissedIds] = useState<Set<number>>(new Set());
   const visibleBroadcasts = (broadcasts ?? []).slice(0, 3).filter((b) => !dismissedIds.has(b.id));
+
+  const showJoinGate = !gateConfirmed && !!user && user.telegramJoined === false && !!settings?.telegramBotUsername;
 
   const referralLink = referral?.referralCode
     ? `${window.location.origin}/register?ref=${referral.referralCode}`
@@ -99,6 +158,9 @@ export default function Dashboard() {
 
   return (
     <Layout>
+      {showJoinGate && settings?.telegramBotUsername && (
+        <TelegramJoinGate botUsername={settings.telegramBotUsername} onConfirmed={() => setGateConfirmed(true)} />
+      )}
       <div className="container mx-auto px-4 py-7 max-w-6xl">
         {/* ── Header ── */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-7">
