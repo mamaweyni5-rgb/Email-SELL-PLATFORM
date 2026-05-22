@@ -81,10 +81,7 @@ export default function Profile() {
             <p
               className="text-2xl font-extrabold"
               style={{
-                background: "linear-gradient(145deg, #FFD700, #D4AF37)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
+                color: "#0d1a00",
               }}
             >
               {profile?.walletBalance ?? 0} ETB
@@ -149,7 +146,7 @@ export default function Profile() {
               }}
             >
               <div className="px-5 py-4 border-b" style={{ borderColor: "hsl(74,55%,22%)" }}>
-                <h3 className="text-sm font-bold" style={{ color: "hsl(46,68%,78%)" }}>{t("profile_all_subs")}</h3>
+                <h3 className="text-sm font-bold" style={{ color: "#0d1a00" }}>{t("profile_all_subs")}</h3>
               </div>
               <div className="p-4">
                 {subsLoading ? (
@@ -205,7 +202,7 @@ export default function Profile() {
               }}
             >
               <div className="px-5 py-4 border-b" style={{ borderColor: "hsl(74,55%,22%)" }}>
-                <h3 className="text-sm font-bold" style={{ color: "hsl(46,68%,78%)" }}>{t("profile_wd_history")}</h3>
+                <h3 className="text-sm font-bold" style={{ color: "#0d1a00" }}>{t("profile_wd_history")}</h3>
               </div>
               <div className="p-4">
                 {wdLoading ? (

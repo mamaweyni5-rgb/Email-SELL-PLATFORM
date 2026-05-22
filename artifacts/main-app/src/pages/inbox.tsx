@@ -108,8 +108,8 @@ export default function Inbox() {
                   {msg.fromAdmin && (
                     <p className="text-[10px] font-bold mb-1" style={{ color: GOLD }}>MailMart Support</p>
                   )}
-                  <p className="text-sm whitespace-pre-wrap" style={{ color: msg.fromAdmin ? "hsl(46,68%,82%)" : "#fff" }}>{msg.body}</p>
-                  <p className="text-[10px] mt-1 text-right" style={{ color: msg.fromAdmin ? "hsl(43,30%,45%)" : "rgba(255,255,255,0.55)" }}>
+                  <p className="text-sm whitespace-pre-wrap" style={{ color: msg.fromAdmin ? "#0d1a00" : "#fff" }}>{msg.body}</p>
+                  <p className="text-[10px] mt-1 text-right" style={{ color: msg.fromAdmin ? "#2d4000" : "rgba(255,255,255,0.55)" }}>
                     {format(new Date(msg.createdAt), "MMM d, HH:mm")}
                   </p>
                 </div>

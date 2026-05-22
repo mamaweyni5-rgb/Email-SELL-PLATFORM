@@ -80,7 +80,7 @@ function TelegramJoinGate({ botUsername, onConfirmed }: { botUsername: string; o
           onClick={handleConfirm}
           disabled={markJoined.isPending}
           className="w-full rounded-xl h-11 text-sm font-bold transition-all"
-          style={{ background: "linear-gradient(135deg, hsl(43,70%,40%), hsl(43,60%,32%))", color: "#0d1a00" }}
+          style={{ background: "linear-gradient(135deg, hsl(74,70%,32%), hsl(74,60%,26%))", color: "#ffffff" }}
         >
           {markJoined.isPending ? "Confirming…" : "✅ I've Joined"}
         </button>
@@ -262,7 +262,7 @@ export default function Dashboard() {
               >
                 <div
                   className="mt-0.5 shrink-0 w-7 h-7 rounded-lg flex items-center justify-center"
-                  style={{ background: "rgba(212,175,55,0.18)", border: "1px solid rgba(212,175,55,0.3)" }}
+                  style={{ background: "rgba(13,58,0,0.18)", border: "1px solid rgba(13,58,0,0.3)" }}
                 >
                   <Megaphone className="h-3.5 w-3.5" style={{ color: "#0d1a00" }} />
                 </div>
@@ -292,7 +292,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-2 mb-3">
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ background: "rgba(212,175,55,0.15)", border: "1px solid rgba(212,175,55,0.25)" }}
+                style={{ background: "rgba(13,58,0,0.15)", border: "1px solid rgba(13,58,0,0.25)" }}
               >
                 <Wallet className="h-4 w-4" style={{ color: "#0d1a00" }} />
               </div>
@@ -302,12 +302,7 @@ export default function Dashboard() {
             </div>
             <div
               className="text-3xl font-extrabold"
-              style={{
-                background: "linear-gradient(145deg, #FFD700, #D4AF37)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
+              style={{ color: "#0d1a00" }}
             >
               {profile?.walletBalance || 0} <span className="text-lg font-bold">ETB</span>
             </div>
@@ -336,7 +331,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-2 mb-3">
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.2)" }}
+                style={{ background: "rgba(13,58,0,0.12)", border: "1px solid rgba(13,58,0,0.2)" }}
               >
                 <Clock className="h-4 w-4" style={{ color: "#0d1a00" }} />
               </div>
@@ -356,8 +351,8 @@ export default function Dashboard() {
             className="rounded-2xl p-6 mb-7"
             style={{
               background: "linear-gradient(135deg, hsl(74,100%,39%), hsl(74,100%,37%))",
-              border: "1px solid hsl(43,40%,30%,0.4)",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(212,175,55,0.1)",
+              border: "1px solid rgba(13,58,0,0.25)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)",
             }}
           >
             <div className="flex items-center gap-2 mb-1">
@@ -545,7 +540,7 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <div className="p-8 text-center flex flex-col items-center">
-                  <Wallet className="h-8 w-8 mb-3" style={{ color: "hsl(43,30%,35%)" }} />
+                  <Wallet className="h-8 w-8 mb-3" style={{ color: "#2d4000" }} />
                   <p className="text-sm" style={{ color: "#2d4000" }}>{t("dash_no_wd")}</p>
                 </div>
               )}

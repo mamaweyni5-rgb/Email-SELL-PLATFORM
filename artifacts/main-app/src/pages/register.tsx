@@ -84,7 +84,7 @@ export default function Register() {
           style={{
             background: "linear-gradient(145deg, hsl(74,100%,39%), hsl(74,100%,37%))",
             border: "1px solid hsl(43,40%,30%,0.4)",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(212,175,55,0.08) inset",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset",
           }}
         >
           {/* Header */}
@@ -92,9 +92,9 @@ export default function Register() {
             <div
               className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 text-xl font-extrabold"
               style={{
-                background: "linear-gradient(145deg, #FFD700, #D4AF37)",
-                color: "#0d1a00",
-                boxShadow: "0 6px 20px rgba(212,175,55,0.4)",
+                background: "linear-gradient(145deg, #2a6600, #1a4700)",
+                color: "#ffffff",
+                boxShadow: "0 6px 20px rgba(13,58,0,0.5)",
               }}
             >
               M
@@ -103,7 +103,7 @@ export default function Register() {
               {t("register_title")}
             </h1>
             <p className="text-sm" style={{ color: SOFT }}>{t("register_subtitle")}</p>
-            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1" style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)" }}>
+            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1" style={{ background: "rgba(13,58,0,0.15)", border: "1px solid rgba(13,58,0,0.3)" }}>
               <Users className="h-3.5 w-3.5" style={{ color: GOLD }} />
               <span className="text-xs font-bold" style={{ color: GOLD }}>10,426+ ተጠቃሚዎች ተቀላቅለዋል</span>
             </div>

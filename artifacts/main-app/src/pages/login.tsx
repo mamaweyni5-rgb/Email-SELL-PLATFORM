@@ -70,7 +70,7 @@ export default function Login() {
           style={{
             background: "linear-gradient(145deg, hsl(74,100%,39%), hsl(74,100%,37%))",
             border: "1px solid hsl(43,40%,30%,0.4)",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(212,175,55,0.08) inset",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset",
           }}
         >
           {/* Header */}
@@ -78,9 +78,9 @@ export default function Login() {
             <div
               className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 text-xl font-extrabold"
               style={{
-                background: "linear-gradient(145deg, #FFD700, #D4AF37)",
-                color: "#0d1a00",
-                boxShadow: "0 6px 20px rgba(212,175,55,0.4)",
+                background: "linear-gradient(145deg, #2a6600, #1a4700)",
+                color: "#ffffff",
+                boxShadow: "0 6px 20px rgba(13,58,0,0.5)",
               }}
             >
               M

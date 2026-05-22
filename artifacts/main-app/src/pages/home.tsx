@@ -55,7 +55,7 @@ export default function Home() {
           <div
             className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full pointer-events-none"
             style={{
-              background: "radial-gradient(ellipse, rgba(212,175,55,0.08) 0%, transparent 70%)",
+              background: "radial-gradient(ellipse, rgba(13,58,0,0.08) 0%, transparent 70%)",
             }}
           />
 
@@ -98,7 +98,7 @@ export default function Home() {
                   background: "hsl(74,90%,39%)",
                   border: "1px solid hsl(43,40%,30%,0.5)",
                   color: "#0d1a00",
-                  boxShadow: "0 4px 20px rgba(212,175,55,0.15)",
+                  boxShadow: "0 4px 20px rgba(13,58,0,0.2)",
                 }}
               >
                 {t("home_rate_label")}{" "}
@@ -180,9 +180,9 @@ export default function Home() {
                   <div
                     className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5"
                     style={{
-                      background: "linear-gradient(145deg, rgba(212,175,55,0.2), rgba(212,175,55,0.05))",
-                      border: "1px solid rgba(212,175,55,0.3)",
-                      boxShadow: "0 0 20px rgba(212,175,55,0.1)",
+                      background: "linear-gradient(145deg, rgba(13,58,0,0.2), rgba(13,58,0,0.05))",
+                      border: "1px solid rgba(13,58,0,0.3)",
+                      boxShadow: "0 0 20px rgba(13,58,0,0.15)",
                     }}
                   >
                     <step.icon className="h-7 w-7" style={{ color: "#0d1a00" }} />

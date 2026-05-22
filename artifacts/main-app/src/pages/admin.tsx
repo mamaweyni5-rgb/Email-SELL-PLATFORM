@@ -706,7 +706,7 @@ function MessagesTab() {
           ) : (messages ?? []).map((msg) => (
             <div key={msg.id} className={`flex ${msg.fromAdmin ? "justify-end" : "justify-start"}`}>
               <div className="max-w-[75%] rounded-2xl px-4 py-2.5" style={msg.fromAdmin ? { background: `linear-gradient(135deg, ${GOLD}55, hsl(43,60%,28%))`, border: `1px solid ${GOLD}40` } : { background: BURGUNDY_CARD, border: "1px solid hsl(43,30%,24%,0.4)" }}>
-                <p className="text-[10px] font-bold mb-0.5" style={{ color: msg.fromAdmin ? "#D4AF37" : "hsl(200,80%,65%)" }}>{msg.fromAdmin ? "Admin" : selectedUserName}</p>
+                <p className="text-[10px] font-bold mb-0.5" style={{ color: msg.fromAdmin ? "#1a4700" : "hsl(200,80%,65%)" }}>{msg.fromAdmin ? "Admin" : selectedUserName}</p>
                 <p className="text-sm whitespace-pre-wrap" style={{ color: "#0d1a00" }}>{msg.body}</p>
                 <p className="text-[10px] mt-1 text-right" style={{ color: "#1a2d00" }}>{format(new Date(msg.createdAt), "MMM d, HH:mm")}</p>
               </div>
@@ -1250,7 +1250,7 @@ function GeneratedEmailsTab() {
           <button
             onClick={handleExport}
             className="flex items-center gap-1.5 rounded-lg px-3 h-9 text-xs font-semibold transition-all"
-            style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)", color: GOLD }}
+            style={{ background: "rgba(13,58,0,0.12)", border: "1px solid rgba(13,58,0,0.3)", color: GOLD }}
           >
             <FileDown className="h-3.5 w-3.5" /> Export CSV
           </button>
@@ -1340,7 +1340,7 @@ function GeneratedEmailsTab() {
                           ? { background: "rgba(91,232,255,0.1)", border: "1px solid rgba(91,232,255,0.3)", color: "#5BE8FF" }
                           : e.status === "submitted"
                           ? { background: "rgba(74,200,120,0.1)", border: "1px solid rgba(74,200,120,0.3)", color: "hsl(136,60%,60%)" }
-                          : { background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)", color: GOLD }
+                          : { background: "rgba(13,58,0,0.12)", border: "1px solid rgba(13,58,0,0.3)", color: GOLD }
                       }
                     >
                       {e.status}

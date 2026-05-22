@@ -170,7 +170,7 @@ export default function Withdraw() {
               <Link
                 href="/get-email"
                 className="inline-flex items-center gap-1.5 text-xs font-bold rounded-lg px-3 py-2 transition-opacity hover:opacity-80"
-                style={{ background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "#0d1a00" }}
+                style={{ background: "linear-gradient(135deg,#2a6600,#1a4700)", color: "#ffffff" }}
               >
                 {t("wd_low_balance_cta")} →
               </Link>
@@ -202,7 +202,7 @@ export default function Withdraw() {
               className="flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold transition-all"
               style={
                 method === "telebirr"
-                  ? { background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "#0d1a00" }
+                  ? { background: "linear-gradient(135deg,#2a6600,#1a4700)", color: "#ffffff" }
                   : { color: SOFT }
               }
             >
@@ -215,7 +215,7 @@ export default function Withdraw() {
               className="flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold transition-all"
               style={
                 method === "bank"
-                  ? { background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "#0d1a00" }
+                  ? { background: "linear-gradient(135deg,#2a6600,#1a4700)", color: "#ffffff" }
                   : { color: SOFT }
               }
             >
@@ -229,10 +229,10 @@ export default function Withdraw() {
             style={{
               background: "linear-gradient(145deg, hsl(74,100%,39%), hsl(74,100%,37%))",
               border: "1px solid hsl(43,40%,30%,0.4)",
-              boxShadow: "0 16px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(212,175,55,0.1)",
+              boxShadow: "0 16px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05)",
             }}
           >
-            <h2 className="text-sm font-bold mb-1" style={{ color: "hsl(46,68%,78%)" }}>
+            <h2 className="text-sm font-bold mb-1" style={{ color: "#0d1a00" }}>
               {method === "telebirr" ? t("wd_card_title") : t("wd_bank_card_title")}
             </h2>
             <p className="text-xs mb-5" style={{ color: "#1a2d00" }}>
@@ -337,7 +337,7 @@ export default function Withdraw() {
                                 style={{
                                   background: "hsl(74,90%,38%)",
                                   border: "1px solid hsl(43,30%,25%,0.5)",
-                                  color: field.value ? "hsl(46,68%,82%)" : "hsl(43,30%,50%)",
+                                  color: field.value ? "#0d1a00" : "#2d4000",
                                 }}
                                 value={field.value ?? ""}
                                 onChange={(e) => field.onChange(e.target.value)}

@@ -116,8 +116,8 @@ function CopyButton({ text }: { text: string }) {
       onClick={copy}
       className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all"
       style={{
-        background: copied ? "rgba(74,200,120,0.18)" : "rgba(212,175,55,0.15)",
-        border: `1px solid ${copied ? "rgba(74,200,120,0.4)" : "rgba(212,175,55,0.3)"}`,
+        background: copied ? "rgba(74,200,120,0.18)" : "rgba(13,58,0,0.15)",
+        border: `1px solid ${copied ? "rgba(74,200,120,0.4)" : "rgba(13,58,0,0.3)"}`,
         color: copied ? "hsl(136,60%,60%)" : "#0d1a00",
       }}
     >
@@ -323,12 +323,12 @@ export default function GetEmail() {
                     <li key={i} className="flex items-start gap-3">
                       <span
                         className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-extrabold mt-0.5"
-                        style={{ background: "rgba(212,175,55,0.2)", border: "1px solid rgba(212,175,55,0.35)", color: "#0d1a00" }}
+                        style={{ background: "rgba(13,58,0,0.2)", border: "1px solid rgba(13,58,0,0.35)", color: "#0d1a00" }}
                       >
                         {i + 1}
                       </span>
                       <div>
-                        <p className="text-sm font-semibold" style={{ color: "hsl(46,68%,80%)" }}>{s.title}</p>
+                        <p className="text-sm font-semibold" style={{ color: "#0d1a00" }}>{s.title}</p>
                         <p className="text-xs leading-relaxed" style={{ color: "#1a2d00" }}>{s.desc}</p>
                       </div>
                     </li>
@@ -380,7 +380,7 @@ export default function GetEmail() {
                       <button
                         onClick={() => setConfirmReturn(false)}
                         className="flex-1 h-9 rounded-lg text-sm font-semibold transition-all"
-                        style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)", color: "#0d1a00" }}
+                        style={{ background: "rgba(13,58,0,0.12)", border: "1px solid rgba(13,58,0,0.25)", color: "#0d1a00" }}
                       >
                         {t("get_email_return_cancel")}
                       </button>
@@ -452,7 +452,7 @@ export default function GetEmail() {
                   border: "1px solid hsl(43,35%,24%,0.4)",
                 }}
               >
-                <p className="text-sm font-bold mb-4" style={{ color: "hsl(46,65%,75%)" }}>
+                <p className="text-sm font-bold mb-4" style={{ color: "#0d1a00" }}>
                   {t("get_email_how_title")}
                 </p>
                 <div className="space-y-4">
@@ -467,7 +467,7 @@ export default function GetEmail() {
                           <Icon className="h-4 w-4" style={{ color: "#5BE8FF" }} />
                         </div>
                         <div>
-                          <p className="text-sm font-semibold" style={{ color: "hsl(46,68%,80%)" }}>{s.title}</p>
+                          <p className="text-sm font-semibold" style={{ color: "#0d1a00" }}>{s.title}</p>
                           <p className="text-xs leading-relaxed mt-0.5" style={{ color: "#1a2d00" }}>{s.desc}</p>
                         </div>
                       </div>
