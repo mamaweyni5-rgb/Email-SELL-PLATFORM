@@ -68,14 +68,17 @@ function downloadCSV(filename: string, headers: string[], rows: (string | number
       ? `"${s.replace(/"/g, '""')}"`
       : s;
   };
-  const csv = [headers, ...rows].map((r) => r.map(escape).join(",")).join("\n");
+  const csv = "\uFEFF" + [headers, ...rows].map((r) => r.map(escape).join(",")).join("\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
+  a.style.display = "none";
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 const priceSchema = z.object({
