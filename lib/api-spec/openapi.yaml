@@ -114,6 +114,29 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /auth/me/telegram-joined:
+    patch:
+      operationId: markTelegramJoined
+      tags: [auth]
+      summary: Mark the current user as having joined the Telegram channel
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [telegramJoined]
+                properties:
+                  telegramJoined:
+                    type: boolean
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /profile:
     get:
       operationId: getProfile
@@ -367,7 +390,14 @@ paths:
     get:
       operationId: adminListUsers
       tags: [admin]
-      summary: List all users with stats
+      summary: List all users with stats (optional search)
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          required: false
+          description: Search by name or email
       responses:
         "200":
           description: All users
@@ -377,6 +407,125 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/AdminUser"
+
+  /admin/users/{id}:
+    get:
+      operationId: adminGetUser
+      tags: [admin]
+      summary: Get a single user by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUserDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/users/{id}/ban:
+    patch:
+      operationId: adminBanUser
+      tags: [admin]
+      summary: Toggle ban status of a user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Updated ban status
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [isBanned]
+                properties:
+                  isBanned:
+                    type: boolean
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/messages:
+    get:
+      operationId: adminListConversations
+      tags: [admin]
+      summary: List all user conversations (last message per user)
+      responses:
+        "200":
+          description: Conversations list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminConversation"
+
+  /admin/messages/{userId}:
+    get:
+      operationId: adminGetConversation
+      tags: [admin]
+      summary: Get all messages for a specific user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+    post:
+      operationId: adminSendMessage
+      tags: [admin]
+      summary: Send a message to a user from admin
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageInput"
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /admin/stats:
     get:
@@ -435,6 +584,59 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /messages:
+    get:
+      operationId: listMessages
+      tags: [profile]
+      summary: Get messages for the current user
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+    post:
+      operationId: createMessage
+      tags: [profile]
+      summary: Send a message from user to admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageInput"
+      responses:
+        "201":
+          description: Message created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /messages/{id}/read:
+    patch:
+      operationId: markMessageRead
+      tags: [profile]
+      summary: Mark a message as read
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Marked as read
+
   /broadcasts:
     get:
       operationId: listBroadcasts
@@ -449,6 +651,69 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Broadcast"
+
+  /admin/submissions/bulk-clear:
+    delete:
+      operationId: adminBulkClearSubmissions
+      tags: [admin]
+      summary: Bulk delete submissions by status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BulkClearInput"
+      responses:
+        "200":
+          description: Deleted count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BulkClearResult"
+
+  /admin/withdrawals/bulk-clear:
+    delete:
+      operationId: adminBulkClearWithdrawals
+      tags: [admin]
+      summary: Bulk delete withdrawals by status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BulkClearInput"
+      responses:
+        "200":
+          description: Deleted count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BulkClearResult"
+
+  /admin/telegram-export:
+    post:
+      operationId: adminTelegramExport
+      tags: [admin]
+      summary: Generate a CSV and send it to the admin via Telegram Bot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TelegramExportInput"
+      responses:
+        "200":
+          description: Export result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TelegramExportResult"
+        "400":
+          description: No data or bot not configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /admin/verify-password:
     post:
@@ -496,6 +761,37 @@ paths:
 
 components:
   schemas:
+    BulkClearInput:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+
+    BulkClearResult:
+      type: object
+      required: [deleted]
+      properties:
+        deleted:
+          type: integer
+
+    TelegramExportInput:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [submissions, approved-submissions, withdrawals, users]
+
+    TelegramExportResult:
+      type: object
+      required: [sent, message]
+      properties:
+        sent:
+          type: boolean
+        message:
+          type: string
+
     HealthStatus:
       type: object
       required: [status]
@@ -825,3 +1121,75 @@ components:
         newPassword:
           type: string
           minLength: 6
+
+    Message:
+      type: object
+      required: [id, userId, fromAdmin, body, isRead, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        fromAdmin:
+          type: boolean
+        body:
+          type: string
+        isRead:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    SendMessageInput:
+      type: object
+      required: [body]
+      properties:
+        body:
+          type: string
+          minLength: 1
+
+    AdminConversation:
+      type: object
+      required: [userId, userName, userEmail, lastMessage, lastMessageAt, unreadCount]
+      properties:
+        userId:
+          type: integer
+        userName:
+          type: string
+        userEmail:
+          type: string
+        lastMessage:
+          type: string
+        lastMessageAt:
+          type: string
+          format: date-time
+        unreadCount:
+          type: integer
+
+    AdminUserDetail:
+      type: object
+      required: [id, email, walletBalance, isBanned, telegramJoined, createdAt, totalSubmissions, approvedSubmissions]
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        name:
+          type: string
+        walletBalance:
+          type: integer
+        isBanned:
+          type: boolean
+        telegramJoined:
+          type: boolean
+        telegramChatId:
+          type: integer
+        commissionEarned:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        totalSubmissions:
+          type: integer
+        approvedSubmissions:
+          type: integer

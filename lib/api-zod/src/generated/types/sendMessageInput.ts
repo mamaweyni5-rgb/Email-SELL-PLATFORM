@@ -6,11 +6,7 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export interface WithdrawalInput {
-  /** @minimum 100 */
-  amount: number;
-  /** @minLength 10 */
-  telebirrNumber: string;
+export interface SendMessageInput {
   /** @minLength 1 */
-  telebirrName: string;
+  body: string;
 }

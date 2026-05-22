@@ -6,11 +6,16 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export interface AdminUser {
+export interface AdminUserDetail {
   id: number;
   email: string;
+  name?: string;
   walletBalance: number;
+  isBanned: boolean;
+  telegramJoined: boolean;
+  telegramChatId?: number;
+  commissionEarned?: number;
+  createdAt: Date;
   totalSubmissions: number;
   approvedSubmissions: number;
-  createdAt: Date;
 }

@@ -24,7 +24,8 @@ export const registerBodyPasswordMin = 6;
 
 
 export const RegisterBody = zod.object({
-  "name": zod.string().min(2),
+  "email": zod.string().email().optional(),
+  "name": zod.string().optional(),
   "password": zod.string().min(registerBodyPasswordMin),
   "referralCode": zod.string().optional()
 })
@@ -40,10 +41,9 @@ export const LoginBody = zod.object({
 
 export const LoginResponse = zod.object({
   "id": zod.number(),
-  "email": zod.string().nullish(),
+  "email": zod.string(),
   "name": zod.string().nullish(),
-  "walletBalance": zod.number(),
-  "telegramJoined": zod.boolean().optional()
+  "walletBalance": zod.number()
 })
 
 
@@ -52,10 +52,17 @@ export const LoginResponse = zod.object({
  */
 export const GetMeResponse = zod.object({
   "id": zod.number(),
-  "email": zod.string().nullish(),
+  "email": zod.string(),
   "name": zod.string().nullish(),
-  "walletBalance": zod.number(),
-  "telegramJoined": zod.boolean().optional()
+  "walletBalance": zod.number()
+})
+
+
+/**
+ * @summary Mark the current user as having joined the Telegram channel
+ */
+export const MarkTelegramJoinedResponse = zod.object({
+  "telegramJoined": zod.boolean()
 })
 
 
@@ -64,7 +71,7 @@ export const GetMeResponse = zod.object({
  */
 export const GetProfileResponse = zod.object({
   "id": zod.number(),
-  "email": zod.string().nullish(),
+  "email": zod.string(),
   "name": zod.string().nullish(),
   "walletBalance": zod.number(),
   "totalSubmissions": zod.number(),
@@ -105,12 +112,8 @@ export const CreateSubmissionBody = zod.object({
 export const ListWithdrawalsResponseItem = zod.object({
   "id": zod.number(),
   "amount": zod.number(),
-  "paymentMethod": zod.string(),
   "telebirrNumber": zod.string(),
   "telebirrName": zod.string(),
-  "bankName": zod.string().nullish(),
-  "bankAccountNumber": zod.string().nullish(),
-  "bankAccountName": zod.string().nullish(),
   "status": zod.enum(['pending', 'completed', 'rejected']),
   "adminNote": zod.string().nullish(),
   "createdAt": zod.coerce.date()
@@ -121,46 +124,18 @@ export const ListWithdrawalsResponse = zod.array(ListWithdrawalsResponseItem)
 /**
  * @summary Request a withdrawal to Telebirr
  */
+export const createWithdrawalBodyAmountMin = 100;
 
 export const createWithdrawalBodyTelebirrNumberMin = 10;
 
-export const ETHIOPIAN_BANKS = [
-  "ኢትዮጵያ ንግድ ባንክ (CBE)",
-  "አዋሽ ባንክ",
-  "ዳሽን ባንክ",
-  "አቢሲኒያ ባንክ",
-  "ዩናይትድ ባንክ",
-  "ንብ ኢንተርናሽናል ባንክ",
-  "ወጋገን ባንክ",
-  "ኦሮሚያ ኮኦፐሬቲቭ ባንክ",
-  "ሊዮን ኢንተርናሽናል ባንክ",
-  "ዘሜን ባንክ",
-  "በርሃን ባንክ",
-  "ቡና ኢንተርናሽናል ባንክ",
-  "አማራ ባንክ",
-  "ሂጅራ ባንክ",
-  "ሲንቄ ባንክ",
-  "ፀሃይ ባንክ",
-  "ሻቤሌ ባንክ",
-] as const;
 
-export const createWithdrawalBodyAmountMin = 100;
 
-export const CreateWithdrawalBody = zod.discriminatedUnion("paymentMethod", [
-  zod.object({
-    paymentMethod: zod.literal("telebirr"),
-    amount: zod.number().min(createWithdrawalBodyAmountMin),
-    telebirrNumber: zod.string().min(createWithdrawalBodyTelebirrNumberMin),
-    telebirrName: zod.string().min(1),
-  }),
-  zod.object({
-    paymentMethod: zod.literal("bank"),
-    amount: zod.number().min(createWithdrawalBodyAmountMin),
-    bankName: zod.string().min(1),
-    bankAccountNumber: zod.string().min(5),
-    bankAccountName: zod.string().min(1),
-  }),
-])
+
+export const CreateWithdrawalBody = zod.object({
+  "amount": zod.number().min(createWithdrawalBodyAmountMin),
+  "telebirrNumber": zod.string().min(createWithdrawalBodyTelebirrNumberMin),
+  "telebirrName": zod.string().min(1)
+})
 
 
 /**
@@ -186,21 +161,10 @@ export const GetReferralInfoResponse = zod.object({
 /**
  * @summary List all submitted email accounts
  */
-export const ListMessagesResponseItem = zod.object({
-  "id": zod.number(),
-  "userId": zod.number(),
-  "fromAdmin": zod.boolean(),
-  "body": zod.string(),
-  "isRead": zod.boolean(),
-  "createdAt": zod.coerce.date()
-})
-export const ListMessagesResponse = zod.array(ListMessagesResponseItem)
-
 export const AdminListSubmissionsResponseItem = zod.object({
   "id": zod.number(),
   "userId": zod.number(),
   "userEmail": zod.string(),
-  "userName": zod.string().optional(),
   "email": zod.string(),
   "password": zod.string(),
   "status": zod.enum(['pending', 'approved', 'rejected']),
@@ -227,7 +191,6 @@ export const AdminUpdateSubmissionResponse = zod.object({
   "id": zod.number(),
   "userId": zod.number(),
   "userEmail": zod.string(),
-  "userName": zod.string().optional(),
   "email": zod.string(),
   "password": zod.string(),
   "status": zod.enum(['pending', 'approved', 'rejected']),
@@ -245,12 +208,8 @@ export const AdminListWithdrawalsResponseItem = zod.object({
   "userId": zod.number(),
   "userEmail": zod.string(),
   "amount": zod.number(),
-  "paymentMethod": zod.string(),
   "telebirrNumber": zod.string(),
   "telebirrName": zod.string(),
-  "bankName": zod.string().nullish(),
-  "bankAccountNumber": zod.string().nullish(),
-  "bankAccountName": zod.string().nullish(),
   "status": zod.enum(['pending', 'completed', 'rejected']),
   "adminNote": zod.string().nullish(),
   "createdAt": zod.coerce.date()
@@ -275,12 +234,8 @@ export const AdminUpdateWithdrawalResponse = zod.object({
   "userId": zod.number(),
   "userEmail": zod.string(),
   "amount": zod.number(),
-  "paymentMethod": zod.string(),
   "telebirrNumber": zod.string(),
   "telebirrName": zod.string(),
-  "bankName": zod.string().nullish(),
-  "bankAccountNumber": zod.string().nullish(),
-  "bankAccountName": zod.string().nullish(),
   "status": zod.enum(['pending', 'completed', 'rejected']),
   "adminNote": zod.string().nullish(),
   "createdAt": zod.coerce.date()
@@ -288,19 +243,102 @@ export const AdminUpdateWithdrawalResponse = zod.object({
 
 
 /**
- * @summary List all users with stats
+ * @summary List all users with stats (optional search)
  */
+export const AdminListUsersQueryParams = zod.object({
+  "search": zod.coerce.string().optional().describe('Search by name or email')
+})
+
 export const AdminListUsersResponseItem = zod.object({
   "id": zod.number(),
-  "email": zod.string().nullish(),
-  "name": zod.string().nullish(),
+  "email": zod.string(),
   "walletBalance": zod.number(),
-  "isBanned": zod.boolean().optional(),
   "totalSubmissions": zod.number(),
   "approvedSubmissions": zod.number(),
   "createdAt": zod.coerce.date()
 })
 export const AdminListUsersResponse = zod.array(AdminListUsersResponseItem)
+
+
+/**
+ * @summary Get a single user by ID
+ */
+export const AdminGetUserParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const AdminGetUserResponse = zod.object({
+  "id": zod.number(),
+  "email": zod.string(),
+  "name": zod.string().optional(),
+  "walletBalance": zod.number(),
+  "isBanned": zod.boolean(),
+  "telegramJoined": zod.boolean(),
+  "telegramChatId": zod.number().optional(),
+  "commissionEarned": zod.number().optional(),
+  "createdAt": zod.coerce.date(),
+  "totalSubmissions": zod.number(),
+  "approvedSubmissions": zod.number()
+})
+
+
+/**
+ * @summary Toggle ban status of a user
+ */
+export const AdminBanUserParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const AdminBanUserResponse = zod.object({
+  "isBanned": zod.boolean()
+})
+
+
+/**
+ * @summary List all user conversations (last message per user)
+ */
+export const AdminListConversationsResponseItem = zod.object({
+  "userId": zod.number(),
+  "userName": zod.string(),
+  "userEmail": zod.string(),
+  "lastMessage": zod.string(),
+  "lastMessageAt": zod.coerce.date(),
+  "unreadCount": zod.number()
+})
+export const AdminListConversationsResponse = zod.array(AdminListConversationsResponseItem)
+
+
+/**
+ * @summary Get all messages for a specific user
+ */
+export const AdminGetConversationParams = zod.object({
+  "userId": zod.coerce.number()
+})
+
+export const AdminGetConversationResponseItem = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "fromAdmin": zod.boolean(),
+  "body": zod.string(),
+  "isRead": zod.boolean(),
+  "createdAt": zod.coerce.date()
+})
+export const AdminGetConversationResponse = zod.array(AdminGetConversationResponseItem)
+
+
+/**
+ * @summary Send a message to a user from admin
+ */
+export const AdminSendMessageParams = zod.object({
+  "userId": zod.coerce.number()
+})
+
+
+
+
+export const AdminSendMessageBody = zod.object({
+  "body": zod.string().min(1)
+})
 
 
 /**
@@ -353,6 +391,39 @@ export const AdminSendBroadcastBody = zod.object({
 
 
 /**
+ * @summary Get messages for the current user
+ */
+export const ListMessagesResponseItem = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "fromAdmin": zod.boolean(),
+  "body": zod.string(),
+  "isRead": zod.boolean(),
+  "createdAt": zod.coerce.date()
+})
+export const ListMessagesResponse = zod.array(ListMessagesResponseItem)
+
+
+/**
+ * @summary Send a message from user to admin
+ */
+
+
+
+export const CreateMessageBody = zod.object({
+  "body": zod.string().min(1)
+})
+
+
+/**
+ * @summary Mark a message as read
+ */
+export const MarkMessageReadParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+/**
  * @summary List recent broadcast announcements
  */
 export const ListBroadcastsResponseItem = zod.object({
@@ -362,6 +433,43 @@ export const ListBroadcastsResponseItem = zod.object({
   "createdAt": zod.coerce.date()
 })
 export const ListBroadcastsResponse = zod.array(ListBroadcastsResponseItem)
+
+
+/**
+ * @summary Bulk delete submissions by status
+ */
+export const AdminBulkClearSubmissionsBody = zod.object({
+  "status": zod.string()
+})
+
+export const AdminBulkClearSubmissionsResponse = zod.object({
+  "deleted": zod.number()
+})
+
+
+/**
+ * @summary Bulk delete withdrawals by status
+ */
+export const AdminBulkClearWithdrawalsBody = zod.object({
+  "status": zod.string()
+})
+
+export const AdminBulkClearWithdrawalsResponse = zod.object({
+  "deleted": zod.number()
+})
+
+
+/**
+ * @summary Generate a CSV and send it to the admin via Telegram Bot
+ */
+export const AdminTelegramExportBody = zod.object({
+  "type": zod.enum(['submissions', 'approved-submissions', 'withdrawals', 'users'])
+})
+
+export const AdminTelegramExportResponse = zod.object({
+  "sent": zod.boolean(),
+  "message": zod.string()
+})
 
 
 /**

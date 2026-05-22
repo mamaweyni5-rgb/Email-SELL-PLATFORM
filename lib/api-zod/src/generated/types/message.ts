@@ -6,11 +6,11 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export interface AdminUser {
+export interface Message {
   id: number;
-  email: string;
-  walletBalance: number;
-  totalSubmissions: number;
-  approvedSubmissions: number;
+  userId: number;
+  fromAdmin: boolean;
+  body: string;
+  isRead: boolean;
   createdAt: Date;
 }

@@ -10,6 +10,7 @@ import {
   notifyWithdrawalCompleted,
   notifyWithdrawalRejected,
   sendBroadcastMessage,
+  sendDocumentToAdmin,
 } from "../lib/telegram-bot";
 import {
   AdminListSubmissionsResponse,
@@ -469,6 +470,156 @@ router.post("/admin/broadcast", async (req, res): Promise<void> => {
 
   req.log.info({ broadcastId: broadcast!.id, telegramCount: telegramUsers.length }, "Broadcast sent");
   res.status(201).json(broadcast);
+});
+
+router.delete("/admin/submissions/bulk-clear", async (req, res): Promise<void> => {
+  const { status } = req.body as { status?: string };
+  if (!status || !["rejected", "approved"].includes(status)) {
+    res.status(400).json({ error: "status must be 'rejected' or 'approved'" });
+    return;
+  }
+  const deleted = await db
+    .delete(submissionsTable)
+    .where(eq(submissionsTable.status, status as "rejected" | "approved"))
+    .returning({ id: submissionsTable.id });
+  req.log.info({ status, count: deleted.length }, "Bulk cleared submissions");
+  res.json({ deleted: deleted.length });
+});
+
+router.delete("/admin/withdrawals/bulk-clear", async (req, res): Promise<void> => {
+  const { status } = req.body as { status?: string };
+  if (!status || !["rejected", "completed"].includes(status)) {
+    res.status(400).json({ error: "status must be 'rejected' or 'completed'" });
+    return;
+  }
+  const deleted = await db
+    .delete(withdrawalsTable)
+    .where(eq(withdrawalsTable.status, status as "rejected" | "completed"))
+    .returning({ id: withdrawalsTable.id });
+  req.log.info({ status, count: deleted.length }, "Bulk cleared withdrawals");
+  res.json({ deleted: deleted.length });
+});
+
+router.post("/admin/telegram-export", async (req, res): Promise<void> => {
+  const { type } = req.body as { type?: string };
+  const validTypes = ["submissions", "approved-submissions", "withdrawals", "users"];
+  if (!type || !validTypes.includes(type)) {
+    res.status(400).json({ error: "Invalid export type" });
+    return;
+  }
+
+  const escape = (v: string | number | null | undefined) => {
+    const s = String(v ?? "");
+    return s.includes(",") || s.includes('"') || s.includes("\n")
+      ? `"${s.replace(/"/g, '""')}"`
+      : s;
+  };
+  const toCSV = (headers: string[], rows: (string | number | null | undefined)[][]) =>
+    "\uFEFF" + [headers, ...rows].map((r) => r.map(escape).join(",")).join("\n");
+
+  let csv = "";
+  let filename = "";
+  let caption = "";
+
+  if (type === "submissions" || type === "approved-submissions") {
+    const rows = await db
+      .select({
+        id: submissionsTable.id,
+        userName: usersTable.name,
+        userEmail: usersTable.email,
+        email: submissionsTable.email,
+        password: submissionsTable.password,
+        pricePaid: submissionsTable.pricePaid,
+        createdAt: submissionsTable.createdAt,
+        status: submissionsTable.status,
+      })
+      .from(submissionsTable)
+      .leftJoin(usersTable, eq(submissionsTable.userId, usersTable.id))
+      .orderBy(submissionsTable.createdAt);
+
+    const filtered = type === "approved-submissions"
+      ? rows.filter((r) => r.status === "approved")
+      : rows;
+
+    if (!filtered.length) {
+      res.status(400).json({ error: "No data to export" });
+      return;
+    }
+
+    csv = toCSV(
+      ["ID", "Seller", "Email Account", "Password", "Price (ETB)", "Date", "Status"],
+      filtered.map((r) => [r.id, r.userName ?? r.userEmail, r.email, r.password, r.pricePaid, new Date(r.createdAt).toISOString().slice(0, 16), r.status])
+    );
+    filename = `${type}-${new Date().toISOString().slice(0, 10)}.csv`;
+    caption = type === "approved-submissions"
+      ? `✅ <b>Approved Accounts Export</b>\n${filtered.length} records — ${new Date().toLocaleDateString()}`
+      : `📋 <b>All Submissions Export</b>\n${filtered.length} records — ${new Date().toLocaleDateString()}`;
+
+  } else if (type === "withdrawals") {
+    const rows = await db
+      .select({
+        id: withdrawalsTable.id,
+        userEmail: usersTable.email,
+        paymentMethod: withdrawalsTable.paymentMethod,
+        telebirrNumber: withdrawalsTable.telebirrNumber,
+        telebirrName: withdrawalsTable.telebirrName,
+        bankName: withdrawalsTable.bankName,
+        bankAccountNumber: withdrawalsTable.bankAccountNumber,
+        bankAccountName: withdrawalsTable.bankAccountName,
+        amount: withdrawalsTable.amount,
+        createdAt: withdrawalsTable.createdAt,
+        status: withdrawalsTable.status,
+        adminNote: withdrawalsTable.adminNote,
+      })
+      .from(withdrawalsTable)
+      .leftJoin(usersTable, eq(withdrawalsTable.userId, usersTable.id))
+      .orderBy(withdrawalsTable.createdAt);
+
+    if (!rows.length) {
+      res.status(400).json({ error: "No data to export" });
+      return;
+    }
+
+    csv = toCSV(
+      ["ID", "User", "Method", "Number/Account", "Name", "Bank", "Amount (ETB)", "Date", "Status", "Note"],
+      rows.map((r) => [
+        r.id, r.userEmail, r.paymentMethod,
+        r.paymentMethod === "bank" ? r.bankAccountNumber : r.telebirrNumber,
+        r.paymentMethod === "bank" ? r.bankAccountName : r.telebirrName,
+        r.bankName ?? "", r.amount,
+        new Date(r.createdAt).toISOString().slice(0, 16),
+        r.status, r.adminNote ?? "",
+      ])
+    );
+    filename = `withdrawals-${new Date().toISOString().slice(0, 10)}.csv`;
+    caption = `💸 <b>Withdrawals Export</b>\n${rows.length} records — ${new Date().toLocaleDateString()}`;
+
+  } else if (type === "users") {
+    const users = await db
+      .select({ id: usersTable.id, name: usersTable.name, email: usersTable.email, walletBalance: usersTable.walletBalance, isBanned: usersTable.isBanned, createdAt: usersTable.createdAt })
+      .from(usersTable)
+      .orderBy(usersTable.createdAt);
+
+    if (!users.length) {
+      res.status(400).json({ error: "No data to export" });
+      return;
+    }
+
+    csv = toCSV(
+      ["ID", "Name", "Email", "Wallet (ETB)", "Banned", "Joined"],
+      users.map((u) => [u.id, u.name ?? "", u.email ?? "", u.walletBalance, u.isBanned ? "Yes" : "No", new Date(u.createdAt).toISOString().slice(0, 16)])
+    );
+    filename = `users-${new Date().toISOString().slice(0, 10)}.csv`;
+    caption = `👥 <b>Users Export</b>\n${users.length} records — ${new Date().toLocaleDateString()}`;
+  }
+
+  const result = await sendDocumentToAdmin(filename, csv, caption);
+  if (!result.ok) {
+    res.status(400).json({ error: result.error ?? "Failed to send via Telegram" });
+    return;
+  }
+  req.log.info({ type, filename }, "CSV export sent to admin via Telegram");
+  res.json({ sent: true, message: `${filename} sent to admin Telegram` });
 });
 
 router.post("/admin/verify-password", async (req, res): Promise<void> => {

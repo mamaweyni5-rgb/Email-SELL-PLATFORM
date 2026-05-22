@@ -5,6 +5,33 @@
  * Email marketplace platform API
  * OpenAPI spec version: 0.2.0
  */
+export interface BulkClearInput {
+  status: string;
+}
+
+export interface BulkClearResult {
+  deleted: number;
+}
+
+export type TelegramExportInputType = typeof TelegramExportInputType[keyof typeof TelegramExportInputType];
+
+
+export const TelegramExportInputType = {
+  submissions: 'submissions',
+  'approved-submissions': 'approved-submissions',
+  withdrawals: 'withdrawals',
+  users: 'users',
+} as const;
+
+export interface TelegramExportInput {
+  type: TelegramExportInputType;
+}
+
+export interface TelegramExportResult {
+  sent: boolean;
+  message: string;
+}
+
 export interface HealthStatus {
   status: string;
 }
@@ -18,25 +45,6 @@ export interface AuthUser {
   email: string;
   name?: string | null;
   walletBalance: number;
-  telegramJoined?: boolean;
-}
-
-export interface Message {
-  id: number;
-  userId: number;
-  fromAdmin: boolean;
-  body: string;
-  isRead: boolean;
-  createdAt: string;
-}
-
-export interface AdminConversation {
-  userId: number;
-  userName: string;
-  userEmail: string;
-  lastMessage: string;
-  lastMessageAt: string;
-  unreadCount: number;
 }
 
 export interface UserProfile {
@@ -77,6 +85,8 @@ export interface Submission {
   email: string;
   status: SubmissionStatus;
   pricePaid: number;
+  /** @nullable */
+  rejectionNote?: string | null;
   createdAt: string;
 }
 
@@ -97,13 +107,14 @@ export const AdminSubmissionStatus = {
 
 export interface AdminSubmission {
   id: number;
-  userName?: string | null;
   userId: number;
   userEmail: string;
   email: string;
   password: string;
   status: AdminSubmissionStatus;
   pricePaid: number;
+  /** @nullable */
+  rejectionNote?: string | null;
   createdAt: string;
 }
 
@@ -117,6 +128,7 @@ export const SubmissionStatusUpdateStatus = {
 
 export interface SubmissionStatusUpdate {
   status: SubmissionStatusUpdateStatus;
+  rejectionNote?: string;
 }
 
 export type WithdrawalStatus = typeof WithdrawalStatus[keyof typeof WithdrawalStatus];
@@ -131,12 +143,8 @@ export const WithdrawalStatus = {
 export interface Withdrawal {
   id: number;
   amount: number;
-  paymentMethod: string;
   telebirrNumber: string;
   telebirrName: string;
-  bankName?: string | null;
-  bankAccountNumber?: string | null;
-  bankAccountName?: string | null;
   status: WithdrawalStatus;
   /** @nullable */
   adminNote?: string | null;
@@ -144,7 +152,7 @@ export interface Withdrawal {
 }
 
 export interface WithdrawalInput {
-  /** @minimum 1 */
+  /** @minimum 100 */
   amount: number;
   /** @minLength 10 */
   telebirrNumber: string;
@@ -166,12 +174,8 @@ export interface AdminWithdrawal {
   userId: number;
   userEmail: string;
   amount: number;
-  paymentMethod: string;
   telebirrNumber: string;
   telebirrName: string;
-  bankName?: string | null;
-  bankAccountNumber?: string | null;
-  bankAccountName?: string | null;
   status: AdminWithdrawalStatus;
   /** @nullable */
   adminNote?: string | null;
@@ -193,7 +197,6 @@ export interface WithdrawalStatusUpdate {
 
 export interface AdminUser {
   id: number;
-  isBanned?: boolean;
   email: string;
   walletBalance: number;
   totalSubmissions: number;
@@ -214,6 +217,7 @@ export interface AdminStats {
 export interface PlatformSettings {
   pricePerEmail: number;
   referralCommissionPct: number;
+  telegramBotUsername?: string;
 }
 
 export interface SettingsUpdate {
@@ -224,6 +228,7 @@ export interface SettingsUpdate {
      * @maximum 100
      */
   referralCommissionPct: number;
+  telegramBotUsername?: string;
 }
 
 export interface ReferralInfo {
@@ -259,4 +264,56 @@ export interface AdminChangePasswordInput {
   /** @minLength 6 */
   newPassword: string;
 }
+
+export interface Message {
+  id: number;
+  userId: number;
+  fromAdmin: boolean;
+  body: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export interface SendMessageInput {
+  /** @minLength 1 */
+  body: string;
+}
+
+export interface AdminConversation {
+  userId: number;
+  userName: string;
+  userEmail: string;
+  lastMessage: string;
+  lastMessageAt: string;
+  unreadCount: number;
+}
+
+export interface AdminUserDetail {
+  id: number;
+  email: string;
+  name?: string;
+  walletBalance: number;
+  isBanned: boolean;
+  telegramJoined: boolean;
+  telegramChatId?: number;
+  commissionEarned?: number;
+  createdAt: string;
+  totalSubmissions: number;
+  approvedSubmissions: number;
+}
+
+export type MarkTelegramJoined200 = {
+  telegramJoined: boolean;
+};
+
+export type AdminListUsersParams = {
+/**
+ * Search by name or email
+ */
+search?: string;
+};
+
+export type AdminBanUser200 = {
+  isBanned: boolean;
+};
 

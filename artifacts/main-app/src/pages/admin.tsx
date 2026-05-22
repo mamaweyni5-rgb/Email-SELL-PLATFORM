@@ -23,9 +23,11 @@ import {
   useAdminGetConversation,
   useAdminSendMessage,
   useAdminBanUser,
-  useAdminSearchUsers,
   getAdminListConversationsQueryKey,
   getAdminGetConversationQueryKey,
+  useAdminBulkClearSubmissions,
+  useAdminBulkClearWithdrawals,
+  useAdminTelegramExport,
 } from "@workspace/api-client-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -131,7 +133,10 @@ function SubmissionsTab() {
   const { toast } = useToast();
   const { data: submissions, isLoading } = useAdminListSubmissions();
   const updateSubmission = useAdminUpdateSubmission();
+  const bulkClear = useAdminBulkClearSubmissions();
+  const tgExport = useAdminTelegramExport();
   const [rejectNoteMap, setRejectNoteMap] = useState<Record<number, string>>({});
+  const [confirmClear, setConfirmClear] = useState<"rejected" | "approved" | null>(null);
 
   const handleExport = () => {
     if (!submissions?.length) {
@@ -141,15 +146,7 @@ function SubmissionsTab() {
     downloadCSV(
       `submissions-${new Date().toISOString().slice(0, 10)}.csv`,
       ["ID", "Seller", "Email Account", "Password", "Price (ETB)", "Date", "Status"],
-      submissions.map((s) => [
-        s.id,
-        s.userName || s.userEmail,
-        s.email,
-        s.password,
-        s.pricePaid,
-        format(new Date(s.createdAt), "yyyy-MM-dd HH:mm"),
-        s.status,
-      ]),
+      submissions.map((s) => [s.id, s.userName || s.userEmail, s.email, s.password, s.pricePaid, format(new Date(s.createdAt), "yyyy-MM-dd HH:mm"), s.status]),
     );
     toast({ title: "Exporting…", description: `${submissions.length} rows — file download started.` });
   };
@@ -163,16 +160,28 @@ function SubmissionsTab() {
     downloadCSV(
       `approved-accounts-${new Date().toISOString().slice(0, 10)}.csv`,
       ["ID", "Seller", "Email Account", "Password", "Price (ETB)", "Date"],
-      approved.map((s) => [
-        s.id,
-        s.userName || s.userEmail,
-        s.email,
-        s.password,
-        s.pricePaid,
-        format(new Date(s.createdAt), "yyyy-MM-dd HH:mm"),
-      ]),
+      approved.map((s) => [s.id, s.userName || s.userEmail, s.email, s.password, s.pricePaid, format(new Date(s.createdAt), "yyyy-MM-dd HH:mm")]),
     );
     toast({ title: "Exporting…", description: `${approved.length} approved accounts — file download started.` });
+  };
+
+  const handleTgExport = (type: "submissions" | "approved-submissions") => {
+    tgExport.mutate({ data: { type } }, {
+      onSuccess: (r) => toast({ title: "📨 Sent to Telegram", description: r.message }),
+      onError: (e: any) => toast({ title: "Failed", description: e?.data?.error ?? "Could not send to Telegram", variant: "destructive" }),
+    });
+  };
+
+  const handleClear = (status: "rejected" | "approved") => {
+    bulkClear.mutate({ data: { status } }, {
+      onSuccess: (r) => {
+        queryClient.invalidateQueries({ queryKey: getAdminListSubmissionsQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getAdminGetStatsQueryKey() });
+        toast({ title: "Cleared", description: `${r.deleted} ${status} submissions deleted.` });
+        setConfirmClear(null);
+      },
+      onError: () => toast({ title: "Error", description: "Failed to clear.", variant: "destructive" }),
+    });
   };
 
   const handleUpdate = (id: number, status: "approved" | "rejected") => {
@@ -204,23 +213,57 @@ function SubmissionsTab() {
 
   return (
     <div>
-      <div className="flex justify-end gap-2 mb-3">
-        <button
-          onClick={handleExportApproved}
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all"
-          style={{ background: "hsl(136,48%,14%)", border: "1px solid hsl(136,48%,28%)", color: "hsl(136,60%,65%)" }}
-        >
-          <FileDown className="h-3.5 w-3.5" />
-          Approved Only
-        </button>
-        <button
-          onClick={handleExport}
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all"
-          style={{ background: "hsl(74,90%,39%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}
-        >
-          <FileDown className="h-3.5 w-3.5" />
-          Export All CSV
-        </button>
+      {/* confirm clear dialog */}
+      {confirmClear && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)" }}>
+          <div className="rounded-2xl p-6 max-w-sm w-full space-y-4 text-center" style={{ background: "hsl(74,58%,52%)", border: "1px solid hsl(74,40%,38%)", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
+            <Trash2 className="h-10 w-10 mx-auto" style={{ color: "hsl(5,75%,50%)" }} />
+            <p className="font-bold text-base" style={{ color: "#0d1a00" }}>
+              {confirmClear === "rejected" ? "ሁሉም ሪጄክትድ ሰብሚሽኖች" : "ሁሉም አፕሩቭድ ሰብሚሽኖች"} ይሰረዙ?
+            </p>
+            <p className="text-sm" style={{ color: "#1a2d00" }}>ይህ ድርጊት ሊቀለበስ አይችልም።</p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmClear(null)} className="flex-1 h-10 rounded-xl font-bold text-sm" style={{ background: "hsl(74,50%,44%)", color: "#0d1a00", border: "1px solid hsl(74,40%,36%)" }}>ሰርዝ</button>
+              <button
+                onClick={() => handleClear(confirmClear)}
+                disabled={bulkClear.isPending}
+                className="flex-1 h-10 rounded-xl font-bold text-sm"
+                style={{ background: "hsl(5,65%,38%)", color: "#fff", border: "none" }}
+              >
+                {bulkClear.isPending ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "አዎ, ሰርዝ"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-wrap justify-between gap-2 mb-3">
+        {/* Clear buttons */}
+        <div className="flex gap-2">
+          <button onClick={() => setConfirmClear("rejected")} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all" style={{ background: "hsl(5,55%,22%)", border: "1px solid hsl(5,55%,36%)", color: "hsl(5,75%,70%)" }}>
+            <Trash2 className="h-3.5 w-3.5" />ሪጄክቶቹን ሰርዝ
+          </button>
+          <button onClick={() => setConfirmClear("approved")} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all" style={{ background: "hsl(136,48%,14%)", border: "1px solid hsl(136,48%,28%)", color: "hsl(136,60%,65%)" }}>
+            <Trash2 className="h-3.5 w-3.5" />አፕሩቮቹን ሰርዝ
+          </button>
+        </div>
+        {/* Export buttons */}
+        <div className="flex gap-2">
+          <button onClick={() => handleTgExport("approved-submissions")} disabled={tgExport.isPending} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all" style={{ background: "hsl(200,70%,18%)", border: "1px solid hsl(200,60%,32%)", color: "#29B6F6" }}>
+            {tgExport.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+            Approved → TG
+          </button>
+          <button onClick={() => handleTgExport("submissions")} disabled={tgExport.isPending} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all" style={{ background: "hsl(200,70%,18%)", border: "1px solid hsl(200,60%,32%)", color: "#29B6F6" }}>
+            {tgExport.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+            All → TG
+          </button>
+          <button onClick={handleExportApproved} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all" style={{ background: "hsl(136,48%,14%)", border: "1px solid hsl(136,48%,28%)", color: "hsl(136,60%,65%)" }}>
+            <FileDown className="h-3.5 w-3.5" />CSV
+          </button>
+          <button onClick={handleExport} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all" style={{ background: "hsl(74,90%,39%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}>
+            <FileDown className="h-3.5 w-3.5" />All CSV
+          </button>
+        </div>
       </div>
     <div
       className="rounded-2xl overflow-hidden"
@@ -304,6 +347,9 @@ function WithdrawalsTab() {
   const [noteMap, setNoteMap] = useState<Record<number, string>>({});
   const { data: withdrawals, isLoading } = useAdminListWithdrawals();
   const updateWithdrawal = useAdminUpdateWithdrawal();
+  const bulkClear = useAdminBulkClearWithdrawals();
+  const tgExport = useAdminTelegramExport();
+  const [confirmClear, setConfirmClear] = useState<"rejected" | "completed" | null>(null);
 
   const handleExport = () => {
     if (!withdrawals?.length) {
@@ -313,20 +359,28 @@ function WithdrawalsTab() {
     downloadCSV(
       `withdrawals-${new Date().toISOString().slice(0, 10)}.csv`,
       ["ID", "User", "Method", "Telebirr/Account Number", "Name", "Bank", "Amount (ETB)", "Date", "Status", "Note"],
-      withdrawals.map((w) => [
-        w.id,
-        w.userEmail,
-        w.paymentMethod,
-        w.paymentMethod === "bank" ? (w.bankAccountNumber ?? "") : w.telebirrNumber,
-        w.paymentMethod === "bank" ? (w.bankAccountName ?? "") : w.telebirrName,
-        w.bankName ?? "",
-        w.amount,
-        format(new Date(w.createdAt), "yyyy-MM-dd HH:mm"),
-        w.status,
-        w.adminNote ?? "",
-      ]),
+      withdrawals.map((w) => [w.id, w.userEmail, w.paymentMethod, w.paymentMethod === "bank" ? (w.bankAccountNumber ?? "") : w.telebirrNumber, w.paymentMethod === "bank" ? (w.bankAccountName ?? "") : w.telebirrName, w.bankName ?? "", w.amount, format(new Date(w.createdAt), "yyyy-MM-dd HH:mm"), w.status, w.adminNote ?? ""]),
     );
     toast({ title: "Exporting…", description: `${withdrawals.length} rows — file download started.` });
+  };
+
+  const handleTgExport = () => {
+    tgExport.mutate({ data: { type: "withdrawals" } }, {
+      onSuccess: (r) => toast({ title: "📨 Sent to Telegram", description: r.message }),
+      onError: (e: any) => toast({ title: "Failed", description: e?.data?.error ?? "Could not send to Telegram", variant: "destructive" }),
+    });
+  };
+
+  const handleClear = (status: "rejected" | "completed") => {
+    bulkClear.mutate({ data: { status } }, {
+      onSuccess: (r) => {
+        queryClient.invalidateQueries({ queryKey: getAdminListWithdrawalsQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getAdminGetStatsQueryKey() });
+        toast({ title: "Cleared", description: `${r.deleted} ${status} withdrawals deleted.` });
+        setConfirmClear(null);
+      },
+      onError: () => toast({ title: "Error", description: "Failed to clear.", variant: "destructive" }),
+    });
   };
 
   const handleUpdate = (id: number, status: "completed" | "rejected") => {
@@ -357,15 +411,50 @@ function WithdrawalsTab() {
 
   return (
     <div>
-      <div className="flex justify-end mb-3">
-        <button
-          onClick={handleExport}
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all"
-          style={{ background: "hsl(74,90%,39%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}
-        >
-          <FileDown className="h-3.5 w-3.5" />
-          Export CSV
-        </button>
+      {/* confirm clear dialog */}
+      {confirmClear && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)" }}>
+          <div className="rounded-2xl p-6 max-w-sm w-full space-y-4 text-center" style={{ background: "hsl(74,58%,52%)", border: "1px solid hsl(74,40%,38%)", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
+            <Trash2 className="h-10 w-10 mx-auto" style={{ color: "hsl(5,75%,50%)" }} />
+            <p className="font-bold text-base" style={{ color: "#0d1a00" }}>
+              {confirmClear === "rejected" ? "ሁሉም ሪጄክትድ ዊዝድሮዎች" : "ሁሉም ተከፈሉ ዊዝድሮዎች"} ይሰረዙ?
+            </p>
+            <p className="text-sm" style={{ color: "#1a2d00" }}>ይህ ድርጊት ሊቀለበስ አይችልም።</p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmClear(null)} className="flex-1 h-10 rounded-xl font-bold text-sm" style={{ background: "hsl(74,50%,44%)", color: "#0d1a00", border: "1px solid hsl(74,40%,36%)" }}>ሰርዝ</button>
+              <button
+                onClick={() => handleClear(confirmClear)}
+                disabled={bulkClear.isPending}
+                className="flex-1 h-10 rounded-xl font-bold text-sm"
+                style={{ background: "hsl(5,65%,38%)", color: "#fff", border: "none" }}
+              >
+                {bulkClear.isPending ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "አዎ, ሰርዝ"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-wrap justify-between gap-2 mb-3">
+        {/* Clear buttons */}
+        <div className="flex gap-2">
+          <button onClick={() => setConfirmClear("rejected")} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold" style={{ background: "hsl(5,55%,22%)", border: "1px solid hsl(5,55%,36%)", color: "hsl(5,75%,70%)" }}>
+            <Trash2 className="h-3.5 w-3.5" />ሪጄክቶቹን ሰርዝ
+          </button>
+          <button onClick={() => setConfirmClear("completed")} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold" style={{ background: "hsl(136,48%,14%)", border: "1px solid hsl(136,48%,28%)", color: "hsl(136,60%,65%)" }}>
+            <Trash2 className="h-3.5 w-3.5" />የተከፈሉትን ሰርዝ
+          </button>
+        </div>
+        {/* Export buttons */}
+        <div className="flex gap-2">
+          <button onClick={handleTgExport} disabled={tgExport.isPending} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold" style={{ background: "hsl(200,70%,18%)", border: "1px solid hsl(200,60%,32%)", color: "#29B6F6" }}>
+            {tgExport.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+            → TG
+          </button>
+          <button onClick={handleExport} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold" style={{ background: "hsl(74,90%,39%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}>
+            <FileDown className="h-3.5 w-3.5" />CSV
+          </button>
+        </div>
       </div>
     <div
       className="rounded-2xl overflow-hidden"
@@ -477,7 +566,7 @@ function UsersTab() {
     return () => clearTimeout(t);
   }, [search]);
 
-  const { data: users, isLoading } = useAdminSearchUsers(debouncedSearch || undefined);
+  const { data: users, isLoading } = useAdminListUsers(debouncedSearch ? { search: debouncedSearch } : undefined);
   const banUser = useAdminBanUser();
 
   const handleBan = (userId: number) => {

@@ -202,6 +202,38 @@ export async function sendBroadcastMessage(
   );
 }
 
+export async function sendDocumentToAdmin(
+  filename: string,
+  csvContent: string,
+  caption: string
+): Promise<{ ok: boolean; error?: string }> {
+  const adminChatId = process.env.ADMIN_TELEGRAM_CHAT_ID;
+  if (!BOT_TOKEN) return { ok: false, error: "TELEGRAM_BOT_TOKEN not set" };
+  if (!adminChatId) return { ok: false, error: "ADMIN_TELEGRAM_CHAT_ID not set" };
+
+  try {
+    const form = new FormData();
+    form.append("chat_id", adminChatId);
+    form.append("caption", caption);
+    form.append("parse_mode", "HTML");
+    form.append(
+      "document",
+      new Blob([csvContent], { type: "text/csv;charset=utf-8" }),
+      filename
+    );
+    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
+      method: "POST",
+      body: form,
+    });
+    const json = await res.json() as { ok: boolean; description?: string };
+    if (!json.ok) return { ok: false, error: json.description ?? "Telegram error" };
+    return { ok: true };
+  } catch (err) {
+    logger.warn({ err }, "Telegram sendDocument failed");
+    return { ok: false, error: String(err) };
+  }
+}
+
 export async function notifyWithdrawalRejected(
   chatId: string | null | undefined,
   amount: number,
