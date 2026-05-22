@@ -100,8 +100,8 @@ export function initTelegram(): void {
   webApp.expand();
 
   try {
-    webApp.setHeaderColor("#3D0015");
-    webApp.setBackgroundColor("#1E0009");
+    webApp.setHeaderColor("#7DA300");
+    webApp.setBackgroundColor("#527500");
   } catch {}
 }
 

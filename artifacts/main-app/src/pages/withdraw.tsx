@@ -168,7 +168,7 @@ export default function Withdraw() {
                 {t("wd_low_balance_desc")}
               </p>
               <Link
-                href="/submit"
+                href="/get-email"
                 className="inline-flex items-center gap-1.5 text-xs font-bold rounded-lg px-3 py-2 transition-opacity hover:opacity-80"
                 style={{ background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "#0d1a00" }}
               >

@@ -185,7 +185,7 @@ export default function Dashboard() {
             >
               {t("dash_withdraw_btn")}
             </Link>
-            <Link href="/submit" className="gold-btn inline-flex items-center justify-center rounded-xl px-5 h-10 text-sm font-bold">
+            <Link href="/get-email" className="gold-btn inline-flex items-center justify-center rounded-xl px-5 h-10 text-sm font-bold">
               {t("dash_sell_btn")}
             </Link>
           </div>
@@ -486,7 +486,7 @@ export default function Dashboard() {
                 <div className="p-8 text-center flex flex-col items-center">
                   <Mail className="h-8 w-8 mb-3" style={{ color: "hsl(43,30%,35%)" }} />
                   <p className="text-sm mb-2" style={{ color: "#2d4000" }}>{t("dash_no_subs")}</p>
-                  <Link href="/submit" className="text-xs font-semibold" style={{ color: "#0d1a00" }}>{t("dash_first_sub")}</Link>
+                  <Link href="/get-email" className="text-xs font-semibold" style={{ color: "#0d1a00" }}>{t("dash_first_sub")}</Link>
                 </div>
               )}
             </div>

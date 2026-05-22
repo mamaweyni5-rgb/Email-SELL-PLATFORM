@@ -5,7 +5,7 @@ import { tgHaptic } from "@/lib/telegram";
 
 const NAV_ITEMS: { href: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; labelKey?: "nav_dashboard" | "nav_sell" | "nav_withdraw" | "nav_profile"; label?: string }[] = [
   { href: "/dashboard", icon: LayoutDashboard, labelKey: "nav_dashboard" },
-  { href: "/submit",    icon: Mail,            labelKey: "nav_sell" },
+  { href: "/get-email", icon: Mail,            labelKey: "nav_sell" },
   { href: "/inbox",     icon: MessageSquare,   label: "Inbox" },
   { href: "/withdraw",  icon: Wallet,          labelKey: "nav_withdraw" },
   { href: "/profile",   icon: User,            labelKey: "nav_profile" },

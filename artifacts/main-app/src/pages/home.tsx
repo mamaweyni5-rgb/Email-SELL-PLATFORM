@@ -1,9 +1,10 @@
 import { useGetMe, useGetSettings, getGetMeQueryKey } from "@workspace/api-client-react";
 import { Link, useLocation } from "wouter";
 import { Layout } from "@/components/layout";
-import { ArrowRight, CheckCircle2, ShieldCheck, Banknote, Star, Send } from "lucide-react";
+import { ArrowRight, Mail, Banknote, Star, Send } from "lucide-react";
 import { useEffect } from "react";
 import { useLanguage } from "@/lib/i18n";
+import { isTelegram } from "@/lib/telegram";
 
 export default function Home() {
   const { data: user, isLoading: authLoading } = useGetMe({ query: { retry: false, queryKey: getGetMeQueryKey() } });
@@ -12,19 +13,24 @@ export default function Home() {
   const { t } = useLanguage();
 
   useEffect(() => {
-    if (!authLoading && user) {
+    if (authLoading) return;
+    if (user) {
       setLocation("/dashboard");
+      return;
+    }
+    if (isTelegram()) {
+      setLocation("/login");
     }
   }, [user, authLoading, setLocation]);
 
   const steps = [
     {
-      icon: ShieldCheck,
+      icon: Mail,
       title: t("home_step1_title"),
       desc: t("home_step1_desc"),
     },
     {
-      icon: CheckCircle2,
+      icon: Send,
       title: t("home_step2_title"),
       desc: t("home_step2_desc"),
     },

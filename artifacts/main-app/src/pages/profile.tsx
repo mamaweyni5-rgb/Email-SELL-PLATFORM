@@ -162,7 +162,7 @@ export default function Profile() {
                   <div className="text-center py-10 flex flex-col items-center">
                     <Mail className="h-10 w-10 mb-3" style={{ color: "hsl(43,30%,32%)" }} />
                     <p className="text-sm mb-2" style={{ color: "#2d4000" }}>{t("profile_no_subs")}</p>
-                    <Link href="/submit" className="text-xs font-semibold" style={{ color: "#0d1a00" }}>
+                    <Link href="/get-email" className="text-xs font-semibold" style={{ color: "#0d1a00" }}>
                       {t("profile_first_sub")}
                     </Link>
                   </div>

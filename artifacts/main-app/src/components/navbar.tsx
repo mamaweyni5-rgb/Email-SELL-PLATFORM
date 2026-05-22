@@ -121,7 +121,7 @@ export function Navbar() {
             {!isLoading && !isError && user && (
               <div className="hidden md:flex items-center gap-1">
                 <Link href="/dashboard" className={navLinkClass("/dashboard")}>{t("nav_dashboard")}</Link>
-                <Link href="/submit" className={navLinkClass("/submit")}>{t("nav_sell")}</Link>
+                <Link href="/get-email" className={navLinkClass("/get-email")}>{t("nav_sell")}</Link>
                 <Link href="/withdraw" className={navLinkClass("/withdraw")}>{t("nav_withdraw")}</Link>
               </div>
             )}

@@ -6,7 +6,7 @@ const translations = {
   en: {
     // Navbar
     nav_dashboard: "Dashboard",
-    nav_sell: "Sell Account",
+    nav_sell: "Get Email",
     nav_withdraw: "Withdraw",
     nav_signin: "Sign In",
     nav_get_started: "Get Started",
@@ -33,15 +33,15 @@ const translations = {
       "A simple, secure process to monetize your accounts in three easy steps.",
     home_hero_badge: "Ethiopia's #1 Email Marketplace",
     home_step_label: "Step",
-    home_step1_title: "1. Submit Securely",
+    home_step1_title: "1. Claim an Email",
     home_step1_desc:
-      "Create an account and submit your valid email credentials through our secure encrypted platform.",
-    home_step2_title: "2. Fast Verification",
+      "Register and claim a ready-made Gmail account from our system — no need to bring your own.",
+    home_step2_title: "2. Open & Verify",
     home_step2_desc:
-      "Our team reviews your submission quickly. Once approved, the funds are instantly added to your wallet.",
+      "Open the email in Gmail, verify it works, then come back and submit it. Our team reviews it quickly.",
     home_step3_title: "3. Withdraw Cash",
     home_step3_desc:
-      "Request a withdrawal to your Telebirr account and get your cash within hours.",
+      "Once approved, funds are instantly added to your wallet. Withdraw to Telebirr within hours.",
 
     // Login
     login_title: "Welcome back",
@@ -82,14 +82,14 @@ const translations = {
     dash_welcome: "Welcome back!",
     dash_subtitle: "Here's an overview of your earnings and submissions.",
     dash_withdraw_btn: "Withdraw Funds",
-    dash_sell_btn: "Sell Account",
+    dash_sell_btn: "Get Email",
     dash_balance: "Available Balance",
     dash_approved: "Approved Accounts",
     dash_pending: "Pending Verification",
     dash_recent_subs: "Recent Submissions",
     dash_view_all: "View all",
     dash_no_subs: "No submissions yet.",
-    dash_first_sub: "Submit your first account",
+    dash_first_sub: "Get your first email",
     dash_recent_wd: "Recent Withdrawals",
     dash_no_wd: "No withdrawal requests yet.",
 
@@ -132,7 +132,7 @@ const translations = {
     wd_no_balance: "You need an approved submission before withdrawing.",
     wd_low_balance_title: "Minimum withdrawal is 100 ETB",
     wd_low_balance_desc: "Your current balance is below the 100 ETB minimum. Submit more accounts to grow your wallet.",
-    wd_low_balance_cta: "Submit an Account",
+    wd_low_balance_cta: "Get an Email",
     wd_error_exceed: "Cannot exceed your balance of",
     wd_toast_title: "Request submitted!",
     wd_toast_desc: "Admin will process your Telebirr payment.",
@@ -146,7 +146,7 @@ const translations = {
     profile_tab_wd: "Withdrawals",
     profile_all_subs: "All Submitted Accounts",
     profile_no_subs: "No submissions yet.",
-    profile_first_sub: "Submit your first account",
+    profile_first_sub: "Get your first email",
     profile_wd_history: "Withdrawal History",
     profile_no_wd: "No withdrawals yet.",
     profile_request_wd: "Request a withdrawal",
@@ -251,7 +251,7 @@ const translations = {
   am: {
     // Navbar
     nav_dashboard: "ዳሽቦርድ",
-    nav_sell: "አካውንት ሸጥ",
+    nav_sell: "ኢሜይል ወስዱ",
     nav_withdraw: "አውጣ",
     nav_signin: "ግባ",
     nav_get_started: "ጀምር",
@@ -279,15 +279,15 @@ const translations = {
     home_how_closing: "መልካም የስራ ዘመን ተመኘን። 🌟",
     home_hero_badge: "የኢትዮጵያ ቁጥር 1 ኢሜይል ገበያ",
     home_step_label: "ደረጃ",
-    home_step1_title: "1. አካውንት ፍጠርና አቅርብ",
+    home_step1_title: "1. ኢሜይል ወስዱ",
     home_step1_desc:
-      "አካውንት ፍጠርና ትክክለኛ የኢሜይል አድሬስ እና ፓስወርድ ለፕላት ፎርም አቅርብ።",
-    home_step2_title: "2. ፈጣን ማረጋገጫ",
+      "ተመዝግበው ከሲስተሙ ዝግጁ Gmail አካውንት ወስዱ — ራስዎ ኢሜይል ማምጣት አያስፈልግም።",
+    home_step2_title: "2. ክፈቱ ያረጋግጡ",
     home_step2_desc:
-      "ቡድናችን ያቀረብከውን ኢሜል / ፓስወርድ ፈጥኖ ያጣራል። ሲጸድቅ ገንዘቡ ወዲያው ወደ ዋሌትህ ይገባል።",
+      "ኢሜይሉን Gmail ላይ ክፈቱ፣ ይሰራል ብለው ሲያረጋግጡ ወደ አፑ ተመልሰው ሰብሚት ያድርጉ።",
     home_step3_title: "3. ወደ ቴሌብር አውጣ",
     home_step3_desc:
-      "ከዋሌትህ ወደ ቴሌብር አካውንትህ የወጪ ጥያቄ ጠይቅና ገንዘቡን በጥቂት ሰዓታት ውስጥ ተቀበል።",
+      "ሲጸድቅ ገንዘቡ ወዲያው ወደ ቦርሳህ ይገባል። ከዚያ ወደ ቴሌብር ይጠይቁ — በጥቂት ሰዓታት ዉስጥ።",
 
     // Login
     login_title: "እንኳን ደህና ተመለሱ",
@@ -328,14 +328,14 @@ const translations = {
     dash_welcome: "እንኳን ደህና ተመለሱ!",
     dash_subtitle: "የገቢዎና ያቅርቦቶ አጭር ሪፖርት እዚህ አለ።",
     dash_withdraw_btn: "ገንዘብ አውጣ",
-    dash_sell_btn: "አካውንት ሸጥ",
+    dash_sell_btn: "ኢሜይል ወስዱ",
     dash_balance: "ያለ ቀሪ",
     dash_approved: "የጸደቁ አካውንቶች",
     dash_pending: "ማረጋገጫ በጥበቃ ላይ",
     dash_recent_subs: "ቅርብ ጊዜ ያቀረቡት",
     dash_view_all: "ሁሉ ይመልከቱ",
     dash_no_subs: "እስካሁን ምንም ማቅረቢያ የለም።",
-    dash_first_sub: "የመጀመሪያ አካውንትህን አቅርብ",
+    dash_first_sub: "የመጀመሪያ ኢሜይልህን ወስድ",
     dash_recent_wd: "ቅርብ ጊዜ ያወጡት",
     dash_no_wd: "እስካሁን የወጪ ጥያቄ የለም።",
 
@@ -378,7 +378,7 @@ const translations = {
     wd_no_balance: "ከማውጣትዎ በፊት ጸድቆ ማቅረቢያ ያስፈልግዎታል።",
     wd_low_balance_title: "ቢያንስ 100 ብር ያስፈልጋል",
     wd_low_balance_desc: "አሁን ያለዎት ቀሪ ከ100 ብር ዝቅ ያለ ነው። ቀሪዎን ለማሳደግ ተጨማሪ አካውንቶች አቅርቡ።",
-    wd_low_balance_cta: "አካውንት አቅርብ",
+    wd_low_balance_cta: "ኢሜይል ወስድ",
     wd_error_exceed: "ቀሪዎን ሊያልፍ አይችልም",
     wd_toast_title: "ጥያቄ ቀርቧል!",
     wd_toast_desc: "አስተዳዳሪ የቴሌብር ክፍያዎን ያስኬዳል።",
@@ -392,7 +392,7 @@ const translations = {
     profile_tab_wd: "ወጪዎች",
     profile_all_subs: "ሁሉም ያቀረቡ አካውንቶች",
     profile_no_subs: "እስካሁን ምንም ማቅረቢያ የለም።",
-    profile_first_sub: "የመጀመሪያ አካውንትህን አቅርብ",
+    profile_first_sub: "የመጀመሪያ ኢሜይልህን ወስድ",
     profile_wd_history: "የወጪ ታሪክ",
     profile_no_wd: "እስካሁን ወጪ የለም።",
     profile_request_wd: "የወጪ ጥያቄ አቅርብ",
