@@ -379,7 +379,10 @@ router.post("/admin/messages/:userId", async (req, res): Promise<void> => {
 
 router.get("/admin/stats", async (_req, res): Promise<void> => {
   const [userCount] = await db
-    .select({ count: sql<number>`count(*)::int` })
+    .select({
+      count: sql<number>`count(*)::int`,
+      botUsers: sql<number>`count(*) filter (where ${usersTable.telegramChatId} is not null)::int`,
+    })
     .from(usersTable);
 
   const [subStats] = await db
@@ -400,6 +403,7 @@ router.get("/admin/stats", async (_req, res): Promise<void> => {
   res.json(
     AdminGetStatsResponse.parse({
       totalUsers: userCount.count,
+      botUsers: userCount.botUsers,
       totalSubmissions: subStats.total,
       pendingSubmissions: subStats.pending,
       approvedSubmissions: subStats.approved,

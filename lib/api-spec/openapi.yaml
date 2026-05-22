@@ -1020,9 +1020,11 @@ components:
 
     AdminStats:
       type: object
-      required: [totalUsers, totalSubmissions, pendingSubmissions, approvedSubmissions, totalEmailsBought, totalPayoutsBirr, pendingWithdrawals]
+      required: [totalUsers, botUsers, totalSubmissions, pendingSubmissions, approvedSubmissions, totalEmailsBought, totalPayoutsBirr, pendingWithdrawals]
       properties:
         totalUsers:
+          type: integer
+        botUsers:
           type: integer
         totalSubmissions:
           type: integer

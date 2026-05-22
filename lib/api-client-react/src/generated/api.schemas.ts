@@ -206,6 +206,7 @@ export interface AdminUser {
 
 export interface AdminStats {
   totalUsers: number;
+  botUsers: number;
   totalSubmissions: number;
   pendingSubmissions: number;
   approvedSubmissions: number;

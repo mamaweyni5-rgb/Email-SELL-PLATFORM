@@ -1370,6 +1370,7 @@ export default function Admin() {
 
   const statCards = [
     { label: "Total Users", value: stats?.totalUsers, icon: Users, color: GOLD },
+    { label: "Bot Users", value: stats?.botUsers, icon: Send, color: "#29B6F6" },
     { label: "Emails Bought", value: stats?.totalEmailsBought, icon: Mail, color: "hsl(136,60%,58%)" },
     { label: "Pending Review", value: stats?.pendingSubmissions, icon: Clock, color: GOLD },
     { label: "Total Paid (ETB)", value: stats?.totalPayoutsBirr, icon: TrendingUp, color: GOLD_BRIGHT },

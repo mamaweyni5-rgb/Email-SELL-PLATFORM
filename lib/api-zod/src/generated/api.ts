@@ -346,6 +346,7 @@ export const AdminSendMessageBody = zod.object({
  */
 export const AdminGetStatsResponse = zod.object({
   "totalUsers": zod.number(),
+  "botUsers": zod.number(),
   "totalSubmissions": zod.number(),
   "pendingSubmissions": zod.number(),
   "approvedSubmissions": zod.number(),
