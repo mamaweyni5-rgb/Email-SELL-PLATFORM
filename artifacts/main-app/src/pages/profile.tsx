@@ -47,9 +47,9 @@ export default function Profile() {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-8 max-w-4xl space-y-4">
-          <Skeleton className="h-9 w-48 rounded-xl" style={{ background: "hsl(57,85%,41%)" }} />
-          <Skeleton className="h-28 w-full rounded-2xl" style={{ background: "hsl(57,85%,40%)" }} />
-          <Skeleton className="h-56 w-full rounded-2xl" style={{ background: "hsl(57,85%,40%)" }} />
+          <Skeleton className="h-9 w-48 rounded-xl" style={{ background: "hsl(74,85%,41%)" }} />
+          <Skeleton className="h-28 w-full rounded-2xl" style={{ background: "hsl(74,85%,40%)" }} />
+          <Skeleton className="h-56 w-full rounded-2xl" style={{ background: "hsl(74,85%,40%)" }} />
         </div>
       </Layout>
     );
@@ -97,7 +97,7 @@ export default function Profile() {
                 {t("profile_approved")}
               </span>
             </div>
-            <p className="text-2xl font-extrabold" style={{ color: "hsl(57,95%,8%)" }}>
+            <p className="text-2xl font-extrabold" style={{ color: "hsl(74,95%,8%)" }}>
               {profile?.approvedSubmissions ?? 0}
             </p>
           </div>
@@ -108,7 +108,7 @@ export default function Profile() {
                 {t("profile_pending")}
               </span>
             </div>
-            <p className="text-2xl font-extrabold" style={{ color: "hsl(57,95%,8%)" }}>
+            <p className="text-2xl font-extrabold" style={{ color: "hsl(74,95%,8%)" }}>
               {profile?.pendingSubmissions ?? 0}
             </p>
           </div>
@@ -119,20 +119,20 @@ export default function Profile() {
           <TabsList
             className="rounded-xl p-1 h-auto"
             style={{
-              background: "hsl(57,100%,37%)",
+              background: "hsl(74,100%,37%)",
               border: "1px solid hsl(43,30%,24%,0.4)",
             }}
           >
             <TabsTrigger
               value="submissions"
-              className="rounded-lg text-sm font-semibold data-[state=active]:text-[hsl(57_90%_10%)] px-5 py-2"
+              className="rounded-lg text-sm font-semibold data-[state=active]:text-[hsl(74_90%_10%)] px-5 py-2"
               style={{ color: "hsl(43,40%,60%)" }}
             >
               {t("profile_tab_subs")}
             </TabsTrigger>
             <TabsTrigger
               value="withdrawals"
-              className="rounded-lg text-sm font-semibold data-[state=active]:text-[hsl(57_90%_10%)] px-5 py-2"
+              className="rounded-lg text-sm font-semibold data-[state=active]:text-[hsl(74_90%_10%)] px-5 py-2"
               style={{ color: "hsl(43,40%,60%)" }}
             >
               {t("profile_tab_wd")}
@@ -143,19 +143,19 @@ export default function Profile() {
             <div
               className="rounded-2xl overflow-hidden"
               style={{
-                background: "hsl(57,100%,38%)",
+                background: "hsl(74,100%,38%)",
                 border: "1px solid hsl(43,30%,24%,0.4)",
                 boxShadow: "0 6px 24px rgba(0,0,0,0.35)",
               }}
             >
-              <div className="px-5 py-4 border-b" style={{ borderColor: "hsl(57,55%,22%)" }}>
+              <div className="px-5 py-4 border-b" style={{ borderColor: "hsl(74,55%,22%)" }}>
                 <h3 className="text-sm font-bold" style={{ color: "hsl(46,68%,78%)" }}>{t("profile_all_subs")}</h3>
               </div>
               <div className="p-4">
                 {subsLoading ? (
                   <div className="space-y-3">
                     {[...Array(3)].map((_, i) => (
-                      <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(57,85%,41%)" }} />
+                      <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(74,85%,41%)" }} />
                     ))}
                   </div>
                 ) : !submissions || submissions.length === 0 ? (
@@ -172,10 +172,10 @@ export default function Profile() {
                       <div
                         key={sub.id}
                         className="py-3 flex items-center justify-between luxury-row transition-colors"
-                        style={{ borderTop: idx > 0 ? "1px solid hsl(57,55%,22%)" : "none" }}
+                        style={{ borderTop: idx > 0 ? "1px solid hsl(74,55%,22%)" : "none" }}
                       >
                         <div>
-                          <p className="font-semibold text-sm" style={{ color: "hsl(57,95%,8%)" }}>{sub.email}</p>
+                          <p className="font-semibold text-sm" style={{ color: "hsl(74,95%,8%)" }}>{sub.email}</p>
                           <p className="text-xs mt-0.5" style={{ color: "hsl(43,30%,50%)" }}>
                             {format(new Date(sub.createdAt), "MMM d, yyyy")}
                           </p>
@@ -199,19 +199,19 @@ export default function Profile() {
             <div
               className="rounded-2xl overflow-hidden"
               style={{
-                background: "hsl(57,100%,38%)",
+                background: "hsl(74,100%,38%)",
                 border: "1px solid hsl(43,30%,24%,0.4)",
                 boxShadow: "0 6px 24px rgba(0,0,0,0.35)",
               }}
             >
-              <div className="px-5 py-4 border-b" style={{ borderColor: "hsl(57,55%,22%)" }}>
+              <div className="px-5 py-4 border-b" style={{ borderColor: "hsl(74,55%,22%)" }}>
                 <h3 className="text-sm font-bold" style={{ color: "hsl(46,68%,78%)" }}>{t("profile_wd_history")}</h3>
               </div>
               <div className="p-4">
                 {wdLoading ? (
                   <div className="space-y-3">
                     {[...Array(3)].map((_, i) => (
-                      <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(57,85%,41%)" }} />
+                      <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(74,85%,41%)" }} />
                     ))}
                   </div>
                 ) : !withdrawals || withdrawals.length === 0 ? (
@@ -228,10 +228,10 @@ export default function Profile() {
                       <div
                         key={wd.id}
                         className="py-3 flex items-center justify-between luxury-row transition-colors"
-                        style={{ borderTop: idx > 0 ? "1px solid hsl(57,55%,22%)" : "none" }}
+                        style={{ borderTop: idx > 0 ? "1px solid hsl(74,55%,22%)" : "none" }}
                       >
                         <div>
-                          <p className="font-semibold text-sm" style={{ color: "hsl(57,95%,8%)" }}>
+                          <p className="font-semibold text-sm" style={{ color: "hsl(74,95%,8%)" }}>
                             {wd.paymentMethod === "bank"
                               ? `🏦 ${wd.bankName ?? ""} — ${wd.bankAccountNumber ?? ""}`
                               : `📱 ${wd.telebirrNumber} — ${wd.telebirrName}`}

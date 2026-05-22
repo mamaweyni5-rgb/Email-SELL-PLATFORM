@@ -42,7 +42,7 @@ export default function Home() {
         <section
           className="flex-1 flex flex-col items-center justify-center text-center px-4 py-16 relative overflow-hidden"
           style={{
-            background: "radial-gradient(ellipse at 50% 0%, hsl(57,100%,39%) 0%, hsl(57,100%,32%) 70%)",
+            background: "radial-gradient(ellipse at 50% 0%, hsl(74,100%,39%) 0%, hsl(74,100%,32%) 70%)",
           }}
         >
           {/* Decorative gold orb */}
@@ -57,7 +57,7 @@ export default function Home() {
             <div
               className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold mb-8 uppercase tracking-widest"
               style={{
-                background: "hsl(57,90%,39%)",
+                background: "hsl(74,90%,39%)",
                 border: "1px solid hsl(43,40%,30%,0.5)",
                 color: "hsl(43,85%,28%)",
               }}
@@ -82,7 +82,7 @@ export default function Home() {
 
             <p
               className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
-              style={{ color: "hsl(57,90%,12%)" }}
+              style={{ color: "hsl(74,90%,12%)" }}
             >
               {t("home_hero_subtitle")}
             </p>
@@ -91,9 +91,9 @@ export default function Home() {
               <div
                 className="inline-flex items-center justify-center rounded-full px-6 py-3 mb-10 text-lg font-semibold"
                 style={{
-                  background: "hsl(57,90%,39%)",
+                  background: "hsl(74,90%,39%)",
                   border: "1px solid hsl(43,40%,30%,0.5)",
-                  color: "hsl(57,95%,8%)",
+                  color: "hsl(74,95%,8%)",
                   boxShadow: "0 4px 20px rgba(212,175,55,0.15)",
                 }}
               >
@@ -155,7 +155,7 @@ export default function Home() {
         {/* ── How it works ── */}
         <section
           className="py-16 px-4"
-          style={{ background: "hsl(57,100%,32%)", borderTop: "1px solid hsl(43,30%,22%,0.3)" }}
+          style={{ background: "hsl(74,100%,32%)", borderTop: "1px solid hsl(43,30%,22%,0.3)" }}
         >
           <div className="container mx-auto max-w-5xl">
             <div className="text-center mb-12">
@@ -165,7 +165,7 @@ export default function Home() {
               >
                 {t("home_how_title")}
               </h2>
-              <p style={{ color: "hsl(57,85%,18%)" }} className="text-base max-w-xl mx-auto">
+              <p style={{ color: "hsl(74,85%,18%)" }} className="text-base max-w-xl mx-auto">
                 {t("home_how_subtitle")}
               </p>
             </div>
@@ -190,7 +190,7 @@ export default function Home() {
                     {t("home_step_label")} {i + 1}
                   </div>
                   <h3 className="text-lg font-bold mb-2" style={{ color: "hsl(43,85%,28%)" }}>{step.title}</h3>
-                  <p className="text-sm leading-relaxed" style={{ color: "hsl(57,85%,18%)" }}>{step.desc}</p>
+                  <p className="text-sm leading-relaxed" style={{ color: "hsl(74,85%,18%)" }}>{step.desc}</p>
                 </div>
               ))}
             </div>

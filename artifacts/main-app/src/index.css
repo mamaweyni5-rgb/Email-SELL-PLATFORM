@@ -68,38 +68,38 @@
 /* LUXURY LEMON & GOLD THEME */
 :root {
   /* True lemon yellow — vivid, unmistakably yellow */
-  --background: 57 100% 34%;
+  --background: 74 60% 48%;
   --foreground: 0 0% 8%;
 
   /* Card surfaces — slightly brighter lemon */
-  --card: 57 100% 39%;
+  --card: 74 58% 52%;
   --card-foreground: 0 0% 8%;
-  --card-border: 57 70% 52%;
+  --card-border: 74 45% 38%;
 
   /* Deep gold primary */
-  --primary: 43 85% 38%;
+  --primary: 43 85% 30%;
   --primary-foreground: 0 0% 100%;
-  --primary-border: 43 85% 38%;
+  --primary-border: 43 85% 30%;
 
-  --border: 57 65% 48%;
-  --input: 57 100% 37%;
+  --border: 74 40% 38%;
+  --input: 74 55% 44%;
   --ring: 43 85% 38%;
 
-  --secondary: 57 85% 43%;
-  --secondary-foreground: 57 95% 8%;
-  --secondary-border: 57 65% 52%;
+  --secondary: 74 55% 44%;
+  --secondary-foreground: 0 0% 8%;
+  --secondary-border: 74 45% 36%;
 
-  --muted: 57 80% 41%;
-  --muted-foreground: 57 60% 20%;
-  --muted-border: 57 60% 48%;
+  --muted: 74 50% 46%;
+  --muted-foreground: 0 0% 22%;
+  --muted-border: 74 42% 40%;
 
-  --accent: 57 85% 43%;
-  --accent-foreground: 57 95% 8%;
-  --accent-border: 57 65% 50%;
+  --accent: 74 55% 44%;
+  --accent-foreground: 0 0% 8%;
+  --accent-border: 74 45% 38%;
 
-  --popover: 57 100% 36%;
-  --popover-foreground: 57 95% 8%;
-  --popover-border: 57 65% 50%;
+  --popover: 74 58% 45%;
+  --popover-foreground: 0 0% 8%;
+  --popover-border: 74 42% 38%;
 
   --destructive: 5 75% 45%;
   --destructive-foreground: 0 0% 100%;
@@ -108,18 +108,18 @@
   --success: 136 48% 32%;
   --success-foreground: 0 0% 100%;
 
-  --warning: 43 85% 38%;
+  --warning: 43 85% 30%;
   --warning-foreground: 0 0% 100%;
 
-  --sidebar: 57 100% 30%;
-  --sidebar-foreground: 57 95% 8%;
-  --sidebar-border: 57 65% 46%;
-  --sidebar-primary: 43 85% 38%;
+  --sidebar: 74 60% 44%;
+  --sidebar-foreground: 0 0% 8%;
+  --sidebar-border: 74 40% 36%;
+  --sidebar-primary: 43 85% 32%;
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-primary-border: 43 85% 38%;
-  --sidebar-accent: 57 85% 43%;
-  --sidebar-accent-foreground: 57 95% 8%;
-  --sidebar-accent-border: 57 65% 50%;
+  --sidebar-accent: 74 55% 44%;
+  --sidebar-accent-foreground: 0 0% 8%;
+  --sidebar-accent-border: 74 45% 38%;
   --sidebar-ring: 43 85% 38%;
 
   --app-font-sans: 'Inter', sans-serif;
@@ -143,7 +143,7 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: hsl(57 100% 30%);
+    background: hsl(74 55% 42%);
   }
 
   ::-webkit-scrollbar-thumb {
@@ -166,8 +166,8 @@
 
 /* ── 3D floating card ── */
 .luxury-card {
-  background: linear-gradient(145deg, hsl(57 100% 42%), hsl(57 100% 37%));
-  border: 1px solid hsl(57 70% 52% / 0.7);
+  background: linear-gradient(145deg, hsl(74 58% 52%), hsl(74 58% 48%));
+  border: 1px solid hsl(74 70% 52% / 0.7);
   box-shadow:
     0 1px 0 rgba(255, 255, 180, 0.4) inset,
     0 -3px 0 rgba(0, 0, 0, 0.25) inset,
@@ -192,7 +192,7 @@
 /* ── Gold button ── */
 .gold-btn {
   background: linear-gradient(145deg, #FFD700, #D4AF37, #B8962E);
-  color: hsl(57 90% 7%);
+  color: hsl(74 90% 7%);
   font-weight: 700;
   border: none;
   box-shadow:
@@ -220,14 +220,14 @@
 
 /* ── Lemon input ── */
 .luxury-input {
-  background: hsl(57 100% 36%) !important;
-  border-color: hsl(57 70% 48%) !important;
-  color: hsl(57 95% 8%) !important;
+  background: hsl(74 58% 46%) !important;
+  border-color: hsl(74 45% 38%) !important;
+  color: hsl(0 0% 8%) !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .luxury-input::placeholder {
-  color: hsl(57 50% 35%);
+  color: hsl(0 0% 35%);
 }
 
 .luxury-input:focus {
@@ -238,8 +238,8 @@
 
 /* ── Stat card 3D lift ── */
 .stat-card {
-  background: linear-gradient(145deg, hsl(57 100% 42%), hsl(57 100% 37%));
-  border: 1px solid hsl(57 70% 52% / 0.7);
+  background: linear-gradient(145deg, hsl(74 58% 52%), hsl(74 58% 48%));
+  border: 1px solid hsl(74 70% 52% / 0.7);
   box-shadow:
     0 1px 0 rgba(255, 255, 180, 0.35) inset,
     0 -2px 0 rgba(0, 0, 0, 0.20) inset,
@@ -287,7 +287,7 @@
 
 /* ── Table rows ── */
 .luxury-row:hover {
-  background: hsl(57 100% 44% / 0.7) !important;
+  background: hsl(74 100% 44% / 0.7) !important;
 }
 
 /* ── Generic 3D card container ── */

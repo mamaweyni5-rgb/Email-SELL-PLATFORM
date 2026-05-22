@@ -73,7 +73,7 @@ export default function Submit() {
       <div
         className="flex flex-1 items-center justify-center p-4"
         style={{
-          background: "radial-gradient(ellipse at 50% 0%, hsl(57,100%,37%) 0%, hsl(57,100%,32%) 65%)",
+          background: "radial-gradient(ellipse at 50% 0%, hsl(74,100%,37%) 0%, hsl(74,100%,32%) 65%)",
         }}
       >
         <div className="w-full max-w-md">
@@ -89,7 +89,7 @@ export default function Submit() {
             <h1 className="text-2xl font-extrabold tracking-tight mb-1" style={{ color: "hsl(43,85%,28%)" }}>
               {t("submit_title")}
             </h1>
-            <p className="text-sm" style={{ color: "hsl(57,65%,20%)" }}>
+            <p className="text-sm" style={{ color: "hsl(74,65%,20%)" }}>
               {t("submit_subtitle_pre")}{" "}
               <span className="font-extrabold" style={{ color: "#FFD700" }}>
                 {settings?.pricePerEmail ?? 20} ETB
@@ -115,13 +115,13 @@ export default function Submit() {
           <div
             className="rounded-2xl p-7"
             style={{
-              background: "linear-gradient(145deg, hsl(57,100%,39%), hsl(57,100%,37%))",
+              background: "linear-gradient(145deg, hsl(74,100%,39%), hsl(74,100%,37%))",
               border: "1px solid hsl(43,40%,30%,0.4)",
               boxShadow: "0 16px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(212,175,55,0.1)",
             }}
           >
             <h2 className="text-sm font-bold mb-1" style={{ color: "hsl(46,68%,78%)" }}>{t("submit_card_title")}</h2>
-            <p className="text-xs mb-5" style={{ color: "hsl(57,70%,20%)" }}>{t("submit_card_desc")}</p>
+            <p className="text-xs mb-5" style={{ color: "hsl(74,70%,20%)" }}>{t("submit_card_desc")}</p>
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
@@ -130,7 +130,7 @@ export default function Submit() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel style={{ color: "hsl(57,90%,12%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                      <FormLabel style={{ color: "hsl(74,90%,12%)", fontSize: "0.8rem", fontWeight: 600 }}>
                         {t("submit_email_label")}
                       </FormLabel>
                       <FormControl>
@@ -153,7 +153,7 @@ export default function Submit() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel style={{ color: "hsl(57,90%,12%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                      <FormLabel style={{ color: "hsl(74,90%,12%)", fontSize: "0.8rem", fontWeight: 600 }}>
                         {t("submit_password_label")}
                       </FormLabel>
                       <FormControl>

@@ -129,7 +129,7 @@ export default function Withdraw() {
       <div
         className="flex flex-1 items-center justify-center p-4"
         style={{
-          background: "radial-gradient(ellipse at 50% 0%, hsl(57,100%,37%) 0%, hsl(57,100%,32%) 65%)",
+          background: "radial-gradient(ellipse at 50% 0%, hsl(74,100%,37%) 0%, hsl(74,100%,32%) 65%)",
         }}
       >
         <div className="w-full max-w-md">
@@ -170,7 +170,7 @@ export default function Withdraw() {
               <Link
                 href="/submit"
                 className="inline-flex items-center gap-1.5 text-xs font-bold rounded-lg px-3 py-2 transition-opacity hover:opacity-80"
-                style={{ background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "hsl(57,100%,32%)" }}
+                style={{ background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "hsl(74,100%,32%)" }}
               >
                 {t("wd_low_balance_cta")} →
               </Link>
@@ -194,7 +194,7 @@ export default function Withdraw() {
           {/* Payment Method Selector */}
           <div
             className="flex rounded-xl p-1 mb-5 gap-1"
-            style={{ background: "hsl(57,100%,37%)", border: "1px solid hsl(43,30%,24%,0.5)" }}
+            style={{ background: "hsl(74,100%,37%)", border: "1px solid hsl(43,30%,24%,0.5)" }}
           >
             <button
               type="button"
@@ -202,7 +202,7 @@ export default function Withdraw() {
               className="flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold transition-all"
               style={
                 method === "telebirr"
-                  ? { background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "hsl(57,100%,32%)" }
+                  ? { background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "hsl(74,100%,32%)" }
                   : { color: SOFT }
               }
             >
@@ -215,7 +215,7 @@ export default function Withdraw() {
               className="flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold transition-all"
               style={
                 method === "bank"
-                  ? { background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "hsl(57,100%,32%)" }
+                  ? { background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "hsl(74,100%,32%)" }
                   : { color: SOFT }
               }
             >
@@ -227,7 +227,7 @@ export default function Withdraw() {
           <div
             className="rounded-2xl p-7"
             style={{
-              background: "linear-gradient(145deg, hsl(57,100%,39%), hsl(57,100%,37%))",
+              background: "linear-gradient(145deg, hsl(74,100%,39%), hsl(74,100%,37%))",
               border: "1px solid hsl(43,40%,30%,0.4)",
               boxShadow: "0 16px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(212,175,55,0.1)",
             }}
@@ -235,7 +235,7 @@ export default function Withdraw() {
             <h2 className="text-sm font-bold mb-1" style={{ color: "hsl(46,68%,78%)" }}>
               {method === "telebirr" ? t("wd_card_title") : t("wd_bank_card_title")}
             </h2>
-            <p className="text-xs mb-5" style={{ color: "hsl(57,70%,20%)" }}>
+            <p className="text-xs mb-5" style={{ color: "hsl(74,70%,20%)" }}>
               {method === "telebirr" ? t("wd_card_desc") : t("wd_bank_card_desc")}
             </p>
 
@@ -335,18 +335,18 @@ export default function Withdraw() {
                               <select
                                 className="luxury-input pl-9 h-11 rounded-lg w-full text-sm appearance-none pr-4"
                                 style={{
-                                  background: "hsl(57,90%,38%)",
+                                  background: "hsl(74,90%,38%)",
                                   border: "1px solid hsl(43,30%,25%,0.5)",
                                   color: field.value ? "hsl(46,68%,82%)" : "hsl(43,30%,50%)",
                                 }}
                                 value={field.value ?? ""}
                                 onChange={(e) => field.onChange(e.target.value)}
                               >
-                                <option value="" disabled style={{ background: "hsl(57,100%,37%)" }}>
+                                <option value="" disabled style={{ background: "hsl(74,100%,37%)" }}>
                                   {t("wd_bank_select_placeholder")}
                                 </option>
                                 {ETHIOPIAN_BANKS.map((bank) => (
-                                  <option key={bank} value={bank} style={{ background: "hsl(57,100%,37%)" }}>
+                                  <option key={bank} value={bank} style={{ background: "hsl(74,100%,37%)" }}>
                                     {bank}
                                   </option>
                                 ))}

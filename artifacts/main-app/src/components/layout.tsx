@@ -89,7 +89,7 @@ function TelegramHeader() {
       <div
         className="flex items-center justify-between py-3 px-4"
         style={{
-          background: "linear-gradient(180deg, hsl(57,100%,32%) 0%, hsl(57,100%,36%) 100%)",
+          background: "linear-gradient(180deg, hsl(74,100%,32%) 0%, hsl(74,100%,36%) 100%)",
           borderBottom: "1px solid hsl(43,40%,30%,0.35)",
           boxShadow: "0 2px 12px rgba(0,0,0,0.4)",
         }}
@@ -99,7 +99,7 @@ function TelegramHeader() {
             className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold cursor-pointer select-none"
             style={{
               background: "linear-gradient(145deg, #FFD700, #D4AF37, #B8962E)",
-              color: "hsl(57,100%,8%)",
+              color: "hsl(74,100%,8%)",
               boxShadow: "0 2px 8px rgba(212,175,55,0.4)",
             }}
             onClick={handleLogoTap}
@@ -123,7 +123,7 @@ function TelegramHeader() {
           className="text-xs font-semibold px-2.5 py-1.5 rounded-md transition-all duration-200"
           style={{
             border: "1px solid hsl(43,40%,30%,0.5)",
-            background: "hsl(57,85%,40%)",
+            background: "hsl(74,85%,40%)",
             color: "hsl(43,60%,65%)",
           }}
         >
@@ -135,14 +135,14 @@ function TelegramHeader() {
         <DialogContent
           className="sm:max-w-sm"
           style={{
-            background: "hsl(57,100%,37%)",
+            background: "hsl(74,100%,37%)",
             border: "1px solid hsl(43,40%,30%,0.4)",
             boxShadow: "0 20px 60px rgba(0,0,0,0.7)",
           }}
         >
           <DialogHeader>
             <DialogTitle style={{ color: "hsl(43,85%,28%)" }}>Admin Access</DialogTitle>
-            <DialogDescription style={{ color: "hsl(57,65%,20%)" }}>Enter admin password to continue</DialogDescription>
+            <DialogDescription style={{ color: "hsl(74,65%,20%)" }}>Enter admin password to continue</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <Input
