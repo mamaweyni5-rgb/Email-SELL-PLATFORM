@@ -111,6 +111,10 @@ export async function runMigrations(): Promise<void> {
         created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
     `);
+
+    await client.query(`
+      ALTER TABLE generated_emails ADD COLUMN IF NOT EXISTS name TEXT;
+    `);
   } finally {
     client.release();
   }

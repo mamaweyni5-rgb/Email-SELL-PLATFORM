@@ -24,7 +24,7 @@ router.get("/generated-emails/available-count", async (_req, res): Promise<void>
 router.get("/generated-emails/my-claim", requireAuth, async (req, res): Promise<void> => {
   const userId = req.session.userId!;
   const { rows } = await pool.query(
-    `SELECT id, email, password, status, claimed_at
+    `SELECT id, name, email, password, status, claimed_at
      FROM generated_emails
      WHERE claimed_by = $1 AND status = 'claimed'
      LIMIT 1`,
@@ -55,7 +55,7 @@ router.post("/generated-emails/claim", requireAuth, async (req, res): Promise<vo
        LIMIT 1
        FOR UPDATE SKIP LOCKED
      )
-     RETURNING id, email, password, status, claimed_at`,
+     RETURNING id, name, email, password, status, claimed_at`,
     [userId]
   );
 
@@ -156,7 +156,7 @@ router.post("/generated-emails/:id/submit", requireAuth, async (req, res): Promi
 
 router.get("/admin/generated-emails", async (_req, res): Promise<void> => {
   const { rows } = await pool.query(
-    `SELECT ge.id, ge.email, ge.password, ge.status, ge.claimed_at, ge.created_at,
+    `SELECT ge.id, ge.name, ge.email, ge.password, ge.status, ge.claimed_at, ge.created_at,
             u.name AS claimed_by_name
      FROM generated_emails ge
      LEFT JOIN users u ON u.id = ge.claimed_by
@@ -166,10 +166,10 @@ router.get("/admin/generated-emails", async (_req, res): Promise<void> => {
 });
 
 router.post("/admin/generated-emails", async (req, res): Promise<void> => {
-  const { emails } = req.body as { emails: { email: string; password: string }[] };
+  const { emails } = req.body as { emails: { name?: string; email: string; password: string }[] };
 
   if (!Array.isArray(emails) || emails.length === 0) {
-    res.status(400).json({ error: "Provide an array of { email, password } objects" });
+    res.status(400).json({ error: "Provide an array of { name, email, password } objects" });
     return;
   }
 
@@ -180,11 +180,11 @@ router.post("/admin/generated-emails", async (req, res): Promise<void> => {
     if (!entry.email || !entry.password) continue;
     try {
       const { rows } = await pool.query(
-        `INSERT INTO generated_emails (email, password)
-         VALUES ($1, $2)
+        `INSERT INTO generated_emails (name, email, password)
+         VALUES ($1, $2, $3)
          ON CONFLICT (email) DO NOTHING
          RETURNING id`,
-        [entry.email.toLowerCase().trim(), entry.password.trim()]
+        [entry.name?.trim() ?? null, entry.email.toLowerCase().trim(), entry.password.trim()]
       );
       if (rows.length > 0) {
         added.push(rows[0].id as number);

@@ -13,6 +13,7 @@ import { useLanguage } from "@/lib/i18n";
 
 type ClaimedEmail = {
   id: number;
+  name: string | null;
   email: string;
   password: string;
   status: string;
@@ -257,6 +258,23 @@ export default function GetEmail() {
                 </div>
 
                 <div className="space-y-4">
+                  {claimed.name && (
+                    <div>
+                      <p className="text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: "hsl(43,35%,52%)" }}>
+                        ስም / Name
+                      </p>
+                      <div
+                        className="flex items-center justify-between gap-2 rounded-xl px-4 py-3"
+                        style={{ background: "rgba(0,0,0,0.35)", border: "1px solid hsl(195,50%,25%,0.4)" }}
+                      >
+                        <span className="text-sm font-semibold truncate" style={{ color: "#0d1a00" }}>
+                          {claimed.name}
+                        </span>
+                        <CopyButton text={claimed.name} />
+                      </div>
+                    </div>
+                  )}
+
                   <div>
                     <p className="text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: "hsl(43,35%,52%)" }}>
                       {t("get_email_email_label")}

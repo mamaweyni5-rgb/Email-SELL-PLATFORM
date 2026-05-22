@@ -1129,6 +1129,7 @@ function SettingsTab() {
 
 type GenEmail = {
   id: number;
+  name: string | null;
   email: string;
   password: string;
   status: string;
@@ -1163,13 +1164,18 @@ function GeneratedEmailsTab() {
   const handleAdd = async () => {
     const lines = bulkText.trim().split("\n").filter(Boolean);
     const parsed = lines.map((line) => {
-      const idx = line.indexOf(":");
-      if (idx < 0) return null;
-      return { email: line.slice(0, idx).trim(), password: line.slice(idx + 1).trim() };
-    }).filter(Boolean) as { email: string; password: string }[];
+      const parts = line.split(":");
+      if (parts.length === 3) {
+        return { name: parts[0].trim(), email: parts[1].trim(), password: parts[2].trim() };
+      }
+      if (parts.length === 2) {
+        return { name: null, email: parts[0].trim(), password: parts[1].trim() };
+      }
+      return null;
+    }).filter(Boolean) as { name: string | null; email: string; password: string }[];
 
     if (parsed.length === 0) {
-      toast({ title: "No valid entries", description: "Use format: email@gmail.com:password", variant: "destructive" });
+      toast({ title: "No valid entries", description: "Use format: name:email@gmail.com:password", variant: "destructive" });
       return;
     }
 
@@ -1214,8 +1220,8 @@ function GeneratedEmailsTab() {
     if (!emails?.length) return;
     downloadCSV(
       `generated-emails-${new Date().toISOString().slice(0, 10)}.csv`,
-      ["ID", "Email", "Password", "Status", "Claimed By", "Created At"],
-      emails.map((e) => [e.id, e.email, e.password, e.status, e.claimed_by_name ?? "", format(new Date(e.created_at), "yyyy-MM-dd HH:mm")])
+      ["ID", "Name", "Email", "Password", "Status", "Claimed By", "Created At"],
+      emails.map((e) => [e.id, e.name ?? "", e.email, e.password, e.status, e.claimed_by_name ?? "", format(new Date(e.created_at), "yyyy-MM-dd HH:mm")])
     );
   };
 
@@ -1264,13 +1270,13 @@ function GeneratedEmailsTab() {
           <div>
             <p className="text-sm font-bold mb-1" style={{ color: "#5BE8FF" }}>Bulk Add Emails</p>
             <p className="text-xs mb-3" style={{ color: TEXT_SOFT }}>
-              One per line in format: <span className="font-mono" style={{ color: GOLD }}>email@gmail.com:password</span>
+              One per line in format: <span className="font-mono" style={{ color: GOLD }}>name:email@gmail.com:password</span>
             </p>
             <textarea
               value={bulkText}
               onChange={(e) => setBulkText(e.target.value)}
               rows={6}
-              placeholder={"example@gmail.com:mypassword123\nanother@gmail.com:pass456"}
+              placeholder={"John Doe:example@gmail.com:mypassword123\nJane Smith:another@gmail.com:pass456"}
               className="w-full rounded-xl px-3 py-2 text-sm font-mono resize-none focus:outline-none"
               style={{
                 background: "rgba(0,0,0,0.4)",
@@ -1315,7 +1321,7 @@ function GeneratedEmailsTab() {
           <Table>
             <TableHeader>
               <TableRow style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}`, background: BURGUNDY_CARD }}>
-                {["Email", "Password", "Status", "Claimed By", "Added", ""].map((h) => (
+                {["Name", "Email", "Password", "Status", "Claimed By", "Added", ""].map((h) => (
                   <TableHead key={h} className="text-xs font-bold uppercase tracking-wide py-3" style={{ color: TEXT_SOFT }}>{h}</TableHead>
                 ))}
               </TableRow>
@@ -1323,6 +1329,7 @@ function GeneratedEmailsTab() {
             <TableBody>
               {emails.map((e) => (
                 <TableRow key={e.id} style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
+                  <TableCell className="text-sm max-w-[120px] truncate py-3" style={{ color: TEXT_SOFT }}>{e.name ?? "—"}</TableCell>
                   <TableCell className="font-mono text-sm max-w-[180px] truncate py-3" style={{ color: GOLD_BRIGHT }}>{e.email}</TableCell>
                   <TableCell className="font-mono text-sm max-w-[140px] truncate py-3" style={{ color: TEXT_BODY }}>{e.password}</TableCell>
                   <TableCell className="py-3">
