@@ -118,7 +118,7 @@ function CopyButton({ text }: { text: string }) {
       style={{
         background: copied ? "rgba(74,200,120,0.18)" : "rgba(212,175,55,0.15)",
         border: `1px solid ${copied ? "rgba(74,200,120,0.4)" : "rgba(212,175,55,0.3)"}`,
-        color: copied ? "hsl(136,60%,60%)" : "#D4AF37",
+        color: copied ? "hsl(136,60%,60%)" : "#0d1a00",
       }}
     >
       {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
@@ -203,7 +203,7 @@ export default function GetEmail() {
           <Link
             href="/dashboard"
             className="inline-flex items-center gap-1.5 text-sm font-medium mb-6 transition-colors"
-            style={{ color: "hsl(43,50%,60%)" }}
+            style={{ color: "#0d1a00" }}
           >
             <ArrowLeft className="h-4 w-4" /> {t("get_email_back")}
           </Link>
@@ -260,7 +260,7 @@ export default function GetEmail() {
                 <div className="space-y-4">
                   {claimed.name && (
                     <div>
-                      <p className="text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: "hsl(43,35%,52%)" }}>
+                      <p className="text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: "#2d4000" }}>
                         ስም / Name
                       </p>
                       <div
@@ -276,7 +276,7 @@ export default function GetEmail() {
                   )}
 
                   <div>
-                    <p className="text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: "hsl(43,35%,52%)" }}>
+                    <p className="text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: "#2d4000" }}>
                       {t("get_email_email_label")}
                     </p>
                     <div
@@ -291,7 +291,7 @@ export default function GetEmail() {
                   </div>
 
                   <div>
-                    <p className="text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: "hsl(43,35%,52%)" }}>
+                    <p className="text-xs font-semibold mb-1.5 uppercase tracking-wider" style={{ color: "#2d4000" }}>
                       {t("get_email_pass_label")}
                     </p>
                     <div
@@ -314,7 +314,7 @@ export default function GetEmail() {
                   border: "1px solid hsl(43,40%,26%,0.45)",
                 }}
               >
-                <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "hsl(43,50%,55%)" }}>
+                <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "#0d1a00" }}>
                   <ListChecks className="h-3.5 w-3.5 inline mr-1.5" />
                   {t("get_email_steps_title")}
                 </p>

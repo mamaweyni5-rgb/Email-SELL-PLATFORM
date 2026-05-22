@@ -54,9 +54,9 @@ const withdrawSchema = z.discriminatedUnion("paymentMethod", [telebirrSchema, ba
 
 type WithdrawForm = z.infer<typeof withdrawSchema>;
 
-const GOLD = "#D4AF37";
-const LABEL_COLOR = "hsl(46,55%,72%)";
-const SOFT = "hsl(43,35%,58%)";
+const GOLD = "#0d1a00";
+const LABEL_COLOR = "#0d1a00";
+const SOFT = "#1a2d00";
 
 export default function Withdraw() {
   const queryClient = useQueryClient();
@@ -136,7 +136,7 @@ export default function Withdraw() {
           <Link
             href="/dashboard"
             className="inline-flex items-center gap-1.5 text-sm font-medium mb-6 transition-colors"
-            style={{ color: "hsl(43,50%,60%)" }}
+            style={{ color: "#0d1a00" }}
           >
             <ArrowLeft className="h-4 w-4" /> {t("wd_back")}
           </Link>
@@ -147,7 +147,7 @@ export default function Withdraw() {
             </h1>
             <p className="text-sm" style={{ color: SOFT }}>
               {t("wd_balance_label")}{" "}
-              <span className="font-extrabold" style={{ color: "#FFD700" }}>
+              <span className="font-extrabold" style={{ color: "#0d1a00" }}>
                 {profile?.walletBalance ?? 0} ETB
               </span>
             </p>
@@ -161,10 +161,10 @@ export default function Withdraw() {
                 border: "1px solid hsl(38,60%,32%,0.6)",
               }}
             >
-              <p className="text-sm font-bold mb-1" style={{ color: "hsl(46,90%,68%)" }}>
+              <p className="text-sm font-bold mb-1" style={{ color: "#0d1a00" }}>
                 ⚠️ {t("wd_low_balance_title")}
               </p>
-              <p className="text-xs mb-3" style={{ color: "hsl(43,40%,56%)" }}>
+              <p className="text-xs mb-3" style={{ color: "#1a2d00" }}>
                 {t("wd_low_balance_desc")}
               </p>
               <Link

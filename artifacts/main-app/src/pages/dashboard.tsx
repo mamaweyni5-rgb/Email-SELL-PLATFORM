@@ -404,7 +404,7 @@ export default function Dashboard() {
                 style={{
                   background: copied ? "hsl(136,40%,20%)" : "hsl(74,90%,40%)",
                   border: "1.5px solid " + (copied ? "hsl(136,48%,35%)" : "hsl(43,40%,32%)"),
-                  color: copied ? "hsl(136,60%,65%)" : "hsl(43,60%,65%)",
+                  color: copied ? "hsl(136,60%,65%)" : "#0d1a00",
                 }}
               >
                 {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
@@ -436,7 +436,7 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-base font-bold" style={{ color: "#0d1a00" }}>{t("dash_recent_subs")}</h2>
-              <Link href="/profile" className="flex items-center gap-1 text-xs font-semibold" style={{ color: "hsl(43,50%,60%)" }}>
+              <Link href="/profile" className="flex items-center gap-1 text-xs font-semibold" style={{ color: "#0d1a00" }}>
                 {t("dash_view_all")} <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
@@ -484,7 +484,7 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <div className="p-8 text-center flex flex-col items-center">
-                  <Mail className="h-8 w-8 mb-3" style={{ color: "hsl(43,30%,35%)" }} />
+                  <Mail className="h-8 w-8 mb-3" style={{ color: "#2d4000" }} />
                   <p className="text-sm mb-2" style={{ color: "#2d4000" }}>{t("dash_no_subs")}</p>
                   <Link href="/get-email" className="text-xs font-semibold" style={{ color: "#0d1a00" }}>{t("dash_first_sub")}</Link>
                 </div>
@@ -496,7 +496,7 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-base font-bold" style={{ color: "#0d1a00" }}>{t("dash_recent_wd")}</h2>
-              <Link href="/profile" className="flex items-center gap-1 text-xs font-semibold" style={{ color: "hsl(43,50%,60%)" }}>
+              <Link href="/profile" className="flex items-center gap-1 text-xs font-semibold" style={{ color: "#0d1a00" }}>
                 {t("dash_view_all")} <ArrowRight className="h-3 w-3" />
               </Link>
             </div>

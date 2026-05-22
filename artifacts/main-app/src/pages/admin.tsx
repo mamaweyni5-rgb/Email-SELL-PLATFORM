@@ -107,8 +107,8 @@ const changePasswordSchema = z.object({
   path: ["confirmPassword"],
 });
 
-const GOLD = "#D4AF37";
-const GOLD_BRIGHT = "#FFD700";
+const GOLD = "#0d1a00";
+const GOLD_BRIGHT = "#0d1a00";
 const BURGUNDY_CARD = "hsl(74,58%,52%)";
 const BURGUNDY_ROW_BORDER = "hsl(74,40%,38%)";
 const TEXT_SOFT = "#2d4000";
@@ -1406,7 +1406,7 @@ export default function Admin() {
           <a
             href="/"
             className="text-sm font-medium transition-colors"
-            style={{ color: "hsl(43,40%,58%)" }}
+            style={{ color: "#0d1a00" }}
           >
             View Site
           </a>
@@ -1460,7 +1460,7 @@ export default function Admin() {
                 key={tab.value}
                 value={tab.value}
                 className="flex items-center gap-1.5 rounded-lg text-sm font-semibold px-4 py-2 data-[state=active]:text-[hsl(74_90%_10%)]"
-                style={{ color: "hsl(43,40%,58%)" }}
+                style={{ color: "#0d1a00" }}
               >
                 <tab.icon className="h-4 w-4" />
                 {tab.label}

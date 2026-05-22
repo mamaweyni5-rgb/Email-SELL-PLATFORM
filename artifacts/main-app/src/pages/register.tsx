@@ -67,9 +67,9 @@ export default function Register() {
     );
   };
 
-  const GOLD = "#D4AF37";
-  const LABEL_COLOR = "hsl(46,55%,72%)";
-  const SOFT = "hsl(43,35%,55%)";
+  const GOLD = "#0d1a00";
+  const LABEL_COLOR = "#0d1a00";
+  const SOFT = "#1a2d00";
 
   return (
     <Layout>

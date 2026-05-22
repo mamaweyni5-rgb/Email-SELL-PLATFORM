@@ -73,7 +73,7 @@ router.post("/auth/register", async (req, res): Promise<void> => {
 
   req.session.userId = user.id;
   req.log.info({ userId: user.id, referrerId }, "User registered");
-  res.status(201).json(LoginResponse.parse(user));
+  res.status(201).json({ id: user.id, email: user.email ?? null, name: user.name ?? null, walletBalance: user.walletBalance });
 });
 
 router.post("/auth/login", async (req, res): Promise<void> => {
@@ -114,7 +114,7 @@ router.post("/auth/login", async (req, res): Promise<void> => {
 
   req.session.userId = user.id;
   req.log.info({ userId: user.id }, "User logged in");
-  res.json(LoginResponse.parse({ id: user.id, email: user.email, name: user.name, walletBalance: user.walletBalance, telegramJoined: user.telegramJoined }));
+  res.json({ id: user.id, email: user.email ?? null, name: user.name ?? null, walletBalance: user.walletBalance, telegramJoined: user.telegramJoined ?? false });
 });
 
 router.post("/auth/logout", async (req, res): Promise<void> => {
@@ -145,7 +145,7 @@ router.get("/auth/me", async (req, res): Promise<void> => {
     return;
   }
 
-  res.json(GetMeResponse.parse(user));
+  res.json({ id: user.id, email: user.email ?? null, name: user.name ?? null, walletBalance: user.walletBalance, telegramJoined: user.telegramJoined ?? false, isBanned: user.isBanned });
 });
 
 router.patch("/auth/me/telegram-joined", requireAuth, async (req, res): Promise<void> => {

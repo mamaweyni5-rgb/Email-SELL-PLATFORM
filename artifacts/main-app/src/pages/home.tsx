@@ -104,7 +104,7 @@ export default function Home() {
                 {t("home_rate_label")}{" "}
                 <span
                   className="font-extrabold ml-2 mr-1"
-                  style={{ color: "#FFD700" }}
+                  style={{ color: "#0d1a00" }}
                 >
                   {settings.pricePerEmail} ETB
                 </span>{" "}

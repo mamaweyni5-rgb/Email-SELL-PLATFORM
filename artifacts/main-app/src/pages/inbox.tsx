@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Send, MessageSquare, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 
-const GOLD = "#D4AF37";
+const GOLD = "#0d1a00";
 const BURGUNDY_CARD = "hsl(74,100%,39%)";
 
 export default function Inbox() {

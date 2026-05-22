@@ -126,14 +126,14 @@ export default function Profile() {
             <TabsTrigger
               value="submissions"
               className="rounded-lg text-sm font-semibold data-[state=active]:text-[hsl(74_90%_10%)] px-5 py-2"
-              style={{ color: "hsl(43,40%,60%)" }}
+              style={{ color: "#0d1a00" }}
             >
               {t("profile_tab_subs")}
             </TabsTrigger>
             <TabsTrigger
               value="withdrawals"
               className="rounded-lg text-sm font-semibold data-[state=active]:text-[hsl(74_90%_10%)] px-5 py-2"
-              style={{ color: "hsl(43,40%,60%)" }}
+              style={{ color: "#0d1a00" }}
             >
               {t("profile_tab_wd")}
             </TabsTrigger>
@@ -160,7 +160,7 @@ export default function Profile() {
                   </div>
                 ) : !submissions || submissions.length === 0 ? (
                   <div className="text-center py-10 flex flex-col items-center">
-                    <Mail className="h-10 w-10 mb-3" style={{ color: "hsl(43,30%,32%)" }} />
+                    <Mail className="h-10 w-10 mb-3" style={{ color: "#2d4000" }} />
                     <p className="text-sm mb-2" style={{ color: "#2d4000" }}>{t("profile_no_subs")}</p>
                     <Link href="/get-email" className="text-xs font-semibold" style={{ color: "#0d1a00" }}>
                       {t("profile_first_sub")}
@@ -216,7 +216,7 @@ export default function Profile() {
                   </div>
                 ) : !withdrawals || withdrawals.length === 0 ? (
                   <div className="text-center py-10 flex flex-col items-center">
-                    <Wallet className="h-10 w-10 mb-3" style={{ color: "hsl(43,30%,32%)" }} />
+                    <Wallet className="h-10 w-10 mb-3" style={{ color: "#2d4000" }} />
                     <p className="text-sm mb-2" style={{ color: "#2d4000" }}>{t("profile_no_wd")}</p>
                     <Link href="/withdraw" className="text-xs font-semibold" style={{ color: "#0d1a00" }}>
                       {t("profile_request_wd")}
@@ -240,7 +240,7 @@ export default function Profile() {
                             {format(new Date(wd.createdAt), "MMM d, yyyy")}
                           </p>
                           {wd.adminNote && (
-                            <p className="text-xs italic mt-0.5" style={{ color: "hsl(43,30%,48%)" }}>{wd.adminNote}</p>
+                            <p className="text-xs italic mt-0.5" style={{ color: "#2d4000" }}>{wd.adminNote}</p>
                           )}
                         </div>
                         <div className="flex items-center gap-3">
