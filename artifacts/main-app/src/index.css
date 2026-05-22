@@ -65,41 +65,41 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* LUXURY BURGUNDY & GOLD THEME */
+/* LUXURY LEMON & GOLD THEME */
 :root {
-  /* Deep velvety burgundy background */
-  --background: 344 90% 12%;
+  /* Deep dark lemon-lime background */
+  --background: 78 90% 8%;
   --foreground: 46 68% 82%;
 
   /* Slightly lighter card surfaces */
-  --card: 348 85% 17%;
+  --card: 78 85% 12%;
   --card-foreground: 46 68% 82%;
-  --card-border: 344 60% 28%;
+  --card-border: 78 60% 24%;
 
   /* Glistening gold primary */
   --primary: 43 62% 52%;
-  --primary-foreground: 344 90% 10%;
+  --primary-foreground: 78 90% 7%;
   --primary-border: 43 62% 52%;
 
-  --border: 344 55% 26%;
-  --input: 344 70% 19%;
+  --border: 78 55% 20%;
+  --input: 78 70% 13%;
   --ring: 43 62% 52%;
 
-  --secondary: 344 65% 22%;
+  --secondary: 78 65% 16%;
   --secondary-foreground: 46 68% 82%;
-  --secondary-border: 344 55% 30%;
+  --secondary-border: 78 55% 24%;
 
-  --muted: 344 60% 18%;
+  --muted: 78 60% 13%;
   --muted-foreground: 43 35% 62%;
-  --muted-border: 344 50% 26%;
+  --muted-border: 78 50% 20%;
 
-  --accent: 344 65% 22%;
+  --accent: 78 65% 16%;
   --accent-foreground: 46 68% 82%;
-  --accent-border: 344 55% 28%;
+  --accent-border: 78 55% 22%;
 
-  --popover: 348 88% 15%;
+  --popover: 78 88% 10%;
   --popover-foreground: 46 68% 82%;
-  --popover-border: 344 55% 28%;
+  --popover-border: 78 55% 22%;
 
   --destructive: 5 75% 52%;
   --destructive-foreground: 0 0% 100%;
@@ -109,17 +109,17 @@
   --success-foreground: 0 0% 100%;
 
   --warning: 43 62% 52%;
-  --warning-foreground: 344 90% 10%;
+  --warning-foreground: 78 90% 7%;
 
-  --sidebar: 344 90% 11%;
+  --sidebar: 78 90% 7%;
   --sidebar-foreground: 46 68% 82%;
-  --sidebar-border: 344 55% 26%;
+  --sidebar-border: 78 55% 20%;
   --sidebar-primary: 43 62% 52%;
-  --sidebar-primary-foreground: 344 90% 10%;
+  --sidebar-primary-foreground: 78 90% 7%;
   --sidebar-primary-border: 43 62% 52%;
-  --sidebar-accent: 344 65% 22%;
+  --sidebar-accent: 78 65% 16%;
   --sidebar-accent-foreground: 46 68% 82%;
-  --sidebar-accent-border: 344 55% 28%;
+  --sidebar-accent-border: 78 55% 22%;
   --sidebar-ring: 43 62% 52%;
 
   --app-font-sans: 'Inter', sans-serif;
@@ -143,7 +143,7 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: hsl(344 90% 12%);
+    background: hsl(78 90% 8%);
   }
 
   ::-webkit-scrollbar-thumb {
@@ -166,47 +166,62 @@
 
 /* ── 3D floating card ── */
 .luxury-card {
-  background: linear-gradient(145deg, hsl(348 85% 19%), hsl(344 80% 15%));
-  border: 1px solid hsl(43 40% 35% / 0.4);
+  background: linear-gradient(145deg, hsl(78 85% 14%), hsl(78 80% 10%));
+  border: 1px solid hsl(78 50% 28% / 0.5);
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.5),
-    0 2px 8px rgba(212, 175, 55, 0.12),
-    inset 0 1px 0 rgba(212, 175, 55, 0.15);
+    0 1px 0 rgba(180, 230, 50, 0.08) inset,
+    0 -3px 0 rgba(0, 0, 0, 0.5) inset,
+    0 4px 0 rgba(0, 0, 0, 0.6),
+    0 8px 16px rgba(0, 0, 0, 0.5),
+    0 16px 40px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(180, 230, 50, 0.10);
   transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
 .luxury-card:hover {
-  transform: translateY(-4px) scale(1.01);
+  transform: translateY(-5px) scale(1.01);
   box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.6),
-    0 4px 16px rgba(212, 175, 55, 0.25),
-    inset 0 1px 0 rgba(212, 175, 55, 0.2);
+    0 1px 0 rgba(180, 230, 50, 0.12) inset,
+    0 -3px 0 rgba(0, 0, 0, 0.6) inset,
+    0 6px 0 rgba(0, 0, 0, 0.7),
+    0 12px 24px rgba(0, 0, 0, 0.6),
+    0 24px 56px rgba(0, 0, 0, 0.5),
+    0 4px 16px rgba(212, 175, 55, 0.22);
 }
 
 /* ── Gold button ── */
 .gold-btn {
   background: linear-gradient(145deg, #FFD700, #D4AF37, #B8962E);
-  color: hsl(344 90% 10%);
+  color: hsl(78 90% 7%);
   font-weight: 700;
   border: none;
-  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+  box-shadow:
+    0 4px 16px rgba(212, 175, 55, 0.4),
+    0 2px 0 rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.3);
   transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
 }
 
 .gold-btn:hover {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.55);
+  box-shadow:
+    0 8px 24px rgba(212, 175, 55, 0.55),
+    0 4px 0 rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.3);
   filter: brightness(1.08);
 }
 
 .gold-btn:active {
-  transform: translateY(0) scale(0.99);
+  transform: translateY(1px) scale(0.99);
+  box-shadow:
+    0 1px 8px rgba(212, 175, 55, 0.3),
+    0 1px 0 rgba(0,0,0,0.4);
 }
 
-/* ── Burgundy border glow on focus ── */
+/* ── Lemon input focus glow ── */
 .luxury-input {
-  background: hsl(344 70% 14%) !important;
-  border-color: hsl(344 55% 30%) !important;
+  background: hsl(78 70% 10%) !important;
+  border-color: hsl(78 55% 22%) !important;
   color: hsl(46 68% 82%) !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -221,17 +236,28 @@
   outline: none !important;
 }
 
-/* ── Stat card lift ── */
+/* ── Stat card 3D lift ── */
 .stat-card {
-  background: linear-gradient(135deg, hsl(348 88% 18%), hsl(344 80% 14%));
-  border: 1px solid hsl(43 40% 30% / 0.35);
-  box-shadow: 0 6px 24px rgba(0,0,0,0.45), 0 1px 0 rgba(212,175,55,0.1) inset;
+  background: linear-gradient(145deg, hsl(78 85% 13%), hsl(78 80% 9%));
+  border: 1px solid hsl(78 50% 26% / 0.5);
+  box-shadow:
+    0 1px 0 rgba(180, 230, 50, 0.10) inset,
+    0 -2px 0 rgba(0, 0, 0, 0.45) inset,
+    0 3px 0 rgba(0, 0, 0, 0.55),
+    0 6px 18px rgba(0, 0, 0, 0.45),
+    0 14px 36px rgba(0, 0, 0, 0.35);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .stat-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 36px rgba(0,0,0,0.55), 0 0 12px rgba(212,175,55,0.18);
+  transform: translateY(-4px);
+  box-shadow:
+    0 1px 0 rgba(180, 230, 50, 0.14) inset,
+    0 -2px 0 rgba(0, 0, 0, 0.5) inset,
+    0 5px 0 rgba(0, 0, 0, 0.65),
+    0 10px 28px rgba(0, 0, 0, 0.55),
+    0 20px 48px rgba(0, 0, 0, 0.45),
+    0 0 14px rgba(212, 175, 55, 0.18);
 }
 
 /* ── Divider ── */
@@ -261,5 +287,15 @@
 
 /* ── Table rows ── */
 .luxury-row:hover {
-  background: hsl(344 70% 20% / 0.6) !important;
+  background: hsl(78 70% 16% / 0.6) !important;
+}
+
+/* ── Generic 3D card container ── */
+.card-3d {
+  box-shadow:
+    0 1px 0 rgba(180, 230, 50, 0.08) inset,
+    0 -2px 0 rgba(0, 0, 0, 0.4) inset,
+    0 3px 0 rgba(0, 0, 0, 0.55),
+    0 8px 20px rgba(0, 0, 0, 0.5),
+    0 18px 44px rgba(0, 0, 0, 0.35);
 }

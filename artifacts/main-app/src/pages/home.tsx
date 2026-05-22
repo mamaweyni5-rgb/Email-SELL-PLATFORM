@@ -42,7 +42,7 @@ export default function Home() {
         <section
           className="flex-1 flex flex-col items-center justify-center text-center px-4 py-16 relative overflow-hidden"
           style={{
-            background: "radial-gradient(ellipse at 50% 0%, hsl(344,80%,18%) 0%, hsl(344,90%,10%) 70%)",
+            background: "radial-gradient(ellipse at 50% 0%, hsl(78,80%,18%) 0%, hsl(78,90%,10%) 70%)",
           }}
         >
           {/* Decorative gold orb */}
@@ -57,7 +57,7 @@ export default function Home() {
             <div
               className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold mb-8 uppercase tracking-widest"
               style={{
-                background: "hsl(344,70%,18%)",
+                background: "hsl(78,70%,18%)",
                 border: "1px solid hsl(43,40%,30%,0.5)",
                 color: "#D4AF37",
               }}
@@ -91,7 +91,7 @@ export default function Home() {
               <div
                 className="inline-flex items-center justify-center rounded-full px-6 py-3 mb-10 text-lg font-semibold"
                 style={{
-                  background: "hsl(344,70%,18%)",
+                  background: "hsl(78,70%,18%)",
                   border: "1px solid hsl(43,40%,30%,0.5)",
                   color: "hsl(46,68%,82%)",
                   boxShadow: "0 4px 20px rgba(212,175,55,0.15)",
@@ -155,7 +155,7 @@ export default function Home() {
         {/* ── How it works ── */}
         <section
           className="py-16 px-4"
-          style={{ background: "hsl(344,90%,11%)", borderTop: "1px solid hsl(43,30%,22%,0.3)" }}
+          style={{ background: "hsl(78,90%,11%)", borderTop: "1px solid hsl(43,30%,22%,0.3)" }}
         >
           <div className="container mx-auto max-w-5xl">
             <div className="text-center mb-12">

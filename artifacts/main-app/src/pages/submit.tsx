@@ -73,7 +73,7 @@ export default function Submit() {
       <div
         className="flex flex-1 items-center justify-center p-4"
         style={{
-          background: "radial-gradient(ellipse at 50% 0%, hsl(344,80%,15%) 0%, hsl(344,90%,11%) 65%)",
+          background: "radial-gradient(ellipse at 50% 0%, hsl(78,80%,15%) 0%, hsl(78,90%,11%) 65%)",
         }}
       >
         <div className="w-full max-w-md">
@@ -115,7 +115,7 @@ export default function Submit() {
           <div
             className="rounded-2xl p-7"
             style={{
-              background: "linear-gradient(145deg, hsl(348,85%,18%), hsl(344,80%,14%))",
+              background: "linear-gradient(145deg, hsl(78,85%,18%), hsl(78,80%,14%))",
               border: "1px solid hsl(43,40%,30%,0.4)",
               boxShadow: "0 16px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(212,175,55,0.1)",
             }}

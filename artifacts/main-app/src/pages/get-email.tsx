@@ -195,7 +195,7 @@ export default function GetEmail() {
       <div
         className="flex flex-1 flex-col p-4 min-h-full"
         style={{
-          background: "radial-gradient(ellipse at 50% 0%, hsl(195,70%,10%) 0%, hsl(344,90%,11%) 60%)",
+          background: "radial-gradient(ellipse at 50% 0%, hsl(195,70%,10%) 0%, hsl(78,90%,11%) 60%)",
         }}
       >
         <div className="w-full max-w-md mx-auto py-2">
@@ -239,7 +239,7 @@ export default function GetEmail() {
               <div
                 className="rounded-2xl p-6 mb-4"
                 style={{
-                  background: "linear-gradient(145deg, hsl(195,60%,12%), hsl(344,80%,14%))",
+                  background: "linear-gradient(145deg, hsl(195,60%,12%), hsl(78,80%,14%))",
                   border: "1px solid hsl(195,60%,30%,0.4)",
                   boxShadow: "0 16px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(91,232,255,0.08)",
                 }}
@@ -292,7 +292,7 @@ export default function GetEmail() {
               <div
                 className="rounded-2xl p-5 mb-5"
                 style={{
-                  background: "linear-gradient(145deg, hsl(40,50%,12%), hsl(344,80%,14%))",
+                  background: "linear-gradient(145deg, hsl(40,50%,12%), hsl(78,80%,14%))",
                   border: "1px solid hsl(43,40%,26%,0.45)",
                 }}
               >
@@ -338,16 +338,16 @@ export default function GetEmail() {
                   <button
                     onClick={() => setConfirmReturn(true)}
                     className="w-full h-10 rounded-xl text-sm font-semibold transition-all"
-                    style={{ background: "transparent", border: "1px solid hsl(344,50%,28%)", color: "hsl(344,50%,60%)" }}
+                    style={{ background: "transparent", border: "1px solid hsl(78,50%,28%)", color: "hsl(78,50%,60%)" }}
                   >
                     {t("get_email_return_btn")}
                   </button>
                 ) : (
                   <div
                     className="rounded-xl p-4"
-                    style={{ background: "hsl(344,70%,14%)", border: "1px solid hsl(344,60%,28%)" }}
+                    style={{ background: "hsl(78,70%,14%)", border: "1px solid hsl(78,60%,28%)" }}
                   >
-                    <p className="text-sm text-center mb-3 font-medium" style={{ color: "hsl(344,60%,70%)" }}>
+                    <p className="text-sm text-center mb-3 font-medium" style={{ color: "hsl(78,60%,70%)" }}>
                       {t("get_email_return_confirm")}
                     </p>
                     <div className="flex gap-2">
@@ -355,7 +355,7 @@ export default function GetEmail() {
                         onClick={handleUnclaim}
                         disabled={unclaim.isPending}
                         className="flex-1 h-9 rounded-lg text-sm font-semibold transition-all"
-                        style={{ background: "hsl(344,60%,22%)", border: "1px solid hsl(344,50%,35%)", color: "hsl(344,60%,75%)" }}
+                        style={{ background: "hsl(78,60%,22%)", border: "1px solid hsl(78,50%,35%)", color: "hsl(78,60%,75%)" }}
                       >
                         {unclaim.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin mx-auto" /> : t("get_email_return_yes")}
                       </button>
@@ -376,7 +376,7 @@ export default function GetEmail() {
               <div
                 className="rounded-2xl p-6 mb-5 text-center"
                 style={{
-                  background: "linear-gradient(145deg, hsl(195,60%,12%), hsl(344,80%,14%))",
+                  background: "linear-gradient(145deg, hsl(195,60%,12%), hsl(78,80%,14%))",
                   border: "1px solid hsl(195,60%,30%,0.4)",
                   boxShadow: "0 12px 40px rgba(0,0,0,0.5)",
                 }}
@@ -430,7 +430,7 @@ export default function GetEmail() {
               <div
                 className="rounded-2xl p-5"
                 style={{
-                  background: "linear-gradient(145deg, hsl(344,82%,15%), hsl(344,80%,12%))",
+                  background: "linear-gradient(145deg, hsl(78,82%,15%), hsl(78,80%,12%))",
                   border: "1px solid hsl(43,35%,24%,0.4)",
                 }}
               >

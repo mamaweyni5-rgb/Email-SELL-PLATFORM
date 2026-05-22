@@ -98,8 +98,8 @@ const changePasswordSchema = z.object({
 
 const GOLD = "#D4AF37";
 const GOLD_BRIGHT = "#FFD700";
-const BURGUNDY_CARD = "hsl(348,82%,16%)";
-const BURGUNDY_ROW_BORDER = "hsl(344,55%,22%)";
+const BURGUNDY_CARD = "hsl(78,80%,11%)";
+const BURGUNDY_ROW_BORDER = "hsl(78,55%,17%)";
 const TEXT_SOFT = "hsl(43,30%,52%)";
 const TEXT_BODY = "hsl(46,68%,82%)";
 
@@ -174,7 +174,7 @@ function SubmissionsTab() {
   };
 
   if (isLoading) return (
-    <div className="space-y-3">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(344,65%,18%)" }} />)}</div>
+    <div className="space-y-3">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(78,65%,18%)" }} />)}</div>
   );
 
   if (!submissions || submissions.length === 0) return (
@@ -199,7 +199,7 @@ function SubmissionsTab() {
         <button
           onClick={handleExport}
           className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all"
-          style={{ background: "hsl(344,70%,18%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}
+          style={{ background: "hsl(78,70%,18%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}
         >
           <FileDown className="h-3.5 w-3.5" />
           Export All CSV
@@ -211,7 +211,7 @@ function SubmissionsTab() {
     >
       <Table>
         <TableHeader>
-          <TableRow style={{ background: "hsl(344,80%,14%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
+          <TableRow style={{ background: "hsl(78,80%,14%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
             {["Seller","Email Account","Password","Price","Date","Status","Rejection Note","Actions"].map(h => (
               <TableHead key={h} className="text-xs font-bold uppercase tracking-wider" style={{ color: GOLD }}>{h}</TableHead>
             ))}
@@ -323,7 +323,7 @@ function WithdrawalsTab() {
   };
 
   if (isLoading) return (
-    <div className="space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(344,65%,18%)" }} />)}</div>
+    <div className="space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(78,65%,18%)" }} />)}</div>
   );
 
   if (!withdrawals || withdrawals.length === 0) return (
@@ -340,7 +340,7 @@ function WithdrawalsTab() {
         <button
           onClick={handleExport}
           className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all"
-          style={{ background: "hsl(344,70%,18%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}
+          style={{ background: "hsl(78,70%,18%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}
         >
           <FileDown className="h-3.5 w-3.5" />
           Export CSV
@@ -352,7 +352,7 @@ function WithdrawalsTab() {
     >
       <Table>
         <TableHeader>
-          <TableRow style={{ background: "hsl(344,80%,14%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
+          <TableRow style={{ background: "hsl(78,80%,14%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
             {["User","Method","Payment Info","Amount","Date","Status","Note","Actions"].map(h => (
               <TableHead key={h} className="text-xs font-bold uppercase tracking-wider" style={{ color: GOLD }}>{h}</TableHead>
             ))}
@@ -483,7 +483,7 @@ function UsersTab() {
   };
 
   if (isLoading) return (
-    <div className="space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(344,65%,18%)" }} />)}</div>
+    <div className="space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(78,65%,18%)" }} />)}</div>
   );
 
   return (
@@ -493,13 +493,13 @@ function UsersTab() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5" style={{ color: "hsl(43,30%,45%)" }} />
           <input
             className="w-full pl-9 pr-3 h-9 rounded-xl text-sm outline-none"
-            style={{ background: "hsl(344,80%,12%)", border: "1px solid hsl(43,30%,22%)", color: "hsl(46,68%,82%)" }}
+            style={{ background: "hsl(78,80%,12%)", border: "1px solid hsl(43,30%,22%)", color: "hsl(46,68%,82%)" }}
             placeholder="Search by name or email…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <button onClick={handleExport} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-9 text-xs font-bold transition-all" style={{ background: "hsl(344,70%,18%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}>
+        <button onClick={handleExport} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-9 text-xs font-bold transition-all" style={{ background: "hsl(78,70%,18%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}>
           <FileDown className="h-3.5 w-3.5" />Export
         </button>
       </div>
@@ -512,7 +512,7 @@ function UsersTab() {
         <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid hsl(43,30%,24%,0.4)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}>
           <Table>
             <TableHeader>
-              <TableRow style={{ background: "hsl(344,80%,14%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
+              <TableRow style={{ background: "hsl(78,80%,14%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
                 {["Name","Email","Wallet","Submissions","Approved","Status","Actions"].map(h => (
                   <TableHead key={h} className="text-xs font-bold uppercase tracking-wider" style={{ color: GOLD }}>{h}</TableHead>
                 ))}
@@ -590,9 +590,9 @@ function MessagesTab() {
           <ArrowLeft className="h-4 w-4" /> Back to conversations
         </button>
         <p className="text-sm font-bold mb-3" style={{ color: "hsl(46,68%,82%)" }}>Chat with {selectedUserName}</p>
-        <div className="flex-1 overflow-y-auto rounded-2xl p-4 space-y-3 mb-4" style={{ background: "hsl(344,80%,10%)", border: "1px solid hsl(43,30%,20%,0.4)" }}>
+        <div className="flex-1 overflow-y-auto rounded-2xl p-4 space-y-3 mb-4" style={{ background: "hsl(78,80%,10%)", border: "1px solid hsl(43,30%,20%,0.4)" }}>
           {msgsLoading ? (
-            <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10 w-3/4 rounded-xl" style={{ background: "hsl(344,65%,18%)" }} />)}</div>
+            <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10 w-3/4 rounded-xl" style={{ background: "hsl(78,65%,18%)" }} />)}</div>
           ) : (messages ?? []).map((msg) => (
             <div key={msg.id} className={`flex ${msg.fromAdmin ? "justify-end" : "justify-start"}`}>
               <div className="max-w-[75%] rounded-2xl px-4 py-2.5" style={msg.fromAdmin ? { background: `linear-gradient(135deg, ${GOLD}55, hsl(43,60%,28%))`, border: `1px solid ${GOLD}40` } : { background: BURGUNDY_CARD, border: "1px solid hsl(43,30%,24%,0.4)" }}>
@@ -603,7 +603,7 @@ function MessagesTab() {
             </div>
           ))}
         </div>
-        <div className="flex items-end gap-2 rounded-2xl p-2" style={{ background: "hsl(344,80%,12%)", border: "1px solid hsl(43,30%,22%,0.5)" }}>
+        <div className="flex items-end gap-2 rounded-2xl p-2" style={{ background: "hsl(78,80%,12%)", border: "1px solid hsl(43,30%,22%,0.5)" }}>
           <textarea
             className="flex-1 resize-none bg-transparent outline-none text-sm px-2 py-1.5 max-h-28"
             rows={1}
@@ -622,7 +622,7 @@ function MessagesTab() {
   }
 
   if (convsLoading) return (
-    <div className="space-y-3">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(344,65%,18%)" }} />)}</div>
+    <div className="space-y-3">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(78,65%,18%)" }} />)}</div>
   );
 
   if (!conversations || conversations.length === 0) return (
@@ -642,7 +642,7 @@ function MessagesTab() {
           style={{ background: BURGUNDY_CARD, border: "1px solid hsl(43,30%,24%,0.4)" }}
           onClick={() => { setSelectedUserId(conv.userId); setSelectedUserName(conv.userName || conv.userEmail); }}
         >
-          <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "hsl(344,70%,18%)", border: `1px solid ${GOLD}30` }}>
+          <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "hsl(78,70%,18%)", border: `1px solid ${GOLD}30` }}>
             <MessageSquare className="w-4 h-4" style={{ color: GOLD }} />
           </div>
           <div className="flex-1 min-w-0">
@@ -652,7 +652,7 @@ function MessagesTab() {
           <div className="text-right flex-shrink-0">
             <p className="text-xs" style={{ color: TEXT_SOFT }}>{format(new Date(conv.lastMessageAt), "MMM d")}</p>
             {conv.unreadCount > 0 && (
-              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold mt-1" style={{ background: GOLD, color: "hsl(344,90%,10%)" }}>{conv.unreadCount}</span>
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold mt-1" style={{ background: GOLD, color: "hsl(78,90%,10%)" }}>{conv.unreadCount}</span>
             )}
           </div>
         </button>
@@ -738,7 +738,7 @@ function BroadcastTab() {
                       placeholder="Write your announcement here..."
                       className="luxury-input w-full rounded-lg px-3 py-2.5 text-sm resize-none"
                       style={{
-                        background: "hsl(344,70%,13%)",
+                        background: "hsl(78,70%,13%)",
                         border: "1px solid hsl(43,30%,28%,0.5)",
                         color: "hsl(46,68%,82%)",
                         outline: "none",
@@ -770,7 +770,7 @@ function BroadcastTab() {
         <h3 className="text-sm font-bold mb-4" style={{ color: GOLD }}>Past Announcements</h3>
         {historyLoading ? (
           <div className="space-y-3">
-            {[0,1,2].map(i => <Skeleton key={i} className="h-16 w-full rounded-xl" style={{ background: "hsl(344,65%,18%)" }} />)}
+            {[0,1,2].map(i => <Skeleton key={i} className="h-16 w-full rounded-xl" style={{ background: "hsl(78,65%,18%)" }} />)}
           </div>
         ) : !broadcasts || broadcasts.length === 0 ? (
           <p className="text-sm text-center py-6" style={{ color: TEXT_SOFT }}>No announcements yet.</p>
@@ -780,7 +780,7 @@ function BroadcastTab() {
               <div
                 key={b.id}
                 className="rounded-xl px-4 py-3"
-                style={{ background: "hsl(344,75%,13%)", border: "1px solid hsl(43,30%,22%,0.4)" }}
+                style={{ background: "hsl(78,75%,13%)", border: "1px solid hsl(43,30%,22%,0.4)" }}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -892,7 +892,7 @@ function SettingsTab() {
                       />
                       <span
                         className="flex items-center text-xs font-bold px-3 rounded-lg"
-                        style={{ background: "hsl(344,70%,18%)", border: "1px solid hsl(43,30%,28%,0.4)", color: GOLD }}
+                        style={{ background: "hsl(78,70%,18%)", border: "1px solid hsl(43,30%,28%,0.4)", color: GOLD }}
                       >
                         ETB
                       </span>
@@ -920,7 +920,7 @@ function SettingsTab() {
                       />
                       <span
                         className="flex items-center text-xs font-bold px-3 rounded-lg"
-                        style={{ background: "hsl(344,70%,18%)", border: "1px solid hsl(43,30%,28%,0.4)", color: GOLD }}
+                        style={{ background: "hsl(78,70%,18%)", border: "1px solid hsl(43,30%,28%,0.4)", color: GOLD }}
                       >
                         %
                       </span>
@@ -1000,7 +1000,7 @@ function SettingsTab() {
               type="submit"
               className="inline-flex items-center gap-2 rounded-lg px-5 h-9 text-sm font-semibold transition-all"
               style={{
-                background: "hsl(344,70%,18%)",
+                background: "hsl(78,70%,18%)",
                 border: "1.5px solid hsl(43,40%,35%)",
                 color: "hsl(43,60%,65%)",
               }}
@@ -1193,7 +1193,7 @@ function GeneratedEmailsTab() {
       {/* Table */}
       {isLoading ? (
         <div className="space-y-2">
-          {[0, 1, 2].map((i) => <Skeleton key={i} className="h-14 rounded-xl" style={{ background: "hsl(344,65%,18%)" }} />)}
+          {[0, 1, 2].map((i) => <Skeleton key={i} className="h-14 rounded-xl" style={{ background: "hsl(78,65%,18%)" }} />)}
         </div>
       ) : !emails?.length ? (
         <div className="text-center py-12" style={{ color: TEXT_SOFT }}>
@@ -1240,7 +1240,7 @@ function GeneratedEmailsTab() {
                       onClick={() => handleDelete(e.id)}
                       disabled={deletingId === e.id}
                       className="rounded-lg p-1.5 transition-all hover:bg-red-900/30"
-                      style={{ color: "hsl(344,60%,55%)" }}
+                      style={{ color: "hsl(78,60%,55%)" }}
                     >
                       {deletingId === e.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                     </button>
@@ -1269,13 +1269,13 @@ export default function Admin() {
   return (
     <div
       className="min-h-screen"
-      style={{ background: "hsl(344,90%,10%)" }}
+      style={{ background: "hsl(78,90%,10%)" }}
     >
       {/* Header */}
       <header
         className="sticky top-0 z-10"
         style={{
-          background: "linear-gradient(180deg, hsl(344,90%,9%) 0%, hsl(344,88%,12%) 100%)",
+          background: "linear-gradient(180deg, hsl(78,90%,9%) 0%, hsl(78,88%,12%) 100%)",
           borderBottom: "1px solid hsl(43,40%,28%,0.3)",
           boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
         }}
@@ -1312,7 +1312,7 @@ export default function Admin() {
                 <stat.icon className="h-4 w-4" style={{ color: stat.color }} />
               </div>
               {statsLoading ? (
-                <Skeleton className="h-8 w-16 rounded-lg" style={{ background: "hsl(344,65%,20%)" }} />
+                <Skeleton className="h-8 w-16 rounded-lg" style={{ background: "hsl(78,65%,20%)" }} />
               ) : (
                 <p className="text-2xl font-extrabold" style={{ color: stat.color }}>{stat.value ?? 0}</p>
               )}
@@ -1325,7 +1325,7 @@ export default function Admin() {
           <TabsList
             className="rounded-xl p-1 h-auto flex-wrap"
             style={{
-              background: "hsl(344,80%,14%)",
+              background: "hsl(78,80%,14%)",
               border: "1px solid hsl(43,30%,24%,0.4)",
             }}
           >
@@ -1341,7 +1341,7 @@ export default function Admin() {
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className="flex items-center gap-1.5 rounded-lg text-sm font-semibold px-4 py-2 data-[state=active]:text-[hsl(344_90%_10%)]"
+                className="flex items-center gap-1.5 rounded-lg text-sm font-semibold px-4 py-2 data-[state=active]:text-[hsl(78_90%_10%)]"
                 style={{ color: "hsl(43,40%,58%)" }}
               >
                 <tab.icon className="h-4 w-4" />

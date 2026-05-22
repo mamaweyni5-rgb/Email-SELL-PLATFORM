@@ -59,8 +59,8 @@ function TelegramJoinGate({ botUsername, onConfirmed }: { botUsername: string; o
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(4px)" }}>
-      <div className="rounded-3xl p-6 max-w-sm w-full text-center space-y-5" style={{ background: "hsl(344,85%,13%)", border: "1px solid hsl(43,40%,30%,0.6)", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
-        <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(200,80%,18%), hsl(344,80%,16%))", border: "1px solid hsl(200,60%,30%,0.5)" }}>
+      <div className="rounded-3xl p-6 max-w-sm w-full text-center space-y-5" style={{ background: "hsl(78,85%,13%)", border: "1px solid hsl(43,40%,30%,0.6)", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
+        <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(200,80%,18%), hsl(78,80%,16%))", border: "1px solid hsl(200,60%,30%,0.5)" }}>
           <Send className="w-7 h-7" style={{ color: "#29B6F6" }} />
         </div>
         <div>
@@ -80,7 +80,7 @@ function TelegramJoinGate({ botUsername, onConfirmed }: { botUsername: string; o
           onClick={handleConfirm}
           disabled={markJoined.isPending}
           className="w-full rounded-xl h-11 text-sm font-bold transition-all"
-          style={{ background: "linear-gradient(135deg, hsl(43,70%,40%), hsl(43,60%,32%))", color: "hsl(344,90%,10%)" }}
+          style={{ background: "linear-gradient(135deg, hsl(43,70%,40%), hsl(43,60%,32%))", color: "hsl(78,90%,10%)" }}
         >
           {markJoined.isPending ? "Confirming…" : "✅ I've Joined"}
         </button>
@@ -143,11 +143,11 @@ export default function Dashboard() {
       <Layout>
         <div className="container mx-auto px-4 py-8 space-y-6 max-w-6xl">
           <div className="space-y-3">
-            <Skeleton className="h-9 w-48 rounded-xl" style={{ background: "hsl(344,65%,22%)" }} />
-            <Skeleton className="h-5 w-72 rounded-lg" style={{ background: "hsl(344,65%,20%)" }} />
+            <Skeleton className="h-9 w-48 rounded-xl" style={{ background: "hsl(78,65%,22%)" }} />
+            <Skeleton className="h-5 w-72 rounded-lg" style={{ background: "hsl(78,65%,20%)" }} />
           </div>
           <div className="grid md:grid-cols-3 gap-5">
-            {[0,1,2].map(i => <Skeleton key={i} className="h-28 w-full rounded-2xl" style={{ background: "hsl(344,65%,20%)" }} />)}
+            {[0,1,2].map(i => <Skeleton key={i} className="h-28 w-full rounded-2xl" style={{ background: "hsl(78,65%,20%)" }} />)}
           </div>
         </div>
       </Layout>
@@ -180,7 +180,7 @@ export default function Dashboard() {
               style={{
                 border: "1.5px solid hsl(43,40%,35%)",
                 color: "hsl(43,60%,65%)",
-                background: "hsl(344,70%,16%)",
+                background: "hsl(78,70%,16%)",
               }}
             >
               {t("dash_withdraw_btn")}
@@ -196,7 +196,7 @@ export default function Dashboard() {
           href="/get-email"
           className="flex items-center gap-3 rounded-2xl px-4 py-3 mb-4 transition-all duration-200 hover:brightness-110 cursor-pointer"
           style={{
-            background: "linear-gradient(135deg, hsl(195,65%,12%), hsl(344,80%,16%))",
+            background: "linear-gradient(135deg, hsl(195,65%,12%), hsl(78,80%,16%))",
             border: "1px solid hsl(195,60%,28%,0.55)",
             boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
             textDecoration: "none",
@@ -225,7 +225,7 @@ export default function Dashboard() {
             rel="noopener noreferrer"
             className="flex items-center gap-3 rounded-2xl px-4 py-3 mb-4 transition-all duration-200 hover:brightness-110 cursor-pointer"
             style={{
-              background: "linear-gradient(135deg, hsl(200,80%,14%), hsl(344,80%,16%))",
+              background: "linear-gradient(135deg, hsl(200,80%,14%), hsl(78,80%,16%))",
               border: "1px solid hsl(200,60%,30%,0.5)",
               boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
               textDecoration: "none",
@@ -255,7 +255,7 @@ export default function Dashboard() {
                 key={b.id}
                 className="flex items-start gap-3 rounded-2xl px-4 py-3"
                 style={{
-                  background: "linear-gradient(135deg, hsl(40,70%,14%), hsl(344,80%,16%))",
+                  background: "linear-gradient(135deg, hsl(40,70%,14%), hsl(78,80%,16%))",
                   border: "1px solid hsl(43,50%,28%,0.5)",
                   boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
                 }}
@@ -355,7 +355,7 @@ export default function Dashboard() {
           <div
             className="rounded-2xl p-6 mb-7"
             style={{
-              background: "linear-gradient(135deg, hsl(348,85%,18%), hsl(344,80%,14%))",
+              background: "linear-gradient(135deg, hsl(78,85%,18%), hsl(78,80%,14%))",
               border: "1px solid hsl(43,40%,30%,0.4)",
               boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(212,175,55,0.1)",
             }}
@@ -369,7 +369,7 @@ export default function Dashboard() {
             <div className="grid sm:grid-cols-2 gap-4 mb-5">
               <div
                 className="rounded-xl p-3 text-center"
-                style={{ background: "hsl(344,70%,16%)", border: "1px solid hsl(43,30%,25%,0.4)" }}
+                style={{ background: "hsl(78,70%,16%)", border: "1px solid hsl(43,30%,25%,0.4)" }}
               >
                 <div className="flex items-center justify-center gap-1 text-xs mb-1" style={{ color: "hsl(43,35%,55%)" }}>
                   <Users className="h-3 w-3" />
@@ -379,7 +379,7 @@ export default function Dashboard() {
               </div>
               <div
                 className="rounded-xl p-3 text-center"
-                style={{ background: "hsl(344,70%,16%)", border: "1px solid hsl(43,30%,25%,0.4)" }}
+                style={{ background: "hsl(78,70%,16%)", border: "1px solid hsl(43,30%,25%,0.4)" }}
               >
                 <div className="flex items-center justify-center gap-1 text-xs mb-1" style={{ color: "hsl(43,35%,55%)" }}>
                   <Wallet className="h-3 w-3" />
@@ -402,7 +402,7 @@ export default function Dashboard() {
                 onClick={handleCopy}
                 className="shrink-0 inline-flex items-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-all"
                 style={{
-                  background: copied ? "hsl(136,40%,20%)" : "hsl(344,70%,20%)",
+                  background: copied ? "hsl(136,40%,20%)" : "hsl(78,70%,20%)",
                   border: "1.5px solid " + (copied ? "hsl(136,48%,35%)" : "hsl(43,40%,32%)"),
                   color: copied ? "hsl(136,60%,65%)" : "hsl(43,60%,65%)",
                 }}
@@ -443,14 +443,14 @@ export default function Dashboard() {
             <div
               className="rounded-2xl overflow-hidden"
               style={{
-                background: "hsl(348,82%,16%)",
+                background: "hsl(78,82%,16%)",
                 border: "1px solid hsl(43,30%,24%,0.4)",
                 boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
               }}
             >
               {submissionsLoading ? (
                 <div className="p-5 space-y-3">
-                  {[0,1].map(i => <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(344,65%,20%)" }} />)}
+                  {[0,1].map(i => <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(78,65%,20%)" }} />)}
                 </div>
               ) : submissions && submissions.length > 0 ? (
                 <div>
@@ -458,12 +458,12 @@ export default function Dashboard() {
                     <div
                       key={sub.id}
                       className="px-4 py-3 flex items-center justify-between transition-colors luxury-row"
-                      style={{ borderTop: idx > 0 ? "1px solid hsl(344,55%,22%)" : "none" }}
+                      style={{ borderTop: idx > 0 ? "1px solid hsl(78,55%,22%)" : "none" }}
                     >
                       <div className="flex items-center gap-3 overflow-hidden">
                         <div
                           className="p-2 rounded-lg shrink-0"
-                          style={{ background: "hsl(344,70%,20%)", border: "1px solid hsl(43,30%,24%,0.3)" }}
+                          style={{ background: "hsl(78,70%,20%)", border: "1px solid hsl(43,30%,24%,0.3)" }}
                         >
                           <Mail className="h-3.5 w-3.5" style={{ color: "#D4AF37" }} />
                         </div>
@@ -503,14 +503,14 @@ export default function Dashboard() {
             <div
               className="rounded-2xl overflow-hidden"
               style={{
-                background: "hsl(348,82%,16%)",
+                background: "hsl(78,82%,16%)",
                 border: "1px solid hsl(43,30%,24%,0.4)",
                 boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
               }}
             >
               {withdrawalsLoading ? (
                 <div className="p-5 space-y-3">
-                  {[0,1].map(i => <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(344,65%,20%)" }} />)}
+                  {[0,1].map(i => <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(78,65%,20%)" }} />)}
                 </div>
               ) : withdrawals && withdrawals.length > 0 ? (
                 <div>
@@ -518,12 +518,12 @@ export default function Dashboard() {
                     <div
                       key={wd.id}
                       className="px-4 py-3 flex items-center justify-between transition-colors luxury-row"
-                      style={{ borderTop: idx > 0 ? "1px solid hsl(344,55%,22%)" : "none" }}
+                      style={{ borderTop: idx > 0 ? "1px solid hsl(78,55%,22%)" : "none" }}
                     >
                       <div className="flex items-center gap-3 overflow-hidden">
                         <div
                           className="p-2 rounded-lg shrink-0"
-                          style={{ background: "hsl(344,70%,20%)", border: "1px solid hsl(43,30%,24%,0.3)" }}
+                          style={{ background: "hsl(78,70%,20%)", border: "1px solid hsl(43,30%,24%,0.3)" }}
                         >
                           <Wallet className="h-3.5 w-3.5" style={{ color: "#D4AF37" }} />
                         </div>

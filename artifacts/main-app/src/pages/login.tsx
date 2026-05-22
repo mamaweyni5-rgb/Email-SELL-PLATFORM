@@ -62,13 +62,13 @@ export default function Login() {
       <div
         className="flex flex-1 items-center justify-center p-4"
         style={{
-          background: "radial-gradient(ellipse at 50% 0%, hsl(344,80%,16%) 0%, hsl(344,90%,11%) 60%)",
+          background: "radial-gradient(ellipse at 50% 0%, hsl(78,80%,16%) 0%, hsl(78,90%,11%) 60%)",
         }}
       >
         <div
           className="w-full max-w-md rounded-2xl p-8"
           style={{
-            background: "linear-gradient(145deg, hsl(348,85%,18%), hsl(344,80%,14%))",
+            background: "linear-gradient(145deg, hsl(78,85%,18%), hsl(78,80%,14%))",
             border: "1px solid hsl(43,40%,30%,0.4)",
             boxShadow: "0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(212,175,55,0.08) inset",
           }}
@@ -79,7 +79,7 @@ export default function Login() {
               className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 text-xl font-extrabold"
               style={{
                 background: "linear-gradient(145deg, #FFD700, #D4AF37)",
-                color: "hsl(344 90% 10%)",
+                color: "hsl(78 90% 10%)",
                 boxShadow: "0 6px 20px rgba(212,175,55,0.4)",
               }}
             >

@@ -79,8 +79,8 @@ export function Navbar() {
   const navLinkClass = (path: string) =>
     `px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
       location === path
-        ? "gold-gradient text-[hsl(344_90%_10%)] shadow-sm"
-        : "text-[hsl(46_68%_70%)] hover:text-[hsl(43_80%_68%)] hover:bg-[hsl(344_65%_20%)]"
+        ? "gold-gradient text-[hsl(78_90%_10%)] shadow-sm"
+        : "text-[hsl(46_68%_70%)] hover:text-[hsl(43_80%_68%)] hover:bg-[hsl(78_65%_20%)]"
     }`;
 
   return (
@@ -88,7 +88,7 @@ export function Navbar() {
       <nav
         className="sticky top-0 z-50"
         style={{
-          background: "linear-gradient(180deg, hsl(344,90%,10%) 0%, hsl(344,88%,13%) 100%)",
+          background: "linear-gradient(180deg, hsl(78,90%,10%) 0%, hsl(78,88%,13%) 100%)",
           borderBottom: "1px solid hsl(43,40%,30%,0.35)",
           boxShadow: "0 4px 24px rgba(0,0,0,0.5), 0 1px 0 rgba(212,175,55,0.1)",
         }}
@@ -100,7 +100,7 @@ export function Navbar() {
                 className="w-9 h-9 rounded-lg flex items-center justify-center cursor-pointer select-none text-sm font-bold"
                 style={{
                   background: "linear-gradient(145deg, #FFD700, #D4AF37, #B8962E)",
-                  color: "hsl(344 90% 10%)",
+                  color: "hsl(78 90% 10%)",
                   boxShadow: "0 3px 12px rgba(212,175,55,0.45)",
                 }}
                 onClick={handleLogoTap}
@@ -135,7 +135,7 @@ export function Navbar() {
               className="text-xs font-semibold px-2.5 py-1.5 rounded-md transition-all duration-200"
               style={{
                 border: "1px solid hsl(43,40%,30%,0.5)",
-                background: "hsl(344,65%,18%)",
+                background: "hsl(78,65%,18%)",
                 color: "hsl(43,60%,65%)",
               }}
               title={lang === "en" ? "Switch to Amharic" : "Switch to English"}
@@ -144,13 +144,13 @@ export function Navbar() {
             </button>
 
             {isLoading ? (
-              <Skeleton className="h-9 w-24 rounded-full" style={{ background: "hsl(344,65%,22%)" }} />
+              <Skeleton className="h-9 w-24 rounded-full" style={{ background: "hsl(78,65%,22%)" }} />
             ) : !isError && user ? (
               <div className="flex items-center gap-2.5">
                 <div
                   className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold"
                   style={{
-                    background: "hsl(344,70%,18%)",
+                    background: "hsl(78,70%,18%)",
                     border: "1px solid hsl(43,40%,30%,0.4)",
                     color: "hsl(43,80%,68%)",
                   }}
@@ -166,7 +166,7 @@ export function Navbar() {
                           className="uppercase text-sm font-bold"
                           style={{
                             background: "linear-gradient(145deg, #D4AF37, #B8962E)",
-                            color: "hsl(344 90% 10%)",
+                            color: "hsl(78 90% 10%)",
                           }}
                         >
                           {(user.name ?? user.email ?? "?").substring(0, 2)}
@@ -178,12 +178,12 @@ export function Navbar() {
                     align="end"
                     className="w-56"
                     style={{
-                      background: "hsl(348,88%,15%)",
+                      background: "hsl(78,88%,15%)",
                       border: "1px solid hsl(43,40%,28%,0.4)",
                       boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
                     }}
                   >
-                    <div className="flex items-center justify-start gap-2 p-2 border-b border-[hsl(344,55%,26%)]">
+                    <div className="flex items-center justify-start gap-2 p-2 border-b border-[hsl(78,55%,26%)]">
                       <div className="flex flex-col space-y-0.5 leading-none">
                         <p className="font-semibold text-sm truncate" style={{ color: "#D4AF37" }}>{user.name ?? user.email ?? ""}</p>
                         <p className="text-xs" style={{ color: "hsl(43,35%,55%)" }}>{t("nav_wallet")}: {user.walletBalance} ETB</p>
@@ -231,7 +231,7 @@ export function Navbar() {
         <DialogContent
           className="sm:max-w-sm"
           style={{
-            background: "hsl(348,88%,14%)",
+            background: "hsl(78,88%,14%)",
             border: "1px solid hsl(43,40%,30%,0.4)",
             boxShadow: "0 20px 60px rgba(0,0,0,0.7)",
           }}
