@@ -195,9 +195,7 @@ export default function GetEmail() {
     <Layout>
       <div
         className="flex flex-1 flex-col p-4 min-h-full"
-        style={{
-          background: "radial-gradient(ellipse at 50% 0%, hsl(195,70%,10%) 0%, hsl(74,100%,32%) 60%)",
-        }}
+        style={{ background: "transparent" }}
       >
         <div className="w-full max-w-md mx-auto py-2">
           <Link
@@ -212,9 +210,9 @@ export default function GetEmail() {
             <div className="flex items-center gap-2 mb-2">
               <div
                 className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                style={{ background: "linear-gradient(135deg, hsl(195,70%,22%), hsl(195,60%,16%))", border: "1px solid hsl(195,60%,35%,0.5)" }}
+                style={{ background: "rgba(255,255,255,0.25)", border: "1px solid rgba(255,255,255,0.4)" }}
               >
-                <Sparkles className="h-4 w-4" style={{ color: "#5BE8FF" }} />
+                <Sparkles className="h-4 w-4" style={{ color: "#0d1a00" }} />
               </div>
               <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "#0d1a00" }}>
                 {t("get_email_title")}
@@ -240,19 +238,19 @@ export default function GetEmail() {
               <div
                 className="rounded-2xl p-6 mb-4"
                 style={{
-                  background: "linear-gradient(145deg, hsl(195,60%,12%), hsl(74,100%,37%))",
-                  border: "1px solid hsl(195,60%,30%,0.4)",
-                  boxShadow: "0 16px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(91,232,255,0.08)",
+                  background: "rgba(255,255,255,0.3)",
+                  border: "1px solid rgba(255,255,255,0.5)",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
                 }}
               >
                 <div className="flex items-center gap-2 mb-4">
                   <div
                     className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
-                    style={{ background: "rgba(91,232,255,0.18)", border: "1px solid rgba(91,232,255,0.35)" }}
+                    style={{ background: "rgba(255,255,255,0.3)", border: "1px solid rgba(255,255,255,0.5)" }}
                   >
-                    <Mail className="h-3.5 w-3.5" style={{ color: "#5BE8FF" }} />
+                    <Mail className="h-3.5 w-3.5" style={{ color: "#0d1a00" }} />
                   </div>
-                  <span className="text-sm font-bold" style={{ color: "hsl(195,70%,75%)" }}>
+                  <span className="text-sm font-bold" style={{ color: "#0d1a00" }}>
                     {t("get_email_your_email")}
                   </span>
                 </div>
@@ -265,7 +263,7 @@ export default function GetEmail() {
                       </p>
                       <div
                         className="flex items-center justify-between gap-2 rounded-xl px-4 py-3"
-                        style={{ background: "rgba(0,0,0,0.35)", border: "1px solid hsl(195,50%,25%,0.4)" }}
+                        style={{ background: "rgba(255,255,255,0.35)", border: "1px solid rgba(255,255,255,0.5)" }}
                       >
                         <span className="text-sm font-semibold truncate" style={{ color: "#0d1a00" }}>
                           {claimed.name}
@@ -281,7 +279,7 @@ export default function GetEmail() {
                     </p>
                     <div
                       className="flex items-center justify-between gap-2 rounded-xl px-4 py-3"
-                      style={{ background: "rgba(0,0,0,0.35)", border: "1px solid hsl(195,50%,25%,0.4)" }}
+                      style={{ background: "rgba(255,255,255,0.35)", border: "1px solid rgba(255,255,255,0.5)" }}
                     >
                       <span className="font-mono text-sm font-semibold truncate" style={{ color: "#0d1a00" }}>
                         {claimed.email}
@@ -296,7 +294,7 @@ export default function GetEmail() {
                     </p>
                     <div
                       className="flex items-center justify-between gap-2 rounded-xl px-4 py-3"
-                      style={{ background: "rgba(0,0,0,0.35)", border: "1px solid hsl(195,50%,25%,0.4)" }}
+                      style={{ background: "rgba(255,255,255,0.35)", border: "1px solid rgba(255,255,255,0.5)" }}
                     >
                       <span className="font-mono text-sm font-semibold truncate" style={{ color: "#0d1a00" }}>
                         {claimed.password}
@@ -310,8 +308,8 @@ export default function GetEmail() {
               <div
                 className="rounded-2xl p-5 mb-5"
                 style={{
-                  background: "linear-gradient(145deg, hsl(40,50%,12%), hsl(74,100%,37%))",
-                  border: "1px solid hsl(43,40%,26%,0.45)",
+                  background: "rgba(255,255,255,0.28)",
+                  border: "1px solid rgba(255,255,255,0.45)",
                 }}
               >
                 <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "#0d1a00" }}>
@@ -356,16 +354,16 @@ export default function GetEmail() {
                   <button
                     onClick={() => setConfirmReturn(true)}
                     className="w-full h-10 rounded-xl text-sm font-semibold transition-all"
-                    style={{ background: "transparent", border: "1px solid hsl(74,50%,28%)", color: "hsl(74,50%,60%)" }}
+                    style={{ background: "transparent", border: "1px solid rgba(0,0,0,0.2)", color: "#0d1a00" }}
                   >
                     {t("get_email_return_btn")}
                   </button>
                 ) : (
                   <div
                     className="rounded-xl p-4"
-                    style={{ background: "hsl(74,70%,14%)", border: "1px solid hsl(74,60%,28%)" }}
+                    style={{ background: "rgba(255,255,255,0.28)", border: "1px solid rgba(255,255,255,0.45)" }}
                   >
-                    <p className="text-sm text-center mb-3 font-medium" style={{ color: "hsl(74,60%,70%)" }}>
+                    <p className="text-sm text-center mb-3 font-medium" style={{ color: "#0d1a00" }}>
                       {t("get_email_return_confirm")}
                     </p>
                     <div className="flex gap-2">
@@ -373,7 +371,7 @@ export default function GetEmail() {
                         onClick={handleUnclaim}
                         disabled={unclaim.isPending}
                         className="flex-1 h-9 rounded-lg text-sm font-semibold transition-all"
-                        style={{ background: "hsl(74,60%,22%)", border: "1px solid hsl(74,50%,35%)", color: "hsl(74,60%,75%)" }}
+                        style={{ background: "rgba(255,255,255,0.3)", border: "1px solid rgba(255,255,255,0.5)", color: "#0d1a00" }}
                       >
                         {unclaim.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin mx-auto" /> : t("get_email_return_yes")}
                       </button>
@@ -394,21 +392,21 @@ export default function GetEmail() {
               <div
                 className="rounded-2xl p-6 mb-5 text-center"
                 style={{
-                  background: "linear-gradient(145deg, hsl(195,60%,12%), hsl(74,100%,37%))",
-                  border: "1px solid hsl(195,60%,30%,0.4)",
-                  boxShadow: "0 12px 40px rgba(0,0,0,0.5)",
+                  background: "rgba(255,255,255,0.3)",
+                  border: "1px solid rgba(255,255,255,0.5)",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
                 }}
               >
                 <div
                   className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-4"
-                  style={{ background: "linear-gradient(135deg, hsl(195,70%,18%), hsl(195,60%,13%))", border: "1px solid hsl(195,60%,32%,0.5)" }}
+                  style={{ background: "rgba(255,255,255,0.3)", border: "1px solid rgba(255,255,255,0.5)" }}
                 >
-                  <Sparkles className="h-7 w-7" style={{ color: "#5BE8FF" }} />
+                  <Sparkles className="h-7 w-7" style={{ color: "#0d1a00" }} />
                 </div>
 
                 <div
                   className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold mb-3"
-                  style={{ background: "rgba(91,232,255,0.12)", border: "1px solid rgba(91,232,255,0.3)", color: "#5BE8FF" }}
+                  style={{ background: "rgba(255,255,255,0.3)", border: "1px solid rgba(255,255,255,0.5)", color: "#0d1a00" }}
                 >
                   <Mail className="h-3 w-3" />
                   {availableData?.count ?? 0} {t("get_email_available")}
@@ -448,8 +446,8 @@ export default function GetEmail() {
               <div
                 className="rounded-2xl p-5"
                 style={{
-                  background: "linear-gradient(145deg, hsl(74,82%,15%), hsl(74,100%,35%))",
-                  border: "1px solid hsl(43,35%,24%,0.4)",
+                  background: "rgba(255,255,255,0.28)",
+                  border: "1px solid rgba(255,255,255,0.45)",
                 }}
               >
                 <p className="text-sm font-bold mb-4" style={{ color: "#0d1a00" }}>
@@ -462,9 +460,9 @@ export default function GetEmail() {
                       <div key={i} className="flex items-start gap-4">
                         <div
                           className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
-                          style={{ background: "rgba(91,232,255,0.12)", border: "1px solid rgba(91,232,255,0.25)" }}
+                          style={{ background: "rgba(255,255,255,0.3)", border: "1px solid rgba(255,255,255,0.5)" }}
                         >
-                          <Icon className="h-4 w-4" style={{ color: "#5BE8FF" }} />
+                          <Icon className="h-4 w-4" style={{ color: "#0d1a00" }} />
                         </div>
                         <div>
                           <p className="text-sm font-semibold" style={{ color: "#0d1a00" }}>{s.title}</p>
