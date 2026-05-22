@@ -59,7 +59,7 @@ export default function Home() {
               style={{
                 background: "hsl(74,90%,39%)",
                 border: "1px solid hsl(43,40%,30%,0.5)",
-                color: "hsl(43,85%,28%)",
+                color: "#0d1a00",
               }}
             >
               <Star className="w-3 h-3 fill-current" />
@@ -69,10 +69,8 @@ export default function Home() {
             <h1
               className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight"
               style={{
-                background: "linear-gradient(170deg, #FFD700 10%, #D4AF37 50%, #F1E5AC 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
+                color: "#0d1a00",
+                textShadow: "0 1px 0 rgba(255,255,255,0.18)",
               }}
             >
               {t("home_hero_title")}{" "}
@@ -82,7 +80,7 @@ export default function Home() {
 
             <p
               className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
-              style={{ color: "hsl(74,90%,12%)" }}
+              style={{ color: "#0d1a00" }}
             >
               {t("home_hero_subtitle")}
             </p>
@@ -93,7 +91,7 @@ export default function Home() {
                 style={{
                   background: "hsl(74,90%,39%)",
                   border: "1px solid hsl(43,40%,30%,0.5)",
-                  color: "hsl(74,95%,8%)",
+                  color: "#0d1a00",
                   boxShadow: "0 4px 20px rgba(212,175,55,0.15)",
                 }}
               >
@@ -124,7 +122,7 @@ export default function Home() {
                   height: "3.25rem",
                   background: "transparent",
                   border: "1.5px solid hsl(43,40%,38%)",
-                  color: "hsl(43,60%,68%)",
+                  color: "#0d1a00",
                 }}
               >
                 {t("home_cta_signin")}
@@ -161,11 +159,11 @@ export default function Home() {
             <div className="text-center mb-12">
               <h2
                 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3"
-                style={{ color: "hsl(43,85%,28%)" }}
+                style={{ color: "#0d1a00" }}
               >
                 {t("home_how_title")}
               </h2>
-              <p style={{ color: "hsl(74,85%,18%)" }} className="text-base max-w-xl mx-auto">
+              <p style={{ color: "#1a2d00" }} className="text-base max-w-xl mx-auto">
                 {t("home_how_subtitle")}
               </p>
             </div>
@@ -181,22 +179,22 @@ export default function Home() {
                       boxShadow: "0 0 20px rgba(212,175,55,0.1)",
                     }}
                   >
-                    <step.icon className="h-7 w-7" style={{ color: "hsl(43,85%,28%)" }} />
+                    <step.icon className="h-7 w-7" style={{ color: "#0d1a00" }} />
                   </div>
                   <div
                     className="text-xs font-bold uppercase tracking-widest mb-2"
-                    style={{ color: "hsl(43,40%,50%)" }}
+                    style={{ color: "#2d4000" }}
                   >
                     {t("home_step_label")} {i + 1}
                   </div>
-                  <h3 className="text-lg font-bold mb-2" style={{ color: "hsl(43,85%,28%)" }}>{step.title}</h3>
-                  <p className="text-sm leading-relaxed" style={{ color: "hsl(74,85%,18%)" }}>{step.desc}</p>
+                  <h3 className="text-lg font-bold mb-2" style={{ color: "#0d1a00" }}>{step.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: "#1a2d00" }}>{step.desc}</p>
                 </div>
               ))}
             </div>
 
             {/* closing note */}
-            <p className="text-center mt-10 text-base font-semibold" style={{ color: "hsl(43,85%,28%)" }}>
+            <p className="text-center mt-10 text-base font-semibold" style={{ color: "#0d1a00" }}>
               {t("home_how_closing")}
             </p>
           </div>

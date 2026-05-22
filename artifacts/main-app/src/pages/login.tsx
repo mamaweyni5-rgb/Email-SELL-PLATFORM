@@ -79,7 +79,7 @@ export default function Login() {
               className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 text-xl font-extrabold"
               style={{
                 background: "linear-gradient(145deg, #FFD700, #D4AF37)",
-                color: "hsl(74 90% 10%)",
+                color: "#0d1a00",
                 boxShadow: "0 6px 20px rgba(212,175,55,0.4)",
               }}
             >
@@ -87,11 +87,11 @@ export default function Login() {
             </div>
             <h1
               className="text-2xl font-extrabold tracking-tight mb-1"
-              style={{ color: "hsl(43,85%,28%)" }}
+              style={{ color: "#0d1a00" }}
             >
               {t("login_title")}
             </h1>
-            <p className="text-sm" style={{ color: "hsl(74,65%,20%)" }}>{t("login_subtitle")}</p>
+            <p className="text-sm" style={{ color: "#1a2d00" }}>{t("login_subtitle")}</p>
           </div>
 
           <Form {...form}>
@@ -101,7 +101,7 @@ export default function Login() {
                 name="identifier"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ color: "hsl(74,90%,12%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                    <FormLabel style={{ color: "#0d1a00", fontSize: "0.8rem", fontWeight: 600 }}>
                       {t("login_identifier")}
                     </FormLabel>
                     <FormControl>
@@ -121,7 +121,7 @@ export default function Login() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ color: "hsl(74,90%,12%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                    <FormLabel style={{ color: "#0d1a00", fontSize: "0.8rem", fontWeight: 600 }}>
                       {t("login_password")}
                     </FormLabel>
                     <FormControl>
@@ -155,13 +155,13 @@ export default function Login() {
 
           <div
             className="mt-6 text-center text-sm"
-            style={{ color: "hsl(74,65%,20%)" }}
+            style={{ color: "#1a2d00" }}
           >
             {t("login_no_account")}{" "}
             <Link
               href="/register"
               className="font-semibold transition-colors"
-              style={{ color: "hsl(43,85%,28%)" }}
+              style={{ color: "#0d1a00" }}
             >
               {t("login_create")}
             </Link>

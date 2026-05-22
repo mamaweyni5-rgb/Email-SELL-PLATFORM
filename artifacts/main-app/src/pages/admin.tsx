@@ -179,7 +179,7 @@ function SubmissionsTab() {
 
   if (!submissions || submissions.length === 0) return (
     <div className="text-center py-16 flex flex-col items-center">
-      <Mail className="h-12 w-12 mb-4" style={{ color: "hsl(74,70%,22%)" }} />
+      <Mail className="h-12 w-12 mb-4" style={{ color: "#1a2d00" }} />
       <p className="text-base font-semibold" style={{ color: "hsl(74,85%,15%)" }}>No submissions yet</p>
       <p className="text-sm mt-1" style={{ color: TEXT_SOFT }}>Email accounts submitted by users will appear here.</p>
     </div>
@@ -328,7 +328,7 @@ function WithdrawalsTab() {
 
   if (!withdrawals || withdrawals.length === 0) return (
     <div className="text-center py-16 flex flex-col items-center">
-      <Wallet className="h-12 w-12 mb-4" style={{ color: "hsl(74,70%,22%)" }} />
+      <Wallet className="h-12 w-12 mb-4" style={{ color: "#1a2d00" }} />
       <p className="text-base font-semibold" style={{ color: "hsl(74,85%,15%)" }}>No withdrawal requests</p>
       <p className="text-sm mt-1" style={{ color: TEXT_SOFT }}>When users request withdrawals, they will appear here.</p>
     </div>
@@ -490,10 +490,10 @@ function UsersTab() {
     <div>
       <div className="flex items-center gap-3 mb-4">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5" style={{ color: "hsl(74,65%,22%)" }} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5" style={{ color: "#1a2d00" }} />
           <input
             className="w-full pl-9 pr-3 h-9 rounded-xl text-sm outline-none"
-            style={{ background: "hsl(74,100%,35%)", border: "1px solid hsl(43,30%,22%)", color: "hsl(74,95%,8%)" }}
+            style={{ background: "hsl(74,100%,35%)", border: "1px solid hsl(43,30%,22%)", color: "#0d1a00" }}
             placeholder="Search by name or email…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -505,7 +505,7 @@ function UsersTab() {
       </div>
       {!users || users.length === 0 ? (
         <div className="text-center py-12 flex flex-col items-center">
-          <Users className="h-12 w-12 mb-4" style={{ color: "hsl(74,70%,22%)" }} />
+          <Users className="h-12 w-12 mb-4" style={{ color: "#1a2d00" }} />
           <p className="text-base font-semibold" style={{ color: "hsl(74,85%,15%)" }}>No users found</p>
         </div>
       ) : (
@@ -589,7 +589,7 @@ function MessagesTab() {
         >
           <ArrowLeft className="h-4 w-4" /> Back to conversations
         </button>
-        <p className="text-sm font-bold mb-3" style={{ color: "hsl(74,95%,8%)" }}>Chat with {selectedUserName}</p>
+        <p className="text-sm font-bold mb-3" style={{ color: "#0d1a00" }}>Chat with {selectedUserName}</p>
         <div className="flex-1 overflow-y-auto rounded-2xl p-4 space-y-3 mb-4" style={{ background: "hsl(74,100%,33%)", border: "1px solid hsl(43,30%,20%,0.4)" }}>
           {msgsLoading ? (
             <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10 w-3/4 rounded-xl" style={{ background: "hsl(74,85%,40%)" }} />)}</div>
@@ -597,8 +597,8 @@ function MessagesTab() {
             <div key={msg.id} className={`flex ${msg.fromAdmin ? "justify-end" : "justify-start"}`}>
               <div className="max-w-[75%] rounded-2xl px-4 py-2.5" style={msg.fromAdmin ? { background: `linear-gradient(135deg, ${GOLD}55, hsl(43,60%,28%))`, border: `1px solid ${GOLD}40` } : { background: BURGUNDY_CARD, border: "1px solid hsl(43,30%,24%,0.4)" }}>
                 <p className="text-[10px] font-bold mb-0.5" style={{ color: msg.fromAdmin ? "#D4AF37" : "hsl(200,80%,65%)" }}>{msg.fromAdmin ? "Admin" : selectedUserName}</p>
-                <p className="text-sm whitespace-pre-wrap" style={{ color: "hsl(74,95%,8%)" }}>{msg.body}</p>
-                <p className="text-[10px] mt-1 text-right" style={{ color: "hsl(74,65%,22%)" }}>{format(new Date(msg.createdAt), "MMM d, HH:mm")}</p>
+                <p className="text-sm whitespace-pre-wrap" style={{ color: "#0d1a00" }}>{msg.body}</p>
+                <p className="text-[10px] mt-1 text-right" style={{ color: "#1a2d00" }}>{format(new Date(msg.createdAt), "MMM d, HH:mm")}</p>
               </div>
             </div>
           ))}
@@ -608,7 +608,7 @@ function MessagesTab() {
             className="flex-1 resize-none bg-transparent outline-none text-sm px-2 py-1.5 max-h-28"
             rows={1}
             placeholder="Reply…"
-            style={{ color: "hsl(74,95%,8%)", caretColor: GOLD }}
+            style={{ color: "#0d1a00", caretColor: GOLD }}
             value={replyBody}
             onChange={(e) => setReplyBody(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
@@ -627,7 +627,7 @@ function MessagesTab() {
 
   if (!conversations || conversations.length === 0) return (
     <div className="text-center py-16 flex flex-col items-center">
-      <MessageSquare className="h-12 w-12 mb-4" style={{ color: "hsl(74,70%,22%)" }} />
+      <MessageSquare className="h-12 w-12 mb-4" style={{ color: "#1a2d00" }} />
       <p className="text-base font-semibold" style={{ color: "hsl(74,85%,15%)" }}>No messages yet</p>
       <p className="text-sm mt-1" style={{ color: TEXT_SOFT }}>When users send messages, they will appear here.</p>
     </div>
@@ -646,13 +646,13 @@ function MessagesTab() {
             <MessageSquare className="w-4 h-4" style={{ color: GOLD }} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold truncate" style={{ color: "hsl(74,95%,8%)" }}>{conv.userName || conv.userEmail}</p>
+            <p className="text-sm font-bold truncate" style={{ color: "#0d1a00" }}>{conv.userName || conv.userEmail}</p>
             <p className="text-xs truncate mt-0.5" style={{ color: TEXT_SOFT }}>{conv.lastMessage}</p>
           </div>
           <div className="text-right flex-shrink-0">
             <p className="text-xs" style={{ color: TEXT_SOFT }}>{format(new Date(conv.lastMessageAt), "MMM d")}</p>
             {conv.unreadCount > 0 && (
-              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold mt-1" style={{ background: GOLD, color: "hsl(74,100%,32%)" }}>{conv.unreadCount}</span>
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold mt-1" style={{ background: GOLD, color: "#0d1a00" }}>{conv.unreadCount}</span>
             )}
           </div>
         </button>
@@ -714,7 +714,7 @@ function BroadcastTab() {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel style={{ color: "hsl(74,90%,12%)", fontSize: "0.8rem", fontWeight: 600 }}>Title</FormLabel>
+                  <FormLabel style={{ color: "#0d1a00", fontSize: "0.8rem", fontWeight: 600 }}>Title</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="e.g. New feature available"
@@ -731,7 +731,7 @@ function BroadcastTab() {
               name="message"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel style={{ color: "hsl(74,90%,12%)", fontSize: "0.8rem", fontWeight: 600 }}>Message</FormLabel>
+                  <FormLabel style={{ color: "#0d1a00", fontSize: "0.8rem", fontWeight: 600 }}>Message</FormLabel>
                   <FormControl>
                     <textarea
                       rows={4}
@@ -740,7 +740,7 @@ function BroadcastTab() {
                       style={{
                         background: "hsl(74,90%,36%)",
                         border: "1px solid hsl(43,30%,28%,0.5)",
-                        color: "hsl(74,95%,8%)",
+                        color: "#0d1a00",
                         outline: "none",
                       }}
                       {...field}
@@ -879,7 +879,7 @@ function SettingsTab() {
               name="pricePerEmail"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel style={{ color: "hsl(74,90%,12%)", fontSize: "0.8rem", fontWeight: 600 }}>Price (ETB)</FormLabel>
+                  <FormLabel style={{ color: "#0d1a00", fontSize: "0.8rem", fontWeight: 600 }}>Price (ETB)</FormLabel>
                   <FormControl>
                     <div className="flex gap-2">
                       <Input
@@ -907,7 +907,7 @@ function SettingsTab() {
               name="referralCommissionPct"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel style={{ color: "hsl(74,90%,12%)", fontSize: "0.8rem", fontWeight: 600 }}>Referral Commission (%)</FormLabel>
+                  <FormLabel style={{ color: "#0d1a00", fontSize: "0.8rem", fontWeight: 600 }}>Referral Commission (%)</FormLabel>
                   <FormControl>
                     <div className="flex gap-2">
                       <Input
@@ -935,10 +935,10 @@ function SettingsTab() {
               name="telegramBotUsername"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel style={{ color: "hsl(74,90%,12%)", fontSize: "0.8rem", fontWeight: 600 }}>Telegram Bot Username</FormLabel>
+                  <FormLabel style={{ color: "#0d1a00", fontSize: "0.8rem", fontWeight: 600 }}>Telegram Bot Username</FormLabel>
                   <FormControl>
                     <div className="flex gap-2 items-center">
-                      <span className="text-sm font-semibold" style={{ color: "hsl(43,40%,50%)" }}>@</span>
+                      <span className="text-sm font-semibold" style={{ color: "#2d4000" }}>@</span>
                       <Input
                         placeholder="YourBotUsername"
                         className="luxury-input h-10 rounded-lg"
@@ -947,7 +947,7 @@ function SettingsTab() {
                       />
                     </div>
                   </FormControl>
-                  <p className="text-xs mt-1" style={{ color: "hsl(74,65%,22%)" }}>
+                  <p className="text-xs mt-1" style={{ color: "#1a2d00" }}>
                     The bot username (without @) shown to users on the dashboard as a link.
                   </p>
                   <FormMessage />
@@ -985,7 +985,7 @@ function SettingsTab() {
                 name={name}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ color: "hsl(74,90%,12%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                    <FormLabel style={{ color: "#0d1a00", fontSize: "0.8rem", fontWeight: 600 }}>
                       {name === "currentPassword" ? "Current Password" : name === "newPassword" ? "New Password" : "Confirm New Password"}
                     </FormLabel>
                     <FormControl>
@@ -1002,7 +1002,7 @@ function SettingsTab() {
               style={{
                 background: "hsl(74,90%,39%)",
                 border: "1.5px solid hsl(43,40%,35%)",
-                color: "hsl(43,60%,65%)",
+                color: "#0d1a00",
               }}
               disabled={changePassword.isPending}
             >
@@ -1115,7 +1115,7 @@ function GeneratedEmailsTab() {
       <div className="grid grid-cols-3 gap-3">
         {[
           { label: "Available", value: stats.available, color: "#5BE8FF" },
-          { label: "Claimed", value: stats.claimed, color: "hsl(43,85%,28%)" },
+          { label: "Claimed", value: stats.claimed, color: "#0d1a00" },
           { label: "Submitted", value: stats.submitted, color: "hsl(136,60%,55%)" },
         ].map((s) => (
           <div key={s.label} className="rounded-2xl p-4 text-center" style={{ background: BURGUNDY_CARD, border: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
@@ -1165,7 +1165,7 @@ function GeneratedEmailsTab() {
               style={{
                 background: "rgba(0,0,0,0.4)",
                 border: "1px solid hsl(195,50%,25%,0.5)",
-                color: "hsl(43,85%,28%)",
+                color: "#0d1a00",
               }}
             />
           </div>
@@ -1174,7 +1174,7 @@ function GeneratedEmailsTab() {
               onClick={handleAdd}
               disabled={adding || !bulkText.trim()}
               className="flex items-center gap-1.5 rounded-xl px-5 h-10 text-sm font-bold transition-all"
-              style={{ background: "linear-gradient(135deg, hsl(195,70%,28%), hsl(195,60%,22%))", color: "hsl(74,95%,8%)", border: "1px solid hsl(195,60%,40%,0.5)" }}
+              style={{ background: "linear-gradient(135deg, hsl(195,70%,28%), hsl(195,60%,22%))", color: "#0d1a00", border: "1px solid hsl(195,60%,40%,0.5)" }}
             >
               {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
               {adding ? "Adding..." : "Add to Pool"}
@@ -1298,7 +1298,7 @@ export default function Admin() {
       <main className="container mx-auto px-4 py-7 max-w-7xl">
         <div className="mb-7">
           <h1 className="text-2xl font-extrabold tracking-tight mb-1" style={{ color: GOLD }}>Dashboard</h1>
-          <p className="text-sm" style={{ color: "hsl(43,30%,50%)" }}>
+          <p className="text-sm" style={{ color: "#2d4000" }}>
             Manage email submissions, withdrawals, and platform settings.
           </p>
         </div>
@@ -1308,7 +1308,7 @@ export default function Admin() {
           {statCards.map((stat) => (
             <div key={stat.label} className="stat-card rounded-2xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(43,30%,50%)" }}>{stat.label}</p>
+                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#2d4000" }}>{stat.label}</p>
                 <stat.icon className="h-4 w-4" style={{ color: stat.color }} />
               </div>
               {statsLoading ? (

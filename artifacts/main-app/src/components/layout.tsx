@@ -141,8 +141,8 @@ function TelegramHeader() {
           }}
         >
           <DialogHeader>
-            <DialogTitle style={{ color: "hsl(43,85%,28%)" }}>Admin Access</DialogTitle>
-            <DialogDescription style={{ color: "hsl(74,65%,20%)" }}>Enter admin password to continue</DialogDescription>
+            <DialogTitle style={{ color: "#0d1a00" }}>Admin Access</DialogTitle>
+            <DialogDescription style={{ color: "#1a2d00" }}>Enter admin password to continue</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <Input

@@ -136,7 +136,7 @@ export function Navbar() {
               style={{
                 border: "1px solid hsl(43,40%,30%,0.5)",
                 background: "hsl(74,85%,40%)",
-                color: "hsl(43,60%,65%)",
+                color: "#0d1a00",
               }}
               title={lang === "en" ? "Switch to Amharic" : "Switch to English"}
             >
@@ -155,7 +155,7 @@ export function Navbar() {
                     color: "hsl(43,80%,68%)",
                   }}
                 >
-                  <Wallet className="w-3.5 h-3.5" style={{ color: "hsl(43,85%,28%)" }} />
+                  <Wallet className="w-3.5 h-3.5" style={{ color: "#0d1a00" }} />
                   {user.walletBalance} ETB
                 </div>
                 <DropdownMenu>
@@ -185,13 +185,13 @@ export function Navbar() {
                   >
                     <div className="flex items-center justify-start gap-2 p-2 border-b border-[hsl(74,55%,26%)]">
                       <div className="flex flex-col space-y-0.5 leading-none">
-                        <p className="font-semibold text-sm truncate" style={{ color: "hsl(43,85%,28%)" }}>{user.name ?? user.email ?? ""}</p>
-                        <p className="text-xs" style={{ color: "hsl(43,35%,55%)" }}>{t("nav_wallet")}: {user.walletBalance} ETB</p>
+                        <p className="font-semibold text-sm truncate" style={{ color: "#0d1a00" }}>{user.name ?? user.email ?? ""}</p>
+                        <p className="text-xs" style={{ color: "#1a2d00" }}>{t("nav_wallet")}: {user.walletBalance} ETB</p>
                       </div>
                     </div>
                     <DropdownMenuItem asChild className="cursor-pointer mt-1">
                       <Link href="/profile" className="flex items-center w-full" style={{ color: "hsl(46,68%,78%)" }}>
-                        <User className="mr-2 h-4 w-4" style={{ color: "hsl(43,85%,28%)" }} />
+                        <User className="mr-2 h-4 w-4" style={{ color: "#0d1a00" }} />
                         <span>{t("nav_profile")}</span>
                       </Link>
                     </DropdownMenuItem>
@@ -211,7 +211,7 @@ export function Navbar() {
                 <Link
                   href="/login"
                   className="text-sm font-medium px-3 py-2 transition-colors"
-                  style={{ color: "hsl(43,60%,65%)" }}
+                  style={{ color: "#0d1a00" }}
                 >
                   {t("nav_signin")}
                 </Link>
@@ -237,8 +237,8 @@ export function Navbar() {
           }}
         >
           <DialogHeader>
-            <DialogTitle style={{ color: "hsl(43,85%,28%)" }}>{t("nav_admin_title")}</DialogTitle>
-            <DialogDescription style={{ color: "hsl(74,65%,20%)" }}>{t("nav_admin_desc")}</DialogDescription>
+            <DialogTitle style={{ color: "#0d1a00" }}>{t("nav_admin_title")}</DialogTitle>
+            <DialogDescription style={{ color: "#1a2d00" }}>{t("nav_admin_desc")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <Input

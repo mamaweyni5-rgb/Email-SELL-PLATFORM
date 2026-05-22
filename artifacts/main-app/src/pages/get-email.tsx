@@ -215,11 +215,11 @@ export default function GetEmail() {
               >
                 <Sparkles className="h-4 w-4" style={{ color: "#5BE8FF" }} />
               </div>
-              <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "hsl(43,85%,28%)" }}>
+              <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "#0d1a00" }}>
                 {t("get_email_title")}
               </h1>
             </div>
-            <p className="text-sm leading-relaxed" style={{ color: "hsl(74,65%,20%)" }}>
+            <p className="text-sm leading-relaxed" style={{ color: "#1a2d00" }}>
               {t("get_email_subtitle")}
             </p>
           </div>
@@ -265,7 +265,7 @@ export default function GetEmail() {
                       className="flex items-center justify-between gap-2 rounded-xl px-4 py-3"
                       style={{ background: "rgba(0,0,0,0.35)", border: "1px solid hsl(195,50%,25%,0.4)" }}
                     >
-                      <span className="font-mono text-sm font-semibold truncate" style={{ color: "hsl(43,85%,28%)" }}>
+                      <span className="font-mono text-sm font-semibold truncate" style={{ color: "#0d1a00" }}>
                         {claimed.email}
                       </span>
                       <CopyButton text={claimed.email} />
@@ -280,7 +280,7 @@ export default function GetEmail() {
                       className="flex items-center justify-between gap-2 rounded-xl px-4 py-3"
                       style={{ background: "rgba(0,0,0,0.35)", border: "1px solid hsl(195,50%,25%,0.4)" }}
                     >
-                      <span className="font-mono text-sm font-semibold truncate" style={{ color: "hsl(43,85%,28%)" }}>
+                      <span className="font-mono text-sm font-semibold truncate" style={{ color: "#0d1a00" }}>
                         {claimed.password}
                       </span>
                       <CopyButton text={claimed.password} />
@@ -305,7 +305,7 @@ export default function GetEmail() {
                     <li key={i} className="flex items-start gap-3">
                       <span
                         className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-extrabold mt-0.5"
-                        style={{ background: "rgba(212,175,55,0.2)", border: "1px solid rgba(212,175,55,0.35)", color: "hsl(43,85%,28%)" }}
+                        style={{ background: "rgba(212,175,55,0.2)", border: "1px solid rgba(212,175,55,0.35)", color: "#0d1a00" }}
                       >
                         {i + 1}
                       </span>
@@ -362,7 +362,7 @@ export default function GetEmail() {
                       <button
                         onClick={() => setConfirmReturn(false)}
                         className="flex-1 h-9 rounded-lg text-sm font-semibold transition-all"
-                        style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)", color: "hsl(43,85%,28%)" }}
+                        style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)", color: "#0d1a00" }}
                       >
                         {t("get_email_return_cancel")}
                       </button>
@@ -396,10 +396,10 @@ export default function GetEmail() {
                   {availableData?.count ?? 0} {t("get_email_available")}
                 </div>
 
-                <h2 className="text-lg font-extrabold mb-2" style={{ color: "hsl(43,85%,28%)" }}>
+                <h2 className="text-lg font-extrabold mb-2" style={{ color: "#0d1a00" }}>
                   {t("get_email_claim_heading")}
                 </h2>
-                <p className="text-sm leading-relaxed mb-6" style={{ color: "hsl(74,65%,20%)" }}>
+                <p className="text-sm leading-relaxed mb-6" style={{ color: "#1a2d00" }}>
                   {t("get_email_claim_desc")}
                 </p>
 
@@ -461,8 +461,8 @@ export default function GetEmail() {
           ) : (
             <div className="text-center py-10">
               <CheckCircle2 className="h-16 w-16 mx-auto mb-4" style={{ color: "hsl(136,60%,55%)" }} />
-              <h2 className="text-xl font-extrabold mb-2" style={{ color: "hsl(43,85%,28%)" }}>{t("get_email_success_title")}</h2>
-              <p className="text-sm mb-6" style={{ color: "hsl(74,65%,20%)" }}>{t("get_email_success_desc")}</p>
+              <h2 className="text-xl font-extrabold mb-2" style={{ color: "#0d1a00" }}>{t("get_email_success_title")}</h2>
+              <p className="text-sm mb-6" style={{ color: "#1a2d00" }}>{t("get_email_success_desc")}</p>
               <Link href="/dashboard" className="gold-btn inline-flex items-center gap-2 px-6 h-11 rounded-xl font-bold text-sm">
                 <ArrowLeft className="h-4 w-4" /> {t("get_email_back")}
               </Link>

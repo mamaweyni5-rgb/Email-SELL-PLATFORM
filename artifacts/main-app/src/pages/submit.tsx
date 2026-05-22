@@ -86,10 +86,10 @@ export default function Submit() {
           </Link>
 
           <div className="mb-6">
-            <h1 className="text-2xl font-extrabold tracking-tight mb-1" style={{ color: "hsl(43,85%,28%)" }}>
+            <h1 className="text-2xl font-extrabold tracking-tight mb-1" style={{ color: "#0d1a00" }}>
               {t("submit_title")}
             </h1>
-            <p className="text-sm" style={{ color: "hsl(74,65%,20%)" }}>
+            <p className="text-sm" style={{ color: "#1a2d00" }}>
               {t("submit_subtitle_pre")}{" "}
               <span className="font-extrabold" style={{ color: "#FFD700" }}>
                 {settings?.pricePerEmail ?? 20} ETB
@@ -130,12 +130,12 @@ export default function Submit() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel style={{ color: "hsl(74,90%,12%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                      <FormLabel style={{ color: "#0d1a00", fontSize: "0.8rem", fontWeight: 600 }}>
                         {t("submit_email_label")}
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Mail className="absolute left-3 top-3 h-4 w-4" style={{ color: "hsl(43,85%,28%)" }} />
+                          <Mail className="absolute left-3 top-3 h-4 w-4" style={{ color: "#0d1a00" }} />
                           <Input
                             className="luxury-input pl-9 h-11 rounded-lg"
                             placeholder={t("submit_email_placeholder")}
@@ -153,12 +153,12 @@ export default function Submit() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel style={{ color: "hsl(74,90%,12%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                      <FormLabel style={{ color: "#0d1a00", fontSize: "0.8rem", fontWeight: 600 }}>
                         {t("submit_password_label")}
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Lock className="absolute left-3 top-3 h-4 w-4" style={{ color: "hsl(43,85%,28%)" }} />
+                          <Lock className="absolute left-3 top-3 h-4 w-4" style={{ color: "#0d1a00" }} />
                           <Input
                             className="luxury-input pl-9 pr-10 h-11 rounded-lg"
                             type={showPassword ? "text" : "password"}

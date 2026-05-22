@@ -170,7 +170,7 @@ export default function Withdraw() {
               <Link
                 href="/submit"
                 className="inline-flex items-center gap-1.5 text-xs font-bold rounded-lg px-3 py-2 transition-opacity hover:opacity-80"
-                style={{ background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "hsl(74,100%,32%)" }}
+                style={{ background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "#0d1a00" }}
               >
                 {t("wd_low_balance_cta")} →
               </Link>
@@ -202,7 +202,7 @@ export default function Withdraw() {
               className="flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold transition-all"
               style={
                 method === "telebirr"
-                  ? { background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "hsl(74,100%,32%)" }
+                  ? { background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "#0d1a00" }
                   : { color: SOFT }
               }
             >
@@ -215,7 +215,7 @@ export default function Withdraw() {
               className="flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold transition-all"
               style={
                 method === "bank"
-                  ? { background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "hsl(74,100%,32%)" }
+                  ? { background: "linear-gradient(135deg,#FFD700,#D4AF37)", color: "#0d1a00" }
                   : { color: SOFT }
               }
             >
@@ -419,7 +419,7 @@ export default function Withdraw() {
                   )}
                 </button>
                 {(profile?.walletBalance ?? 0) < MIN_WITHDRAWAL && (
-                  <p className="text-xs text-center" style={{ color: "hsl(43,30%,50%)" }}>{t("wd_no_balance")}</p>
+                  <p className="text-xs text-center" style={{ color: "#2d4000" }}>{t("wd_no_balance")}</p>
                 )}
               </form>
             </Form>

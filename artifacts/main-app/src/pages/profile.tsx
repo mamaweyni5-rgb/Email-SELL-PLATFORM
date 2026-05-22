@@ -61,10 +61,10 @@ export default function Profile() {
     <Layout>
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-7">
-          <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "hsl(43,85%,28%)" }}>
+          <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "#0d1a00" }}>
             {t("profile_title")}
           </h1>
-          <p className="text-sm mt-1" style={{ color: "hsl(43,35%,55%)" }}>{user.name ?? user.email ?? ""}</p>
+          <p className="text-sm mt-1" style={{ color: "#1a2d00" }}>{user.name ?? user.email ?? ""}</p>
         </div>
 
         {/* Stat cards */}
@@ -73,8 +73,8 @@ export default function Profile() {
             className="stat-card rounded-2xl p-4"
           >
             <div className="flex items-center gap-1.5 mb-2">
-              <Wallet className="h-3.5 w-3.5" style={{ color: "hsl(43,85%,28%)" }} />
-              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(43,35%,55%)" }}>
+              <Wallet className="h-3.5 w-3.5" style={{ color: "#0d1a00" }} />
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#1a2d00" }}>
                 {t("profile_balance")}
               </span>
             </div>
@@ -93,22 +93,22 @@ export default function Profile() {
           <div className="stat-card rounded-2xl p-4">
             <div className="flex items-center gap-1.5 mb-2">
               <CheckCircle className="h-3.5 w-3.5" style={{ color: "hsl(136,48%,50%)" }} />
-              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(43,35%,55%)" }}>
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#1a2d00" }}>
                 {t("profile_approved")}
               </span>
             </div>
-            <p className="text-2xl font-extrabold" style={{ color: "hsl(74,95%,8%)" }}>
+            <p className="text-2xl font-extrabold" style={{ color: "#0d1a00" }}>
               {profile?.approvedSubmissions ?? 0}
             </p>
           </div>
           <div className="stat-card rounded-2xl p-4">
             <div className="flex items-center gap-1.5 mb-2">
-              <Clock className="h-3.5 w-3.5" style={{ color: "hsl(43,85%,28%)" }} />
-              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(43,35%,55%)" }}>
+              <Clock className="h-3.5 w-3.5" style={{ color: "#0d1a00" }} />
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#1a2d00" }}>
                 {t("profile_pending")}
               </span>
             </div>
-            <p className="text-2xl font-extrabold" style={{ color: "hsl(74,95%,8%)" }}>
+            <p className="text-2xl font-extrabold" style={{ color: "#0d1a00" }}>
               {profile?.pendingSubmissions ?? 0}
             </p>
           </div>
@@ -161,8 +161,8 @@ export default function Profile() {
                 ) : !submissions || submissions.length === 0 ? (
                   <div className="text-center py-10 flex flex-col items-center">
                     <Mail className="h-10 w-10 mb-3" style={{ color: "hsl(43,30%,32%)" }} />
-                    <p className="text-sm mb-2" style={{ color: "hsl(43,30%,50%)" }}>{t("profile_no_subs")}</p>
-                    <Link href="/submit" className="text-xs font-semibold" style={{ color: "hsl(43,85%,28%)" }}>
+                    <p className="text-sm mb-2" style={{ color: "#2d4000" }}>{t("profile_no_subs")}</p>
+                    <Link href="/submit" className="text-xs font-semibold" style={{ color: "#0d1a00" }}>
                       {t("profile_first_sub")}
                     </Link>
                   </div>
@@ -175,8 +175,8 @@ export default function Profile() {
                         style={{ borderTop: idx > 0 ? "1px solid hsl(74,55%,22%)" : "none" }}
                       >
                         <div>
-                          <p className="font-semibold text-sm" style={{ color: "hsl(74,95%,8%)" }}>{sub.email}</p>
-                          <p className="text-xs mt-0.5" style={{ color: "hsl(43,30%,50%)" }}>
+                          <p className="font-semibold text-sm" style={{ color: "#0d1a00" }}>{sub.email}</p>
+                          <p className="text-xs mt-0.5" style={{ color: "#2d4000" }}>
                             {format(new Date(sub.createdAt), "MMM d, yyyy")}
                           </p>
                           {sub.status === "rejected" && sub.rejectionNote && (
@@ -184,7 +184,7 @@ export default function Profile() {
                           )}
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="font-bold text-sm" style={{ color: "hsl(43,85%,28%)" }}>{sub.pricePaid} ETB</span>
+                          <span className="font-bold text-sm" style={{ color: "#0d1a00" }}>{sub.pricePaid} ETB</span>
                           <StatusPill status={sub.status} />
                         </div>
                       </div>
@@ -217,8 +217,8 @@ export default function Profile() {
                 ) : !withdrawals || withdrawals.length === 0 ? (
                   <div className="text-center py-10 flex flex-col items-center">
                     <Wallet className="h-10 w-10 mb-3" style={{ color: "hsl(43,30%,32%)" }} />
-                    <p className="text-sm mb-2" style={{ color: "hsl(43,30%,50%)" }}>{t("profile_no_wd")}</p>
-                    <Link href="/withdraw" className="text-xs font-semibold" style={{ color: "hsl(43,85%,28%)" }}>
+                    <p className="text-sm mb-2" style={{ color: "#2d4000" }}>{t("profile_no_wd")}</p>
+                    <Link href="/withdraw" className="text-xs font-semibold" style={{ color: "#0d1a00" }}>
                       {t("profile_request_wd")}
                     </Link>
                   </div>
@@ -231,12 +231,12 @@ export default function Profile() {
                         style={{ borderTop: idx > 0 ? "1px solid hsl(74,55%,22%)" : "none" }}
                       >
                         <div>
-                          <p className="font-semibold text-sm" style={{ color: "hsl(74,95%,8%)" }}>
+                          <p className="font-semibold text-sm" style={{ color: "#0d1a00" }}>
                             {wd.paymentMethod === "bank"
                               ? `🏦 ${wd.bankName ?? ""} — ${wd.bankAccountNumber ?? ""}`
                               : `📱 ${wd.telebirrNumber} — ${wd.telebirrName}`}
                           </p>
-                          <p className="text-xs mt-0.5" style={{ color: "hsl(43,30%,50%)" }}>
+                          <p className="text-xs mt-0.5" style={{ color: "#2d4000" }}>
                             {format(new Date(wd.createdAt), "MMM d, yyyy")}
                           </p>
                           {wd.adminNote && (
@@ -244,7 +244,7 @@ export default function Profile() {
                           )}
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="font-bold text-sm" style={{ color: "hsl(43,85%,28%)" }}>{wd.amount} ETB</span>
+                          <span className="font-bold text-sm" style={{ color: "#0d1a00" }}>{wd.amount} ETB</span>
                           <StatusPill status={wd.status} />
                         </div>
                       </div>

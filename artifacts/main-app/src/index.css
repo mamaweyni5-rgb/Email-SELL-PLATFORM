@@ -158,10 +158,8 @@
 }
 
 .gold-gradient-text {
-  background: linear-gradient(145deg, #7A5C00, #5C4000, #3D2A00);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #0d1a00;
+  font-weight: 800;
 }
 
 /* ── 3D floating card ── */

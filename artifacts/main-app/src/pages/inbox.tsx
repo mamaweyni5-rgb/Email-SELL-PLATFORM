@@ -90,9 +90,9 @@ export default function Inbox() {
             </div>
           ) : !messages || messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center py-12">
-              <MessageSquare className="w-12 h-12 mb-3" style={{ color: "hsl(74,70%,22%)" }} />
-              <p className="text-sm font-semibold" style={{ color: "hsl(74,85%,18%)" }}>No messages yet</p>
-              <p className="text-xs mt-1" style={{ color: "hsl(74,65%,22%)" }}>Send a message to contact support.</p>
+              <MessageSquare className="w-12 h-12 mb-3" style={{ color: "#1a2d00" }} />
+              <p className="text-sm font-semibold" style={{ color: "#1a2d00" }}>No messages yet</p>
+              <p className="text-xs mt-1" style={{ color: "#1a2d00" }}>Send a message to contact support.</p>
             </div>
           ) : (
             messages.map((msg) => (
@@ -128,7 +128,7 @@ export default function Inbox() {
             className="flex-1 resize-none bg-transparent outline-none text-sm px-2 py-1.5 max-h-28"
             rows={1}
             placeholder="Type a message…"
-            style={{ color: "hsl(74,95%,8%)", caretColor: GOLD }}
+            style={{ color: "#0d1a00", caretColor: GOLD }}
             value={body}
             onChange={(e) => setBody(e.target.value)}
             onKeyDown={handleKeyDown}

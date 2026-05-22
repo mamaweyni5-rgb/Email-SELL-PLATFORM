@@ -64,15 +64,15 @@ function TelegramJoinGate({ botUsername, onConfirmed }: { botUsername: string; o
           <Send className="w-7 h-7" style={{ color: "#29B6F6" }} />
         </div>
         <div>
-          <h2 className="text-lg font-extrabold mb-2" style={{ color: "hsl(43,85%,28%)" }}>Join Our Telegram Bot</h2>
-          <p className="text-sm leading-relaxed" style={{ color: "hsl(43,40%,62%)" }}>
+          <h2 className="text-lg font-extrabold mb-2" style={{ color: "#0d1a00" }}>Join Our Telegram Bot</h2>
+          <p className="text-sm leading-relaxed" style={{ color: "#2d4000" }}>
             To use MailMart, you must first join our Telegram bot. You'll receive payment notifications and updates there.
           </p>
         </div>
         <button
           onClick={handleJoin}
           className="w-full rounded-xl h-11 text-sm font-bold transition-all"
-          style={{ background: "linear-gradient(135deg, hsl(200,80%,35%), hsl(200,70%,28%))", color: "hsl(74,95%,8%)", border: "1px solid hsl(200,60%,45%,0.5)" }}
+          style={{ background: "linear-gradient(135deg, hsl(200,80%,35%), hsl(200,70%,28%))", color: "#0d1a00", border: "1px solid hsl(200,60%,45%,0.5)" }}
         >
           👉 Join @{botUsername}
         </button>
@@ -80,7 +80,7 @@ function TelegramJoinGate({ botUsername, onConfirmed }: { botUsername: string; o
           onClick={handleConfirm}
           disabled={markJoined.isPending}
           className="w-full rounded-xl h-11 text-sm font-bold transition-all"
-          style={{ background: "linear-gradient(135deg, hsl(43,70%,40%), hsl(43,60%,32%))", color: "hsl(74,100%,32%)" }}
+          style={{ background: "linear-gradient(135deg, hsl(43,70%,40%), hsl(43,60%,32%))", color: "#0d1a00" }}
         >
           {markJoined.isPending ? "Confirming…" : "✅ I've Joined"}
         </button>
@@ -167,11 +167,11 @@ export default function Dashboard() {
           <div>
             <h1
               className="text-2xl sm:text-3xl font-extrabold tracking-tight"
-              style={{ color: "hsl(43,85%,28%)" }}
+              style={{ color: "#0d1a00" }}
             >
               {t("dash_welcome")}
             </h1>
-            <p className="mt-1 text-sm" style={{ color: "hsl(74,65%,20%)" }}>{t("dash_subtitle")}</p>
+            <p className="mt-1 text-sm" style={{ color: "#1a2d00" }}>{t("dash_subtitle")}</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <Link
@@ -179,7 +179,7 @@ export default function Dashboard() {
               className="inline-flex items-center justify-center rounded-xl px-4 h-10 text-sm font-semibold transition-all"
               style={{
                 border: "1.5px solid hsl(43,40%,35%)",
-                color: "hsl(43,60%,65%)",
+                color: "#0d1a00",
                 background: "hsl(74,90%,38%)",
               }}
             >
@@ -264,19 +264,19 @@ export default function Dashboard() {
                   className="mt-0.5 shrink-0 w-7 h-7 rounded-lg flex items-center justify-center"
                   style={{ background: "rgba(212,175,55,0.18)", border: "1px solid rgba(212,175,55,0.3)" }}
                 >
-                  <Megaphone className="h-3.5 w-3.5" style={{ color: "hsl(43,85%,28%)" }} />
+                  <Megaphone className="h-3.5 w-3.5" style={{ color: "#0d1a00" }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-sm leading-snug" style={{ color: "hsl(43,85%,28%)" }}>{b.title}</p>
-                  <p className="text-xs mt-0.5 leading-relaxed" style={{ color: "hsl(43,40%,62%)" }}>{b.message}</p>
-                  <p className="text-xs mt-1" style={{ color: "hsl(74,65%,22%)" }}>
+                  <p className="font-bold text-sm leading-snug" style={{ color: "#0d1a00" }}>{b.title}</p>
+                  <p className="text-xs mt-0.5 leading-relaxed" style={{ color: "#2d4000" }}>{b.message}</p>
+                  <p className="text-xs mt-1" style={{ color: "#1a2d00" }}>
                     {format(new Date(b.createdAt), "MMM d, yyyy")}
                   </p>
                 </div>
                 <button
                   onClick={() => setDismissedIds((s) => new Set([...s, b.id]))}
                   className="shrink-0 mt-0.5 rounded-lg p-1 transition-colors"
-                  style={{ color: "hsl(74,65%,22%)" }}
+                  style={{ color: "#1a2d00" }}
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -294,9 +294,9 @@ export default function Dashboard() {
                 className="w-8 h-8 rounded-lg flex items-center justify-center"
                 style={{ background: "rgba(212,175,55,0.15)", border: "1px solid rgba(212,175,55,0.25)" }}
               >
-                <Wallet className="h-4 w-4" style={{ color: "hsl(43,85%,28%)" }} />
+                <Wallet className="h-4 w-4" style={{ color: "#0d1a00" }} />
               </div>
-              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(74,65%,20%)" }}>
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#1a2d00" }}>
                 {t("dash_balance")}
               </span>
             </div>
@@ -322,11 +322,11 @@ export default function Dashboard() {
               >
                 <CheckCircle className="h-4 w-4" style={{ color: "hsl(136,48%,50%)" }} />
               </div>
-              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(74,65%,20%)" }}>
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#1a2d00" }}>
                 {t("dash_approved")}
               </span>
             </div>
-            <div className="text-3xl font-extrabold" style={{ color: "hsl(74,95%,8%)" }}>
+            <div className="text-3xl font-extrabold" style={{ color: "#0d1a00" }}>
               {profile?.approvedSubmissions || 0}
             </div>
           </div>
@@ -338,13 +338,13 @@ export default function Dashboard() {
                 className="w-8 h-8 rounded-lg flex items-center justify-center"
                 style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.2)" }}
               >
-                <Clock className="h-4 w-4" style={{ color: "hsl(43,85%,28%)" }} />
+                <Clock className="h-4 w-4" style={{ color: "#0d1a00" }} />
               </div>
-              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(74,65%,20%)" }}>
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#1a2d00" }}>
                 {t("dash_pending")}
               </span>
             </div>
-            <div className="text-3xl font-extrabold" style={{ color: "hsl(74,95%,8%)" }}>
+            <div className="text-3xl font-extrabold" style={{ color: "#0d1a00" }}>
               {profile?.pendingSubmissions || 0}
             </div>
           </div>
@@ -361,35 +361,35 @@ export default function Dashboard() {
             }}
           >
             <div className="flex items-center gap-2 mb-1">
-              <Gift className="h-5 w-5" style={{ color: "hsl(43,85%,28%)" }} />
-              <h3 className="font-bold text-base" style={{ color: "hsl(43,85%,28%)" }}>{t("referral_card_title")}</h3>
+              <Gift className="h-5 w-5" style={{ color: "#0d1a00" }} />
+              <h3 className="font-bold text-base" style={{ color: "#0d1a00" }}>{t("referral_card_title")}</h3>
             </div>
-            <p className="text-xs mb-5" style={{ color: "hsl(74,65%,20%)" }}>{t("referral_card_desc")}</p>
+            <p className="text-xs mb-5" style={{ color: "#1a2d00" }}>{t("referral_card_desc")}</p>
 
             <div className="grid sm:grid-cols-2 gap-4 mb-5">
               <div
                 className="rounded-xl p-3 text-center"
                 style={{ background: "hsl(74,90%,38%)", border: "1px solid hsl(43,30%,25%,0.4)" }}
               >
-                <div className="flex items-center justify-center gap-1 text-xs mb-1" style={{ color: "hsl(43,35%,55%)" }}>
+                <div className="flex items-center justify-center gap-1 text-xs mb-1" style={{ color: "#1a2d00" }}>
                   <Users className="h-3 w-3" />
                   {t("referral_friends")}
                 </div>
-                <div className="text-2xl font-extrabold" style={{ color: "hsl(43,85%,28%)" }}>{referral.referralCount ?? 0}</div>
+                <div className="text-2xl font-extrabold" style={{ color: "#0d1a00" }}>{referral.referralCount ?? 0}</div>
               </div>
               <div
                 className="rounded-xl p-3 text-center"
                 style={{ background: "hsl(74,90%,38%)", border: "1px solid hsl(43,30%,25%,0.4)" }}
               >
-                <div className="flex items-center justify-center gap-1 text-xs mb-1" style={{ color: "hsl(43,35%,55%)" }}>
+                <div className="flex items-center justify-center gap-1 text-xs mb-1" style={{ color: "#1a2d00" }}>
                   <Wallet className="h-3 w-3" />
                   {t("referral_earned")}
                 </div>
-                <div className="text-2xl font-extrabold" style={{ color: "hsl(43,85%,28%)" }}>{referral.commissionEarned ?? 0} ETB</div>
+                <div className="text-2xl font-extrabold" style={{ color: "#0d1a00" }}>{referral.commissionEarned ?? 0} ETB</div>
               </div>
             </div>
 
-            <label className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(43,35%,55%)" }}>
+            <label className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#1a2d00" }}>
               {t("referral_link_label")}
             </label>
             <div className="flex gap-2 mt-2">
@@ -426,7 +426,7 @@ export default function Dashboard() {
               {t("referral_share_tg")}
             </button>
 
-            <p className="text-xs mt-3" style={{ color: "hsl(43,30%,50%)" }}>{t("referral_how")}</p>
+            <p className="text-xs mt-3" style={{ color: "#2d4000" }}>{t("referral_how")}</p>
           </div>
         )}
 
@@ -435,7 +435,7 @@ export default function Dashboard() {
           {/* Submissions */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-bold" style={{ color: "hsl(43,85%,28%)" }}>{t("dash_recent_subs")}</h2>
+              <h2 className="text-base font-bold" style={{ color: "#0d1a00" }}>{t("dash_recent_subs")}</h2>
               <Link href="/profile" className="flex items-center gap-1 text-xs font-semibold" style={{ color: "hsl(43,50%,60%)" }}>
                 {t("dash_view_all")} <ArrowRight className="h-3 w-3" />
               </Link>
@@ -465,18 +465,18 @@ export default function Dashboard() {
                           className="p-2 rounded-lg shrink-0"
                           style={{ background: "hsl(74,90%,40%)", border: "1px solid hsl(43,30%,24%,0.3)" }}
                         >
-                          <Mail className="h-3.5 w-3.5" style={{ color: "hsl(43,85%,28%)" }} />
+                          <Mail className="h-3.5 w-3.5" style={{ color: "#0d1a00" }} />
                         </div>
                         <div className="min-w-0">
-                          <p className="font-semibold text-sm truncate" style={{ color: "hsl(74,95%,8%)" }}>{sub.email}</p>
-                          <p className="text-xs" style={{ color: "hsl(43,30%,50%)" }}>{format(new Date(sub.createdAt), "MMM d, yyyy")}</p>
+                          <p className="font-semibold text-sm truncate" style={{ color: "#0d1a00" }}>{sub.email}</p>
+                          <p className="text-xs" style={{ color: "#2d4000" }}>{format(new Date(sub.createdAt), "MMM d, yyyy")}</p>
                           {sub.status === "rejected" && sub.rejectionNote && (
                             <p className="text-xs mt-0.5 truncate" style={{ color: "hsl(5,75%,65%)" }}>⚠ {sub.rejectionNote}</p>
                           )}
                         </div>
                       </div>
                       <div className="flex items-center gap-3 shrink-0 ml-3">
-                        <span className="font-bold text-sm" style={{ color: "hsl(43,85%,28%)" }}>{sub.pricePaid} ETB</span>
+                        <span className="font-bold text-sm" style={{ color: "#0d1a00" }}>{sub.pricePaid} ETB</span>
                         <StatusPill status={sub.status} />
                       </div>
                     </div>
@@ -485,8 +485,8 @@ export default function Dashboard() {
               ) : (
                 <div className="p-8 text-center flex flex-col items-center">
                   <Mail className="h-8 w-8 mb-3" style={{ color: "hsl(43,30%,35%)" }} />
-                  <p className="text-sm mb-2" style={{ color: "hsl(43,30%,50%)" }}>{t("dash_no_subs")}</p>
-                  <Link href="/submit" className="text-xs font-semibold" style={{ color: "hsl(43,85%,28%)" }}>{t("dash_first_sub")}</Link>
+                  <p className="text-sm mb-2" style={{ color: "#2d4000" }}>{t("dash_no_subs")}</p>
+                  <Link href="/submit" className="text-xs font-semibold" style={{ color: "#0d1a00" }}>{t("dash_first_sub")}</Link>
                 </div>
               )}
             </div>
@@ -495,7 +495,7 @@ export default function Dashboard() {
           {/* Withdrawals */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-bold" style={{ color: "hsl(43,85%,28%)" }}>{t("dash_recent_wd")}</h2>
+              <h2 className="text-base font-bold" style={{ color: "#0d1a00" }}>{t("dash_recent_wd")}</h2>
               <Link href="/profile" className="flex items-center gap-1 text-xs font-semibold" style={{ color: "hsl(43,50%,60%)" }}>
                 {t("dash_view_all")} <ArrowRight className="h-3 w-3" />
               </Link>
@@ -525,19 +525,19 @@ export default function Dashboard() {
                           className="p-2 rounded-lg shrink-0"
                           style={{ background: "hsl(74,90%,40%)", border: "1px solid hsl(43,30%,24%,0.3)" }}
                         >
-                          <Wallet className="h-3.5 w-3.5" style={{ color: "hsl(43,85%,28%)" }} />
+                          <Wallet className="h-3.5 w-3.5" style={{ color: "#0d1a00" }} />
                         </div>
                         <div className="min-w-0">
-                          <p className="font-semibold text-sm truncate" style={{ color: "hsl(74,95%,8%)" }}>
+                          <p className="font-semibold text-sm truncate" style={{ color: "#0d1a00" }}>
                             {wd.paymentMethod === "bank"
                               ? `🏦 ${wd.bankAccountNumber ?? wd.bankName ?? ""}`
                               : `📱 ${wd.telebirrNumber}`}
                           </p>
-                          <p className="text-xs" style={{ color: "hsl(43,30%,50%)" }}>{format(new Date(wd.createdAt), "MMM d, yyyy")}</p>
+                          <p className="text-xs" style={{ color: "#2d4000" }}>{format(new Date(wd.createdAt), "MMM d, yyyy")}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 shrink-0 ml-3">
-                        <span className="font-bold text-sm" style={{ color: "hsl(43,85%,28%)" }}>{wd.amount} ETB</span>
+                        <span className="font-bold text-sm" style={{ color: "#0d1a00" }}>{wd.amount} ETB</span>
                         <StatusPill status={wd.status} />
                       </div>
                     </div>
@@ -546,7 +546,7 @@ export default function Dashboard() {
               ) : (
                 <div className="p-8 text-center flex flex-col items-center">
                   <Wallet className="h-8 w-8 mb-3" style={{ color: "hsl(43,30%,35%)" }} />
-                  <p className="text-sm" style={{ color: "hsl(43,30%,50%)" }}>{t("dash_no_wd")}</p>
+                  <p className="text-sm" style={{ color: "#2d4000" }}>{t("dash_no_wd")}</p>
                 </div>
               )}
             </div>
