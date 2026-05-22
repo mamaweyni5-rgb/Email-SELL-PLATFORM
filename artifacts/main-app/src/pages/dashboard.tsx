@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Layout } from "@/components/layout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
-import { ArrowRight, Mail, Wallet, Clock, CheckCircle, Users, Gift, Copy, Check, Send, Megaphone, X } from "lucide-react";
+import { ArrowRight, Mail, Wallet, Clock, CheckCircle, Users, Gift, Copy, Check, Send, Megaphone, X, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { useLanguage } from "@/lib/i18n";
 import { tg, tgHaptic, isTelegram } from "@/lib/telegram";
@@ -173,7 +173,7 @@ export default function Dashboard() {
             </h1>
             <p className="mt-1 text-sm" style={{ color: "hsl(43,35%,58%)" }}>{t("dash_subtitle")}</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
             <Link
               href="/withdraw"
               className="inline-flex items-center justify-center rounded-xl px-4 h-10 text-sm font-semibold transition-all"
@@ -190,6 +190,32 @@ export default function Dashboard() {
             </Link>
           </div>
         </div>
+
+        {/* ── Get Email Promo Banner ── */}
+        <Link
+          href="/get-email"
+          className="flex items-center gap-3 rounded-2xl px-4 py-3 mb-4 transition-all duration-200 hover:brightness-110 cursor-pointer"
+          style={{
+            background: "linear-gradient(135deg, hsl(195,65%,12%), hsl(344,80%,16%))",
+            border: "1px solid hsl(195,60%,28%,0.55)",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
+            textDecoration: "none",
+          }}
+        >
+          <div
+            className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
+            style={{ background: "rgba(91,232,255,0.18)", border: "1px solid rgba(91,232,255,0.35)" }}
+          >
+            <Sparkles className="h-4 w-4" style={{ color: "#5BE8FF" }} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold" style={{ color: "#5BE8FF" }}>{t("dash_get_email_title")}</p>
+            <p className="text-xs truncate" style={{ color: "hsl(195,50%,60%)" }}>
+              {t("dash_get_email_desc")}
+            </p>
+          </div>
+          <ArrowRight className="h-4 w-4 shrink-0" style={{ color: "hsl(195,50%,55%)" }} />
+        </Link>
 
         {/* ── Telegram Bot Banner ── */}
         {settings?.telegramBotUsername && (

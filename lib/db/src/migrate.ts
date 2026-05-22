@@ -99,6 +99,18 @@ export async function runMigrations(): Promise<void> {
       ALTER TABLE users ADD COLUMN IF NOT EXISTS is_banned BOOLEAN NOT NULL DEFAULT FALSE;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS telegram_joined BOOLEAN NOT NULL DEFAULT FALSE;
     `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS generated_emails (
+        id          SERIAL PRIMARY KEY,
+        email       TEXT NOT NULL UNIQUE,
+        password    TEXT NOT NULL,
+        status      TEXT NOT NULL DEFAULT 'available',
+        claimed_by  INTEGER REFERENCES users(id),
+        claimed_at  TIMESTAMPTZ,
+        created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
   } finally {
     client.release();
   }

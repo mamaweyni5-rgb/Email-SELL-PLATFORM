@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import {
   useAdminListSubmissions,
   useAdminUpdateSubmission,
@@ -56,6 +56,9 @@ import {
   Ban,
   UserCheck,
   ArrowLeft,
+  Sparkles,
+  Trash2,
+  Plus,
 } from "lucide-react";
 
 function downloadCSV(filename: string, headers: string[], rows: (string | number)[][]) {
@@ -1011,6 +1014,244 @@ function SettingsTab() {
   );
 }
 
+type GenEmail = {
+  id: number;
+  email: string;
+  password: string;
+  status: string;
+  claimed_at: string | null;
+  created_at: string;
+  claimed_by_name: string | null;
+};
+
+function GeneratedEmailsTab() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [bulkText, setBulkText] = useState("");
+  const [adding, setAdding] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [showAdd, setShowAdd] = useState(false);
+
+  const { data: emails, isLoading } = useQuery<GenEmail[]>({
+    queryKey: ["admin-gen-emails"],
+    queryFn: async () => {
+      const r = await fetch("/api/admin/generated-emails", { credentials: "include" });
+      if (!r.ok) throw new Error("Failed");
+      return r.json();
+    },
+  });
+
+  const stats = {
+    available: emails?.filter((e) => e.status === "available").length ?? 0,
+    claimed: emails?.filter((e) => e.status === "claimed").length ?? 0,
+    submitted: emails?.filter((e) => e.status === "submitted").length ?? 0,
+  };
+
+  const handleAdd = async () => {
+    const lines = bulkText.trim().split("\n").filter(Boolean);
+    const parsed = lines.map((line) => {
+      const idx = line.indexOf(":");
+      if (idx < 0) return null;
+      return { email: line.slice(0, idx).trim(), password: line.slice(idx + 1).trim() };
+    }).filter(Boolean) as { email: string; password: string }[];
+
+    if (parsed.length === 0) {
+      toast({ title: "No valid entries", description: "Use format: email@gmail.com:password", variant: "destructive" });
+      return;
+    }
+
+    setAdding(true);
+    try {
+      const r = await fetch("/api/admin/generated-emails", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ emails: parsed }),
+      });
+      const body = await r.json();
+      if (!r.ok) throw new Error(body.error ?? "Failed");
+      toast({ title: `Added ${body.added} emails`, description: body.skipped > 0 ? `${body.skipped} duplicates skipped.` : "All emails added successfully." });
+      setBulkText("");
+      setShowAdd(false);
+      queryClient.invalidateQueries({ queryKey: ["admin-gen-emails"] });
+    } catch (err) {
+      toast({ title: "Error", description: (err as Error).message, variant: "destructive" });
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    setDeletingId(id);
+    try {
+      const r = await fetch(`/api/admin/generated-emails/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!r.ok) throw new Error("Failed");
+      queryClient.invalidateQueries({ queryKey: ["admin-gen-emails"] });
+    } catch (err) {
+      toast({ title: "Error", description: (err as Error).message, variant: "destructive" });
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleExport = () => {
+    if (!emails?.length) return;
+    downloadCSV(
+      `generated-emails-${new Date().toISOString().slice(0, 10)}.csv`,
+      ["ID", "Email", "Password", "Status", "Claimed By", "Created At"],
+      emails.map((e) => [e.id, e.email, e.password, e.status, e.claimed_by_name ?? "", format(new Date(e.created_at), "yyyy-MM-dd HH:mm")])
+    );
+  };
+
+  return (
+    <div className="space-y-5">
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: "Available", value: stats.available, color: "#5BE8FF" },
+          { label: "Claimed", value: stats.claimed, color: "#D4AF37" },
+          { label: "Submitted", value: stats.submitted, color: "hsl(136,60%,55%)" },
+        ].map((s) => (
+          <div key={s.label} className="rounded-2xl p-4 text-center" style={{ background: BURGUNDY_CARD, border: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
+            <p className="text-2xl font-extrabold" style={{ color: s.color }}>{s.value}</p>
+            <p className="text-xs font-semibold mt-0.5" style={{ color: TEXT_SOFT }}>{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <h3 className="text-sm font-bold" style={{ color: TEXT_BODY }}>
+          Email Pool ({emails?.length ?? 0} total)
+        </h3>
+        <div className="flex gap-2">
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-1.5 rounded-lg px-3 h-9 text-xs font-semibold transition-all"
+            style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)", color: GOLD }}
+          >
+            <FileDown className="h-3.5 w-3.5" /> Export CSV
+          </button>
+          <button
+            onClick={() => setShowAdd((v) => !v)}
+            className="flex items-center gap-1.5 rounded-lg px-3 h-9 text-xs font-semibold transition-all"
+            style={{ background: "rgba(91,232,255,0.15)", border: "1px solid rgba(91,232,255,0.35)", color: "#5BE8FF" }}
+          >
+            <Plus className="h-3.5 w-3.5" /> Add Emails
+          </button>
+        </div>
+      </div>
+
+      {/* Add panel */}
+      {showAdd && (
+        <div className="rounded-2xl p-5 space-y-3" style={{ background: BURGUNDY_CARD, border: "1px solid hsl(195,60%,28%,0.4)" }}>
+          <div>
+            <p className="text-sm font-bold mb-1" style={{ color: "#5BE8FF" }}>Bulk Add Emails</p>
+            <p className="text-xs mb-3" style={{ color: TEXT_SOFT }}>
+              One per line in format: <span className="font-mono" style={{ color: GOLD }}>email@gmail.com:password</span>
+            </p>
+            <textarea
+              value={bulkText}
+              onChange={(e) => setBulkText(e.target.value)}
+              rows={6}
+              placeholder={"example@gmail.com:mypassword123\nanother@gmail.com:pass456"}
+              className="w-full rounded-xl px-3 py-2 text-sm font-mono resize-none focus:outline-none"
+              style={{
+                background: "rgba(0,0,0,0.4)",
+                border: "1px solid hsl(195,50%,25%,0.5)",
+                color: "#D4AF37",
+              }}
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={handleAdd}
+              disabled={adding || !bulkText.trim()}
+              className="flex items-center gap-1.5 rounded-xl px-5 h-10 text-sm font-bold transition-all"
+              style={{ background: "linear-gradient(135deg, hsl(195,70%,28%), hsl(195,60%,22%))", color: "#fff", border: "1px solid hsl(195,60%,40%,0.5)" }}
+            >
+              {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              {adding ? "Adding..." : "Add to Pool"}
+            </button>
+            <button
+              onClick={() => { setShowAdd(false); setBulkText(""); }}
+              className="rounded-xl px-4 h-10 text-sm font-semibold"
+              style={{ background: "transparent", border: `1px solid ${BURGUNDY_ROW_BORDER}`, color: TEXT_SOFT }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Table */}
+      {isLoading ? (
+        <div className="space-y-2">
+          {[0, 1, 2].map((i) => <Skeleton key={i} className="h-14 rounded-xl" style={{ background: "hsl(344,65%,18%)" }} />)}
+        </div>
+      ) : !emails?.length ? (
+        <div className="text-center py-12" style={{ color: TEXT_SOFT }}>
+          <Sparkles className="h-10 w-10 mx-auto mb-3 opacity-30" />
+          <p className="text-sm">No generated emails yet. Add some using the button above.</p>
+        </div>
+      ) : (
+        <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
+          <Table>
+            <TableHeader>
+              <TableRow style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}`, background: BURGUNDY_CARD }}>
+                {["Email", "Password", "Status", "Claimed By", "Added", ""].map((h) => (
+                  <TableHead key={h} className="text-xs font-bold uppercase tracking-wide py-3" style={{ color: TEXT_SOFT }}>{h}</TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {emails.map((e) => (
+                <TableRow key={e.id} style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
+                  <TableCell className="font-mono text-sm max-w-[180px] truncate py-3" style={{ color: GOLD_BRIGHT }}>{e.email}</TableCell>
+                  <TableCell className="font-mono text-sm max-w-[140px] truncate py-3" style={{ color: TEXT_BODY }}>{e.password}</TableCell>
+                  <TableCell className="py-3">
+                    <span
+                      className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border"
+                      style={
+                        e.status === "available"
+                          ? { background: "rgba(91,232,255,0.1)", border: "1px solid rgba(91,232,255,0.3)", color: "#5BE8FF" }
+                          : e.status === "submitted"
+                          ? { background: "rgba(74,200,120,0.1)", border: "1px solid rgba(74,200,120,0.3)", color: "hsl(136,60%,60%)" }
+                          : { background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.3)", color: GOLD }
+                      }
+                    >
+                      {e.status}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-sm py-3" style={{ color: TEXT_SOFT }}>
+                    {e.claimed_by_name ?? (e.status === "available" ? "—" : "Unknown")}
+                  </TableCell>
+                  <TableCell className="text-xs py-3" style={{ color: TEXT_SOFT }}>
+                    {format(new Date(e.created_at), "MMM d, HH:mm")}
+                  </TableCell>
+                  <TableCell className="py-3">
+                    <button
+                      onClick={() => handleDelete(e.id)}
+                      disabled={deletingId === e.id}
+                      className="rounded-lg p-1.5 transition-all hover:bg-red-900/30"
+                      style={{ color: "hsl(344,60%,55%)" }}
+                    >
+                      {deletingId === e.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                    </button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Admin() {
   const { data: stats, isLoading: statsLoading } = useAdminGetStats();
 
@@ -1090,6 +1331,7 @@ export default function Admin() {
               { value: "withdrawals", icon: Wallet, label: "Withdrawals" },
               { value: "users", icon: Users, label: "Users" },
               { value: "messages", icon: MessageSquare, label: "Messages" },
+              { value: "gen-emails", icon: Sparkles, label: "Gen Emails" },
               { value: "broadcast", icon: Megaphone, label: "Broadcast" },
               { value: "settings", icon: ShieldCheck, label: "Settings" },
             ].map(tab => (
@@ -1109,6 +1351,7 @@ export default function Admin() {
           <TabsContent value="withdrawals"><WithdrawalsTab /></TabsContent>
           <TabsContent value="users"><UsersTab /></TabsContent>
           <TabsContent value="messages"><MessagesTab /></TabsContent>
+          <TabsContent value="gen-emails"><GeneratedEmailsTab /></TabsContent>
           <TabsContent value="broadcast"><BroadcastTab /></TabsContent>
           <TabsContent value="settings"><SettingsTab /></TabsContent>
         </Tabs>
