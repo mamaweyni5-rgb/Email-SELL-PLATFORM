@@ -8,7 +8,7 @@ import { Send, MessageSquare, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 
 const GOLD = "#D4AF37";
-const BURGUNDY_CARD = "hsl(78,80%,11%)";
+const BURGUNDY_CARD = "hsl(57,100%,39%)";
 
 export default function Inbox() {
   const { data: user, isLoading: authLoading, isError } = useGetMe({ query: { retry: false } });
@@ -57,7 +57,7 @@ export default function Inbox() {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-8 max-w-2xl space-y-3">
-          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(78,65%,18%)" }} />)}
+          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(57,85%,40%)" }} />)}
         </div>
       </Layout>
     );
@@ -70,29 +70,29 @@ export default function Inbox() {
       <div className="container mx-auto px-4 py-6 max-w-2xl flex flex-col" style={{ height: "calc(100vh - 130px)" }}>
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: "hsl(78,70%,18%)", border: `1px solid ${GOLD}40` }}>
+          <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: "hsl(57,90%,39%)", border: `1px solid ${GOLD}40` }}>
             <MessageSquare className="w-4 h-4" style={{ color: GOLD }} />
           </div>
           <div>
             <h1 className="text-lg font-bold" style={{ color: GOLD }}>Support Inbox</h1>
-            <p className="text-xs" style={{ color: "hsl(43,30%,52%)" }}>Messages from MailMart support</p>
+            <p className="text-xs" style={{ color: "hsl(57,70%,20%)" }}>Messages from MailMart support</p>
           </div>
         </div>
 
         {/* Messages */}
         <div
           className="flex-1 overflow-y-auto rounded-2xl p-4 space-y-3 mb-4"
-          style={{ background: "hsl(78,80%,10%)", border: "1px solid hsl(43,30%,20%,0.4)" }}
+          style={{ background: "hsl(57,100%,33%)", border: "1px solid hsl(43,30%,20%,0.4)" }}
         >
           {msgsLoading ? (
             <div className="space-y-3">
-              {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-12 w-3/4 rounded-xl" style={{ background: "hsl(78,65%,18%)" }} />)}
+              {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-12 w-3/4 rounded-xl" style={{ background: "hsl(57,85%,40%)" }} />)}
             </div>
           ) : !messages || messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center py-12">
-              <MessageSquare className="w-12 h-12 mb-3" style={{ color: "hsl(43,30%,30%)" }} />
-              <p className="text-sm font-semibold" style={{ color: "hsl(46,50%,65%)" }}>No messages yet</p>
-              <p className="text-xs mt-1" style={{ color: "hsl(43,30%,45%)" }}>Send a message to contact support.</p>
+              <MessageSquare className="w-12 h-12 mb-3" style={{ color: "hsl(57,70%,22%)" }} />
+              <p className="text-sm font-semibold" style={{ color: "hsl(57,85%,18%)" }}>No messages yet</p>
+              <p className="text-xs mt-1" style={{ color: "hsl(57,65%,22%)" }}>Send a message to contact support.</p>
             </div>
           ) : (
             messages.map((msg) => (
@@ -122,13 +122,13 @@ export default function Inbox() {
         {/* Input */}
         <div
           className="flex items-end gap-2 rounded-2xl p-2"
-          style={{ background: "hsl(78,80%,12%)", border: "1px solid hsl(43,30%,22%,0.5)" }}
+          style={{ background: "hsl(57,100%,35%)", border: "1px solid hsl(43,30%,22%,0.5)" }}
         >
           <textarea
             className="flex-1 resize-none bg-transparent outline-none text-sm px-2 py-1.5 max-h-28"
             rows={1}
             placeholder="Type a message…"
-            style={{ color: "hsl(46,68%,82%)", caretColor: GOLD }}
+            style={{ color: "hsl(57,95%,8%)", caretColor: GOLD }}
             value={body}
             onChange={(e) => setBody(e.target.value)}
             onKeyDown={handleKeyDown}

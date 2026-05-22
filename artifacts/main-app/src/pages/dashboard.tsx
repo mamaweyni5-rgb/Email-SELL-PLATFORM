@@ -59,12 +59,12 @@ function TelegramJoinGate({ botUsername, onConfirmed }: { botUsername: string; o
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(4px)" }}>
-      <div className="rounded-3xl p-6 max-w-sm w-full text-center space-y-5" style={{ background: "hsl(78,85%,13%)", border: "1px solid hsl(43,40%,30%,0.6)", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
-        <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(200,80%,18%), hsl(78,80%,16%))", border: "1px solid hsl(200,60%,30%,0.5)" }}>
+      <div className="rounded-3xl p-6 max-w-sm w-full text-center space-y-5" style={{ background: "hsl(57,100%,36%)", border: "1px solid hsl(43,40%,30%,0.6)", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
+        <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(200,80%,18%), hsl(57,100%,38%))", border: "1px solid hsl(200,60%,30%,0.5)" }}>
           <Send className="w-7 h-7" style={{ color: "#29B6F6" }} />
         </div>
         <div>
-          <h2 className="text-lg font-extrabold mb-2" style={{ color: "#D4AF37" }}>Join Our Telegram Bot</h2>
+          <h2 className="text-lg font-extrabold mb-2" style={{ color: "hsl(43,85%,28%)" }}>Join Our Telegram Bot</h2>
           <p className="text-sm leading-relaxed" style={{ color: "hsl(43,40%,62%)" }}>
             To use MailMart, you must first join our Telegram bot. You'll receive payment notifications and updates there.
           </p>
@@ -72,7 +72,7 @@ function TelegramJoinGate({ botUsername, onConfirmed }: { botUsername: string; o
         <button
           onClick={handleJoin}
           className="w-full rounded-xl h-11 text-sm font-bold transition-all"
-          style={{ background: "linear-gradient(135deg, hsl(200,80%,35%), hsl(200,70%,28%))", color: "#fff", border: "1px solid hsl(200,60%,45%,0.5)" }}
+          style={{ background: "linear-gradient(135deg, hsl(200,80%,35%), hsl(200,70%,28%))", color: "hsl(57,95%,8%)", border: "1px solid hsl(200,60%,45%,0.5)" }}
         >
           👉 Join @{botUsername}
         </button>
@@ -80,7 +80,7 @@ function TelegramJoinGate({ botUsername, onConfirmed }: { botUsername: string; o
           onClick={handleConfirm}
           disabled={markJoined.isPending}
           className="w-full rounded-xl h-11 text-sm font-bold transition-all"
-          style={{ background: "linear-gradient(135deg, hsl(43,70%,40%), hsl(43,60%,32%))", color: "hsl(78,90%,10%)" }}
+          style={{ background: "linear-gradient(135deg, hsl(43,70%,40%), hsl(43,60%,32%))", color: "hsl(57,100%,32%)" }}
         >
           {markJoined.isPending ? "Confirming…" : "✅ I've Joined"}
         </button>
@@ -143,11 +143,11 @@ export default function Dashboard() {
       <Layout>
         <div className="container mx-auto px-4 py-8 space-y-6 max-w-6xl">
           <div className="space-y-3">
-            <Skeleton className="h-9 w-48 rounded-xl" style={{ background: "hsl(78,65%,22%)" }} />
-            <Skeleton className="h-5 w-72 rounded-lg" style={{ background: "hsl(78,65%,20%)" }} />
+            <Skeleton className="h-9 w-48 rounded-xl" style={{ background: "hsl(57,85%,42%)" }} />
+            <Skeleton className="h-5 w-72 rounded-lg" style={{ background: "hsl(57,85%,41%)" }} />
           </div>
           <div className="grid md:grid-cols-3 gap-5">
-            {[0,1,2].map(i => <Skeleton key={i} className="h-28 w-full rounded-2xl" style={{ background: "hsl(78,65%,20%)" }} />)}
+            {[0,1,2].map(i => <Skeleton key={i} className="h-28 w-full rounded-2xl" style={{ background: "hsl(57,85%,41%)" }} />)}
           </div>
         </div>
       </Layout>
@@ -167,11 +167,11 @@ export default function Dashboard() {
           <div>
             <h1
               className="text-2xl sm:text-3xl font-extrabold tracking-tight"
-              style={{ color: "#D4AF37" }}
+              style={{ color: "hsl(43,85%,28%)" }}
             >
               {t("dash_welcome")}
             </h1>
-            <p className="mt-1 text-sm" style={{ color: "hsl(43,35%,58%)" }}>{t("dash_subtitle")}</p>
+            <p className="mt-1 text-sm" style={{ color: "hsl(57,65%,20%)" }}>{t("dash_subtitle")}</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <Link
@@ -180,7 +180,7 @@ export default function Dashboard() {
               style={{
                 border: "1.5px solid hsl(43,40%,35%)",
                 color: "hsl(43,60%,65%)",
-                background: "hsl(78,70%,16%)",
+                background: "hsl(57,90%,38%)",
               }}
             >
               {t("dash_withdraw_btn")}
@@ -196,7 +196,7 @@ export default function Dashboard() {
           href="/get-email"
           className="flex items-center gap-3 rounded-2xl px-4 py-3 mb-4 transition-all duration-200 hover:brightness-110 cursor-pointer"
           style={{
-            background: "linear-gradient(135deg, hsl(195,65%,12%), hsl(78,80%,16%))",
+            background: "linear-gradient(135deg, hsl(195,65%,12%), hsl(57,100%,38%))",
             border: "1px solid hsl(195,60%,28%,0.55)",
             boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
             textDecoration: "none",
@@ -225,7 +225,7 @@ export default function Dashboard() {
             rel="noopener noreferrer"
             className="flex items-center gap-3 rounded-2xl px-4 py-3 mb-4 transition-all duration-200 hover:brightness-110 cursor-pointer"
             style={{
-              background: "linear-gradient(135deg, hsl(200,80%,14%), hsl(78,80%,16%))",
+              background: "linear-gradient(135deg, hsl(200,80%,14%), hsl(57,100%,38%))",
               border: "1px solid hsl(200,60%,30%,0.5)",
               boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
               textDecoration: "none",
@@ -255,7 +255,7 @@ export default function Dashboard() {
                 key={b.id}
                 className="flex items-start gap-3 rounded-2xl px-4 py-3"
                 style={{
-                  background: "linear-gradient(135deg, hsl(40,70%,14%), hsl(78,80%,16%))",
+                  background: "linear-gradient(135deg, hsl(40,70%,14%), hsl(57,100%,38%))",
                   border: "1px solid hsl(43,50%,28%,0.5)",
                   boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
                 }}
@@ -264,19 +264,19 @@ export default function Dashboard() {
                   className="mt-0.5 shrink-0 w-7 h-7 rounded-lg flex items-center justify-center"
                   style={{ background: "rgba(212,175,55,0.18)", border: "1px solid rgba(212,175,55,0.3)" }}
                 >
-                  <Megaphone className="h-3.5 w-3.5" style={{ color: "#D4AF37" }} />
+                  <Megaphone className="h-3.5 w-3.5" style={{ color: "hsl(43,85%,28%)" }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-sm leading-snug" style={{ color: "#D4AF37" }}>{b.title}</p>
+                  <p className="font-bold text-sm leading-snug" style={{ color: "hsl(43,85%,28%)" }}>{b.title}</p>
                   <p className="text-xs mt-0.5 leading-relaxed" style={{ color: "hsl(43,40%,62%)" }}>{b.message}</p>
-                  <p className="text-xs mt-1" style={{ color: "hsl(43,30%,45%)" }}>
+                  <p className="text-xs mt-1" style={{ color: "hsl(57,65%,22%)" }}>
                     {format(new Date(b.createdAt), "MMM d, yyyy")}
                   </p>
                 </div>
                 <button
                   onClick={() => setDismissedIds((s) => new Set([...s, b.id]))}
                   className="shrink-0 mt-0.5 rounded-lg p-1 transition-colors"
-                  style={{ color: "hsl(43,30%,45%)" }}
+                  style={{ color: "hsl(57,65%,22%)" }}
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -294,9 +294,9 @@ export default function Dashboard() {
                 className="w-8 h-8 rounded-lg flex items-center justify-center"
                 style={{ background: "rgba(212,175,55,0.15)", border: "1px solid rgba(212,175,55,0.25)" }}
               >
-                <Wallet className="h-4 w-4" style={{ color: "#D4AF37" }} />
+                <Wallet className="h-4 w-4" style={{ color: "hsl(43,85%,28%)" }} />
               </div>
-              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(43,35%,58%)" }}>
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(57,65%,20%)" }}>
                 {t("dash_balance")}
               </span>
             </div>
@@ -322,11 +322,11 @@ export default function Dashboard() {
               >
                 <CheckCircle className="h-4 w-4" style={{ color: "hsl(136,48%,50%)" }} />
               </div>
-              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(43,35%,58%)" }}>
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(57,65%,20%)" }}>
                 {t("dash_approved")}
               </span>
             </div>
-            <div className="text-3xl font-extrabold" style={{ color: "hsl(46,68%,82%)" }}>
+            <div className="text-3xl font-extrabold" style={{ color: "hsl(57,95%,8%)" }}>
               {profile?.approvedSubmissions || 0}
             </div>
           </div>
@@ -338,13 +338,13 @@ export default function Dashboard() {
                 className="w-8 h-8 rounded-lg flex items-center justify-center"
                 style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.2)" }}
               >
-                <Clock className="h-4 w-4" style={{ color: "#D4AF37" }} />
+                <Clock className="h-4 w-4" style={{ color: "hsl(43,85%,28%)" }} />
               </div>
-              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(43,35%,58%)" }}>
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(57,65%,20%)" }}>
                 {t("dash_pending")}
               </span>
             </div>
-            <div className="text-3xl font-extrabold" style={{ color: "hsl(46,68%,82%)" }}>
+            <div className="text-3xl font-extrabold" style={{ color: "hsl(57,95%,8%)" }}>
               {profile?.pendingSubmissions || 0}
             </div>
           </div>
@@ -355,37 +355,37 @@ export default function Dashboard() {
           <div
             className="rounded-2xl p-6 mb-7"
             style={{
-              background: "linear-gradient(135deg, hsl(78,85%,18%), hsl(78,80%,14%))",
+              background: "linear-gradient(135deg, hsl(57,100%,39%), hsl(57,100%,37%))",
               border: "1px solid hsl(43,40%,30%,0.4)",
               boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(212,175,55,0.1)",
             }}
           >
             <div className="flex items-center gap-2 mb-1">
-              <Gift className="h-5 w-5" style={{ color: "#D4AF37" }} />
-              <h3 className="font-bold text-base" style={{ color: "#D4AF37" }}>{t("referral_card_title")}</h3>
+              <Gift className="h-5 w-5" style={{ color: "hsl(43,85%,28%)" }} />
+              <h3 className="font-bold text-base" style={{ color: "hsl(43,85%,28%)" }}>{t("referral_card_title")}</h3>
             </div>
-            <p className="text-xs mb-5" style={{ color: "hsl(43,35%,58%)" }}>{t("referral_card_desc")}</p>
+            <p className="text-xs mb-5" style={{ color: "hsl(57,65%,20%)" }}>{t("referral_card_desc")}</p>
 
             <div className="grid sm:grid-cols-2 gap-4 mb-5">
               <div
                 className="rounded-xl p-3 text-center"
-                style={{ background: "hsl(78,70%,16%)", border: "1px solid hsl(43,30%,25%,0.4)" }}
+                style={{ background: "hsl(57,90%,38%)", border: "1px solid hsl(43,30%,25%,0.4)" }}
               >
                 <div className="flex items-center justify-center gap-1 text-xs mb-1" style={{ color: "hsl(43,35%,55%)" }}>
                   <Users className="h-3 w-3" />
                   {t("referral_friends")}
                 </div>
-                <div className="text-2xl font-extrabold" style={{ color: "#D4AF37" }}>{referral.referralCount ?? 0}</div>
+                <div className="text-2xl font-extrabold" style={{ color: "hsl(43,85%,28%)" }}>{referral.referralCount ?? 0}</div>
               </div>
               <div
                 className="rounded-xl p-3 text-center"
-                style={{ background: "hsl(78,70%,16%)", border: "1px solid hsl(43,30%,25%,0.4)" }}
+                style={{ background: "hsl(57,90%,38%)", border: "1px solid hsl(43,30%,25%,0.4)" }}
               >
                 <div className="flex items-center justify-center gap-1 text-xs mb-1" style={{ color: "hsl(43,35%,55%)" }}>
                   <Wallet className="h-3 w-3" />
                   {t("referral_earned")}
                 </div>
-                <div className="text-2xl font-extrabold" style={{ color: "#D4AF37" }}>{referral.commissionEarned ?? 0} ETB</div>
+                <div className="text-2xl font-extrabold" style={{ color: "hsl(43,85%,28%)" }}>{referral.commissionEarned ?? 0} ETB</div>
               </div>
             </div>
 
@@ -402,7 +402,7 @@ export default function Dashboard() {
                 onClick={handleCopy}
                 className="shrink-0 inline-flex items-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-all"
                 style={{
-                  background: copied ? "hsl(136,40%,20%)" : "hsl(78,70%,20%)",
+                  background: copied ? "hsl(136,40%,20%)" : "hsl(57,90%,40%)",
                   border: "1.5px solid " + (copied ? "hsl(136,48%,35%)" : "hsl(43,40%,32%)"),
                   color: copied ? "hsl(136,60%,65%)" : "hsl(43,60%,65%)",
                 }}
@@ -435,7 +435,7 @@ export default function Dashboard() {
           {/* Submissions */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-bold" style={{ color: "#D4AF37" }}>{t("dash_recent_subs")}</h2>
+              <h2 className="text-base font-bold" style={{ color: "hsl(43,85%,28%)" }}>{t("dash_recent_subs")}</h2>
               <Link href="/profile" className="flex items-center gap-1 text-xs font-semibold" style={{ color: "hsl(43,50%,60%)" }}>
                 {t("dash_view_all")} <ArrowRight className="h-3 w-3" />
               </Link>
@@ -443,14 +443,14 @@ export default function Dashboard() {
             <div
               className="rounded-2xl overflow-hidden"
               style={{
-                background: "hsl(78,82%,16%)",
+                background: "hsl(57,100%,38%)",
                 border: "1px solid hsl(43,30%,24%,0.4)",
                 boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
               }}
             >
               {submissionsLoading ? (
                 <div className="p-5 space-y-3">
-                  {[0,1].map(i => <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(78,65%,20%)" }} />)}
+                  {[0,1].map(i => <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(57,85%,41%)" }} />)}
                 </div>
               ) : submissions && submissions.length > 0 ? (
                 <div>
@@ -458,17 +458,17 @@ export default function Dashboard() {
                     <div
                       key={sub.id}
                       className="px-4 py-3 flex items-center justify-between transition-colors luxury-row"
-                      style={{ borderTop: idx > 0 ? "1px solid hsl(78,55%,22%)" : "none" }}
+                      style={{ borderTop: idx > 0 ? "1px solid hsl(57,55%,22%)" : "none" }}
                     >
                       <div className="flex items-center gap-3 overflow-hidden">
                         <div
                           className="p-2 rounded-lg shrink-0"
-                          style={{ background: "hsl(78,70%,20%)", border: "1px solid hsl(43,30%,24%,0.3)" }}
+                          style={{ background: "hsl(57,90%,40%)", border: "1px solid hsl(43,30%,24%,0.3)" }}
                         >
-                          <Mail className="h-3.5 w-3.5" style={{ color: "#D4AF37" }} />
+                          <Mail className="h-3.5 w-3.5" style={{ color: "hsl(43,85%,28%)" }} />
                         </div>
                         <div className="min-w-0">
-                          <p className="font-semibold text-sm truncate" style={{ color: "hsl(46,68%,82%)" }}>{sub.email}</p>
+                          <p className="font-semibold text-sm truncate" style={{ color: "hsl(57,95%,8%)" }}>{sub.email}</p>
                           <p className="text-xs" style={{ color: "hsl(43,30%,50%)" }}>{format(new Date(sub.createdAt), "MMM d, yyyy")}</p>
                           {sub.status === "rejected" && sub.rejectionNote && (
                             <p className="text-xs mt-0.5 truncate" style={{ color: "hsl(5,75%,65%)" }}>⚠ {sub.rejectionNote}</p>
@@ -476,7 +476,7 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3 shrink-0 ml-3">
-                        <span className="font-bold text-sm" style={{ color: "#D4AF37" }}>{sub.pricePaid} ETB</span>
+                        <span className="font-bold text-sm" style={{ color: "hsl(43,85%,28%)" }}>{sub.pricePaid} ETB</span>
                         <StatusPill status={sub.status} />
                       </div>
                     </div>
@@ -486,7 +486,7 @@ export default function Dashboard() {
                 <div className="p-8 text-center flex flex-col items-center">
                   <Mail className="h-8 w-8 mb-3" style={{ color: "hsl(43,30%,35%)" }} />
                   <p className="text-sm mb-2" style={{ color: "hsl(43,30%,50%)" }}>{t("dash_no_subs")}</p>
-                  <Link href="/submit" className="text-xs font-semibold" style={{ color: "#D4AF37" }}>{t("dash_first_sub")}</Link>
+                  <Link href="/submit" className="text-xs font-semibold" style={{ color: "hsl(43,85%,28%)" }}>{t("dash_first_sub")}</Link>
                 </div>
               )}
             </div>
@@ -495,7 +495,7 @@ export default function Dashboard() {
           {/* Withdrawals */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-bold" style={{ color: "#D4AF37" }}>{t("dash_recent_wd")}</h2>
+              <h2 className="text-base font-bold" style={{ color: "hsl(43,85%,28%)" }}>{t("dash_recent_wd")}</h2>
               <Link href="/profile" className="flex items-center gap-1 text-xs font-semibold" style={{ color: "hsl(43,50%,60%)" }}>
                 {t("dash_view_all")} <ArrowRight className="h-3 w-3" />
               </Link>
@@ -503,14 +503,14 @@ export default function Dashboard() {
             <div
               className="rounded-2xl overflow-hidden"
               style={{
-                background: "hsl(78,82%,16%)",
+                background: "hsl(57,100%,38%)",
                 border: "1px solid hsl(43,30%,24%,0.4)",
                 boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
               }}
             >
               {withdrawalsLoading ? (
                 <div className="p-5 space-y-3">
-                  {[0,1].map(i => <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(78,65%,20%)" }} />)}
+                  {[0,1].map(i => <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(57,85%,41%)" }} />)}
                 </div>
               ) : withdrawals && withdrawals.length > 0 ? (
                 <div>
@@ -518,17 +518,17 @@ export default function Dashboard() {
                     <div
                       key={wd.id}
                       className="px-4 py-3 flex items-center justify-between transition-colors luxury-row"
-                      style={{ borderTop: idx > 0 ? "1px solid hsl(78,55%,22%)" : "none" }}
+                      style={{ borderTop: idx > 0 ? "1px solid hsl(57,55%,22%)" : "none" }}
                     >
                       <div className="flex items-center gap-3 overflow-hidden">
                         <div
                           className="p-2 rounded-lg shrink-0"
-                          style={{ background: "hsl(78,70%,20%)", border: "1px solid hsl(43,30%,24%,0.3)" }}
+                          style={{ background: "hsl(57,90%,40%)", border: "1px solid hsl(43,30%,24%,0.3)" }}
                         >
-                          <Wallet className="h-3.5 w-3.5" style={{ color: "#D4AF37" }} />
+                          <Wallet className="h-3.5 w-3.5" style={{ color: "hsl(43,85%,28%)" }} />
                         </div>
                         <div className="min-w-0">
-                          <p className="font-semibold text-sm truncate" style={{ color: "hsl(46,68%,82%)" }}>
+                          <p className="font-semibold text-sm truncate" style={{ color: "hsl(57,95%,8%)" }}>
                             {wd.paymentMethod === "bank"
                               ? `🏦 ${wd.bankAccountNumber ?? wd.bankName ?? ""}`
                               : `📱 ${wd.telebirrNumber}`}
@@ -537,7 +537,7 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3 shrink-0 ml-3">
-                        <span className="font-bold text-sm" style={{ color: "#D4AF37" }}>{wd.amount} ETB</span>
+                        <span className="font-bold text-sm" style={{ color: "hsl(43,85%,28%)" }}>{wd.amount} ETB</span>
                         <StatusPill status={wd.status} />
                       </div>
                     </div>

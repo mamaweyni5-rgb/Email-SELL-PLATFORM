@@ -47,9 +47,9 @@ export default function Profile() {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-8 max-w-4xl space-y-4">
-          <Skeleton className="h-9 w-48 rounded-xl" style={{ background: "hsl(78,65%,20%)" }} />
-          <Skeleton className="h-28 w-full rounded-2xl" style={{ background: "hsl(78,65%,18%)" }} />
-          <Skeleton className="h-56 w-full rounded-2xl" style={{ background: "hsl(78,65%,18%)" }} />
+          <Skeleton className="h-9 w-48 rounded-xl" style={{ background: "hsl(57,85%,41%)" }} />
+          <Skeleton className="h-28 w-full rounded-2xl" style={{ background: "hsl(57,85%,40%)" }} />
+          <Skeleton className="h-56 w-full rounded-2xl" style={{ background: "hsl(57,85%,40%)" }} />
         </div>
       </Layout>
     );
@@ -61,7 +61,7 @@ export default function Profile() {
     <Layout>
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-7">
-          <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "#D4AF37" }}>
+          <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "hsl(43,85%,28%)" }}>
             {t("profile_title")}
           </h1>
           <p className="text-sm mt-1" style={{ color: "hsl(43,35%,55%)" }}>{user.name ?? user.email ?? ""}</p>
@@ -73,7 +73,7 @@ export default function Profile() {
             className="stat-card rounded-2xl p-4"
           >
             <div className="flex items-center gap-1.5 mb-2">
-              <Wallet className="h-3.5 w-3.5" style={{ color: "#D4AF37" }} />
+              <Wallet className="h-3.5 w-3.5" style={{ color: "hsl(43,85%,28%)" }} />
               <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(43,35%,55%)" }}>
                 {t("profile_balance")}
               </span>
@@ -97,18 +97,18 @@ export default function Profile() {
                 {t("profile_approved")}
               </span>
             </div>
-            <p className="text-2xl font-extrabold" style={{ color: "hsl(46,68%,82%)" }}>
+            <p className="text-2xl font-extrabold" style={{ color: "hsl(57,95%,8%)" }}>
               {profile?.approvedSubmissions ?? 0}
             </p>
           </div>
           <div className="stat-card rounded-2xl p-4">
             <div className="flex items-center gap-1.5 mb-2">
-              <Clock className="h-3.5 w-3.5" style={{ color: "#D4AF37" }} />
+              <Clock className="h-3.5 w-3.5" style={{ color: "hsl(43,85%,28%)" }} />
               <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(43,35%,55%)" }}>
                 {t("profile_pending")}
               </span>
             </div>
-            <p className="text-2xl font-extrabold" style={{ color: "hsl(46,68%,82%)" }}>
+            <p className="text-2xl font-extrabold" style={{ color: "hsl(57,95%,8%)" }}>
               {profile?.pendingSubmissions ?? 0}
             </p>
           </div>
@@ -119,20 +119,20 @@ export default function Profile() {
           <TabsList
             className="rounded-xl p-1 h-auto"
             style={{
-              background: "hsl(78,80%,15%)",
+              background: "hsl(57,100%,37%)",
               border: "1px solid hsl(43,30%,24%,0.4)",
             }}
           >
             <TabsTrigger
               value="submissions"
-              className="rounded-lg text-sm font-semibold data-[state=active]:text-[hsl(78_90%_10%)] px-5 py-2"
+              className="rounded-lg text-sm font-semibold data-[state=active]:text-[hsl(57_90%_10%)] px-5 py-2"
               style={{ color: "hsl(43,40%,60%)" }}
             >
               {t("profile_tab_subs")}
             </TabsTrigger>
             <TabsTrigger
               value="withdrawals"
-              className="rounded-lg text-sm font-semibold data-[state=active]:text-[hsl(78_90%_10%)] px-5 py-2"
+              className="rounded-lg text-sm font-semibold data-[state=active]:text-[hsl(57_90%_10%)] px-5 py-2"
               style={{ color: "hsl(43,40%,60%)" }}
             >
               {t("profile_tab_wd")}
@@ -143,26 +143,26 @@ export default function Profile() {
             <div
               className="rounded-2xl overflow-hidden"
               style={{
-                background: "hsl(78,82%,16%)",
+                background: "hsl(57,100%,38%)",
                 border: "1px solid hsl(43,30%,24%,0.4)",
                 boxShadow: "0 6px 24px rgba(0,0,0,0.35)",
               }}
             >
-              <div className="px-5 py-4 border-b" style={{ borderColor: "hsl(78,55%,22%)" }}>
+              <div className="px-5 py-4 border-b" style={{ borderColor: "hsl(57,55%,22%)" }}>
                 <h3 className="text-sm font-bold" style={{ color: "hsl(46,68%,78%)" }}>{t("profile_all_subs")}</h3>
               </div>
               <div className="p-4">
                 {subsLoading ? (
                   <div className="space-y-3">
                     {[...Array(3)].map((_, i) => (
-                      <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(78,65%,20%)" }} />
+                      <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(57,85%,41%)" }} />
                     ))}
                   </div>
                 ) : !submissions || submissions.length === 0 ? (
                   <div className="text-center py-10 flex flex-col items-center">
                     <Mail className="h-10 w-10 mb-3" style={{ color: "hsl(43,30%,32%)" }} />
                     <p className="text-sm mb-2" style={{ color: "hsl(43,30%,50%)" }}>{t("profile_no_subs")}</p>
-                    <Link href="/submit" className="text-xs font-semibold" style={{ color: "#D4AF37" }}>
+                    <Link href="/submit" className="text-xs font-semibold" style={{ color: "hsl(43,85%,28%)" }}>
                       {t("profile_first_sub")}
                     </Link>
                   </div>
@@ -172,10 +172,10 @@ export default function Profile() {
                       <div
                         key={sub.id}
                         className="py-3 flex items-center justify-between luxury-row transition-colors"
-                        style={{ borderTop: idx > 0 ? "1px solid hsl(78,55%,22%)" : "none" }}
+                        style={{ borderTop: idx > 0 ? "1px solid hsl(57,55%,22%)" : "none" }}
                       >
                         <div>
-                          <p className="font-semibold text-sm" style={{ color: "hsl(46,68%,82%)" }}>{sub.email}</p>
+                          <p className="font-semibold text-sm" style={{ color: "hsl(57,95%,8%)" }}>{sub.email}</p>
                           <p className="text-xs mt-0.5" style={{ color: "hsl(43,30%,50%)" }}>
                             {format(new Date(sub.createdAt), "MMM d, yyyy")}
                           </p>
@@ -184,7 +184,7 @@ export default function Profile() {
                           )}
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="font-bold text-sm" style={{ color: "#D4AF37" }}>{sub.pricePaid} ETB</span>
+                          <span className="font-bold text-sm" style={{ color: "hsl(43,85%,28%)" }}>{sub.pricePaid} ETB</span>
                           <StatusPill status={sub.status} />
                         </div>
                       </div>
@@ -199,26 +199,26 @@ export default function Profile() {
             <div
               className="rounded-2xl overflow-hidden"
               style={{
-                background: "hsl(78,82%,16%)",
+                background: "hsl(57,100%,38%)",
                 border: "1px solid hsl(43,30%,24%,0.4)",
                 boxShadow: "0 6px 24px rgba(0,0,0,0.35)",
               }}
             >
-              <div className="px-5 py-4 border-b" style={{ borderColor: "hsl(78,55%,22%)" }}>
+              <div className="px-5 py-4 border-b" style={{ borderColor: "hsl(57,55%,22%)" }}>
                 <h3 className="text-sm font-bold" style={{ color: "hsl(46,68%,78%)" }}>{t("profile_wd_history")}</h3>
               </div>
               <div className="p-4">
                 {wdLoading ? (
                   <div className="space-y-3">
                     {[...Array(3)].map((_, i) => (
-                      <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(78,65%,20%)" }} />
+                      <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(57,85%,41%)" }} />
                     ))}
                   </div>
                 ) : !withdrawals || withdrawals.length === 0 ? (
                   <div className="text-center py-10 flex flex-col items-center">
                     <Wallet className="h-10 w-10 mb-3" style={{ color: "hsl(43,30%,32%)" }} />
                     <p className="text-sm mb-2" style={{ color: "hsl(43,30%,50%)" }}>{t("profile_no_wd")}</p>
-                    <Link href="/withdraw" className="text-xs font-semibold" style={{ color: "#D4AF37" }}>
+                    <Link href="/withdraw" className="text-xs font-semibold" style={{ color: "hsl(43,85%,28%)" }}>
                       {t("profile_request_wd")}
                     </Link>
                   </div>
@@ -228,10 +228,10 @@ export default function Profile() {
                       <div
                         key={wd.id}
                         className="py-3 flex items-center justify-between luxury-row transition-colors"
-                        style={{ borderTop: idx > 0 ? "1px solid hsl(78,55%,22%)" : "none" }}
+                        style={{ borderTop: idx > 0 ? "1px solid hsl(57,55%,22%)" : "none" }}
                       >
                         <div>
-                          <p className="font-semibold text-sm" style={{ color: "hsl(46,68%,82%)" }}>
+                          <p className="font-semibold text-sm" style={{ color: "hsl(57,95%,8%)" }}>
                             {wd.paymentMethod === "bank"
                               ? `🏦 ${wd.bankName ?? ""} — ${wd.bankAccountNumber ?? ""}`
                               : `📱 ${wd.telebirrNumber} — ${wd.telebirrName}`}
@@ -244,7 +244,7 @@ export default function Profile() {
                           )}
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="font-bold text-sm" style={{ color: "#D4AF37" }}>{wd.amount} ETB</span>
+                          <span className="font-bold text-sm" style={{ color: "hsl(43,85%,28%)" }}>{wd.amount} ETB</span>
                           <StatusPill status={wd.status} />
                         </div>
                       </div>

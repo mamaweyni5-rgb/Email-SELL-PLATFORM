@@ -62,13 +62,13 @@ export default function Login() {
       <div
         className="flex flex-1 items-center justify-center p-4"
         style={{
-          background: "radial-gradient(ellipse at 50% 0%, hsl(78,80%,16%) 0%, hsl(78,90%,11%) 60%)",
+          background: "radial-gradient(ellipse at 50% 0%, hsl(57,100%,38%) 0%, hsl(57,100%,32%) 60%)",
         }}
       >
         <div
           className="w-full max-w-md rounded-2xl p-8"
           style={{
-            background: "linear-gradient(145deg, hsl(78,85%,18%), hsl(78,80%,14%))",
+            background: "linear-gradient(145deg, hsl(57,100%,39%), hsl(57,100%,37%))",
             border: "1px solid hsl(43,40%,30%,0.4)",
             boxShadow: "0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(212,175,55,0.08) inset",
           }}
@@ -79,7 +79,7 @@ export default function Login() {
               className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 text-xl font-extrabold"
               style={{
                 background: "linear-gradient(145deg, #FFD700, #D4AF37)",
-                color: "hsl(78 90% 10%)",
+                color: "hsl(57 90% 10%)",
                 boxShadow: "0 6px 20px rgba(212,175,55,0.4)",
               }}
             >
@@ -87,11 +87,11 @@ export default function Login() {
             </div>
             <h1
               className="text-2xl font-extrabold tracking-tight mb-1"
-              style={{ color: "#D4AF37" }}
+              style={{ color: "hsl(43,85%,28%)" }}
             >
               {t("login_title")}
             </h1>
-            <p className="text-sm" style={{ color: "hsl(43,35%,58%)" }}>{t("login_subtitle")}</p>
+            <p className="text-sm" style={{ color: "hsl(57,65%,20%)" }}>{t("login_subtitle")}</p>
           </div>
 
           <Form {...form}>
@@ -101,7 +101,7 @@ export default function Login() {
                 name="identifier"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                    <FormLabel style={{ color: "hsl(57,90%,12%)", fontSize: "0.8rem", fontWeight: 600 }}>
                       {t("login_identifier")}
                     </FormLabel>
                     <FormControl>
@@ -121,7 +121,7 @@ export default function Login() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ color: "hsl(46,55%,72%)", fontSize: "0.8rem", fontWeight: 600 }}>
+                    <FormLabel style={{ color: "hsl(57,90%,12%)", fontSize: "0.8rem", fontWeight: 600 }}>
                       {t("login_password")}
                     </FormLabel>
                     <FormControl>
@@ -155,13 +155,13 @@ export default function Login() {
 
           <div
             className="mt-6 text-center text-sm"
-            style={{ color: "hsl(43,35%,58%)" }}
+            style={{ color: "hsl(57,65%,20%)" }}
           >
             {t("login_no_account")}{" "}
             <Link
               href="/register"
               className="font-semibold transition-colors"
-              style={{ color: "#D4AF37" }}
+              style={{ color: "hsl(43,85%,28%)" }}
             >
               {t("login_create")}
             </Link>

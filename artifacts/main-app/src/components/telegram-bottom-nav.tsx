@@ -21,7 +21,7 @@ export function TelegramBottomNav({ show }: { show: boolean }) {
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around"
       style={{
-        background: "linear-gradient(0deg, hsl(78,90%,9%) 0%, hsl(78,88%,13%) 100%)",
+        background: "linear-gradient(0deg, hsl(57,100%,30%) 0%, hsl(57,100%,36%) 100%)",
         borderTop: "1px solid hsl(43,40%,28%,0.4)",
         boxShadow: "0 -4px 20px rgba(0,0,0,0.5)",
         paddingBottom: "env(safe-area-inset-bottom, 8px)",
