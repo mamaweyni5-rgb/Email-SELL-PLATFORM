@@ -77,10 +77,10 @@ export function Navbar() {
   };
 
   const navLinkClass = (path: string) =>
-    `px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
+    `px-3 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 ${
       location === path
-        ? "gold-gradient text-[hsl(74_90%_10%)] shadow-sm"
-        : "text-[hsl(46_68%_70%)] hover:text-[hsl(43_80%_68%)] hover:bg-[hsl(74_65%_20%)]"
+        ? "gold-gradient text-[#0d1a00] shadow-sm"
+        : "text-[#0d1a00] hover:bg-[rgba(0,0,0,0.12)]"
     }`;
 
   return (
@@ -108,12 +108,10 @@ export function Navbar() {
                 M
               </div>
               <span
-                className="font-bold text-xl tracking-tight"
+                className="font-extrabold text-xl tracking-tight"
                 style={{
-                  background: "linear-gradient(145deg, #FFD700, #D4AF37)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
+                  color: "#0d1a00",
+                  textShadow: "0 1px 0 rgba(255,255,255,0.3)",
                 }}
               >
                 MailMart

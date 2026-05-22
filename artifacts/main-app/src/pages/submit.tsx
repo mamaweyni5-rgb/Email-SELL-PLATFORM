@@ -121,7 +121,7 @@ export default function Submit() {
             }}
           >
             <h2 className="text-sm font-bold mb-1" style={{ color: "hsl(46,68%,78%)" }}>{t("submit_card_title")}</h2>
-            <p className="text-xs mb-5" style={{ color: "hsl(74,70%,20%)" }}>{t("submit_card_desc")}</p>
+            <p className="text-xs mb-5" style={{ color: "#1a2d00" }}>{t("submit_card_desc")}</p>
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">

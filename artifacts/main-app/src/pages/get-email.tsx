@@ -311,7 +311,7 @@ export default function GetEmail() {
                       </span>
                       <div>
                         <p className="text-sm font-semibold" style={{ color: "hsl(46,68%,80%)" }}>{s.title}</p>
-                        <p className="text-xs leading-relaxed" style={{ color: "hsl(74,70%,20%)" }}>{s.desc}</p>
+                        <p className="text-xs leading-relaxed" style={{ color: "#1a2d00" }}>{s.desc}</p>
                       </div>
                     </li>
                   ))}
@@ -450,7 +450,7 @@ export default function GetEmail() {
                         </div>
                         <div>
                           <p className="text-sm font-semibold" style={{ color: "hsl(46,68%,80%)" }}>{s.title}</p>
-                          <p className="text-xs leading-relaxed mt-0.5" style={{ color: "hsl(74,70%,20%)" }}>{s.desc}</p>
+                          <p className="text-xs leading-relaxed mt-0.5" style={{ color: "#1a2d00" }}>{s.desc}</p>
                         </div>
                       </div>
                     );

@@ -74,11 +74,20 @@ function downloadCSV(filename: string, headers: string[], rows: (string | number
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
-  a.style.display = "none";
+  a.style.cssText = "position:fixed;top:-100px;left:-100px;opacity:0;";
   document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  a.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 2000);
+  // Telegram WebApp fallback — open in external browser
+  try {
+    const tgApp = (window as any)?.Telegram?.WebApp;
+    if (tgApp?.openLink) {
+      tgApp.openLink(url);
+    }
+  } catch (_) {}
 }
 
 const priceSchema = z.object({
@@ -98,10 +107,10 @@ const changePasswordSchema = z.object({
 
 const GOLD = "#D4AF37";
 const GOLD_BRIGHT = "#FFD700";
-const BURGUNDY_CARD = "hsl(74,100%,39%)";
-const BURGUNDY_ROW_BORDER = "hsl(74,70%,50%)";
-const TEXT_SOFT = "hsl(74,70%,20%)";
-const TEXT_BODY = "hsl(74,95%,8%)";
+const BURGUNDY_CARD = "hsl(74,58%,52%)";
+const BURGUNDY_ROW_BORDER = "hsl(74,40%,38%)";
+const TEXT_SOFT = "#2d4000";
+const TEXT_BODY = "#0d1a00";
 
 function StatusPill({ status }: { status: string }) {
   const cls =
@@ -125,7 +134,10 @@ function SubmissionsTab() {
   const [rejectNoteMap, setRejectNoteMap] = useState<Record<number, string>>({});
 
   const handleExport = () => {
-    if (!submissions?.length) return;
+    if (!submissions?.length) {
+      toast({ title: "No data", description: "No submissions to export yet." });
+      return;
+    }
     downloadCSV(
       `submissions-${new Date().toISOString().slice(0, 10)}.csv`,
       ["ID", "Seller", "Email Account", "Password", "Price (ETB)", "Date", "Status"],
@@ -139,11 +151,15 @@ function SubmissionsTab() {
         s.status,
       ]),
     );
+    toast({ title: "Exporting…", description: `${submissions.length} rows — file download started.` });
   };
 
   const handleExportApproved = () => {
     const approved = submissions?.filter((s) => s.status === "approved") ?? [];
-    if (!approved.length) return;
+    if (!approved.length) {
+      toast({ title: "No approved submissions", description: "Approve some submissions first before exporting." });
+      return;
+    }
     downloadCSV(
       `approved-accounts-${new Date().toISOString().slice(0, 10)}.csv`,
       ["ID", "Seller", "Email Account", "Password", "Price (ETB)", "Date"],
@@ -156,6 +172,7 @@ function SubmissionsTab() {
         format(new Date(s.createdAt), "yyyy-MM-dd HH:mm"),
       ]),
     );
+    toast({ title: "Exporting…", description: `${approved.length} approved accounts — file download started.` });
   };
 
   const handleUpdate = (id: number, status: "approved" | "rejected") => {
@@ -180,7 +197,7 @@ function SubmissionsTab() {
   if (!submissions || submissions.length === 0) return (
     <div className="text-center py-16 flex flex-col items-center">
       <Mail className="h-12 w-12 mb-4" style={{ color: "#1a2d00" }} />
-      <p className="text-base font-semibold" style={{ color: "hsl(74,85%,15%)" }}>No submissions yet</p>
+      <p className="text-base font-semibold" style={{ color: "#0d1a00" }}>No submissions yet</p>
       <p className="text-sm mt-1" style={{ color: TEXT_SOFT }}>Email accounts submitted by users will appear here.</p>
     </div>
   );
@@ -289,7 +306,10 @@ function WithdrawalsTab() {
   const updateWithdrawal = useAdminUpdateWithdrawal();
 
   const handleExport = () => {
-    if (!withdrawals?.length) return;
+    if (!withdrawals?.length) {
+      toast({ title: "No data", description: "No withdrawal requests to export yet." });
+      return;
+    }
     downloadCSV(
       `withdrawals-${new Date().toISOString().slice(0, 10)}.csv`,
       ["ID", "User", "Method", "Telebirr/Account Number", "Name", "Bank", "Amount (ETB)", "Date", "Status", "Note"],
@@ -306,6 +326,7 @@ function WithdrawalsTab() {
         w.adminNote ?? "",
       ]),
     );
+    toast({ title: "Exporting…", description: `${withdrawals.length} rows — file download started.` });
   };
 
   const handleUpdate = (id: number, status: "completed" | "rejected") => {
@@ -329,7 +350,7 @@ function WithdrawalsTab() {
   if (!withdrawals || withdrawals.length === 0) return (
     <div className="text-center py-16 flex flex-col items-center">
       <Wallet className="h-12 w-12 mb-4" style={{ color: "#1a2d00" }} />
-      <p className="text-base font-semibold" style={{ color: "hsl(74,85%,15%)" }}>No withdrawal requests</p>
+      <p className="text-base font-semibold" style={{ color: "#0d1a00" }}>No withdrawal requests</p>
       <p className="text-sm mt-1" style={{ color: TEXT_SOFT }}>When users request withdrawals, they will appear here.</p>
     </div>
   );
@@ -506,7 +527,7 @@ function UsersTab() {
       {!users || users.length === 0 ? (
         <div className="text-center py-12 flex flex-col items-center">
           <Users className="h-12 w-12 mb-4" style={{ color: "#1a2d00" }} />
-          <p className="text-base font-semibold" style={{ color: "hsl(74,85%,15%)" }}>No users found</p>
+          <p className="text-base font-semibold" style={{ color: "#0d1a00" }}>No users found</p>
         </div>
       ) : (
         <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid hsl(43,30%,24%,0.4)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}>
@@ -628,7 +649,7 @@ function MessagesTab() {
   if (!conversations || conversations.length === 0) return (
     <div className="text-center py-16 flex flex-col items-center">
       <MessageSquare className="h-12 w-12 mb-4" style={{ color: "#1a2d00" }} />
-      <p className="text-base font-semibold" style={{ color: "hsl(74,85%,15%)" }}>No messages yet</p>
+      <p className="text-base font-semibold" style={{ color: "#0d1a00" }}>No messages yet</p>
       <p className="text-sm mt-1" style={{ color: TEXT_SOFT }}>When users send messages, they will appear here.</p>
     </div>
   );

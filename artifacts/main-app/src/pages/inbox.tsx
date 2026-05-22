@@ -75,7 +75,7 @@ export default function Inbox() {
           </div>
           <div>
             <h1 className="text-lg font-bold" style={{ color: GOLD }}>Support Inbox</h1>
-            <p className="text-xs" style={{ color: "hsl(74,70%,20%)" }}>Messages from MailMart support</p>
+            <p className="text-xs" style={{ color: "#1a2d00" }}>Messages from MailMart support</p>
           </div>
         </div>
 

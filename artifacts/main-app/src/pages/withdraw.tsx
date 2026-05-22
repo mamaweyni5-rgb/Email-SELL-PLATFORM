@@ -235,7 +235,7 @@ export default function Withdraw() {
             <h2 className="text-sm font-bold mb-1" style={{ color: "hsl(46,68%,78%)" }}>
               {method === "telebirr" ? t("wd_card_title") : t("wd_bank_card_title")}
             </h2>
-            <p className="text-xs mb-5" style={{ color: "hsl(74,70%,20%)" }}>
+            <p className="text-xs mb-5" style={{ color: "#1a2d00" }}>
               {method === "telebirr" ? t("wd_card_desc") : t("wd_bank_card_desc")}
             </p>
 
