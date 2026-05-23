@@ -253,8 +253,10 @@ export const AdminListUsersQueryParams = zod.object({
 
 export const AdminListUsersResponseItem = zod.object({
   "id": zod.number(),
-  "email": zod.string(),
+  "email": zod.string().nullable(),
+  "name": zod.string().nullable(),
   "walletBalance": zod.number(),
+  "isBanned": zod.boolean(),
   "totalSubmissions": zod.number(),
   "approvedSubmissions": zod.number(),
   "createdAt": zod.coerce.date()

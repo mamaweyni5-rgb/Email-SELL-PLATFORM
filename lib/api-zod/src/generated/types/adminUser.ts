@@ -8,8 +8,12 @@
 
 export interface AdminUser {
   id: number;
-  email: string;
+  /** @nullable */
+  email: string | null;
+  /** @nullable */
+  name: string | null;
   walletBalance: number;
+  isBanned: boolean;
   totalSubmissions: number;
   approvedSubmissions: number;
   createdAt: Date;

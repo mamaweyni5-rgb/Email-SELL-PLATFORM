@@ -309,7 +309,11 @@ router.get("/admin/users", async (req, res): Promise<void> => {
     }),
   );
 
-  res.json(AdminListUsersResponse.parse(usersWithStats.map((u: any) => ({ ...u }))));
+  res.json(AdminListUsersResponse.parse(usersWithStats.map((u: any) => ({
+    ...u,
+    email: u.email ?? null,
+    name: u.name ?? null,
+  }))));
 });
 
 router.get("/admin/users/:id", async (req, res): Promise<void> => {

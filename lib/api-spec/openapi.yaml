@@ -1004,14 +1004,18 @@ components:
 
     AdminUser:
       type: object
-      required: [id, email, walletBalance, totalSubmissions, approvedSubmissions, createdAt]
+      required: [id, email, name, walletBalance, isBanned, totalSubmissions, approvedSubmissions, createdAt]
       properties:
         id:
           type: integer
         email:
-          type: string
+          type: ["string", "null"]
+        name:
+          type: ["string", "null"]
         walletBalance:
           type: integer
+        isBanned:
+          type: boolean
         totalSubmissions:
           type: integer
         approvedSubmissions:
