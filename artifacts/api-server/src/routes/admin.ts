@@ -128,6 +128,12 @@ router.patch("/admin/submissions/:id", async (req, res): Promise<void> => {
         .set({ walletBalance: sql`${usersTable.walletBalance} - ${existing.pricePaid}` })
         .where(eq(usersTable.id, existing.userId));
     }
+    await db.execute(sql`
+      UPDATE generated_emails
+      SET status = 'available', claimed_by = NULL, claimed_at = NULL, email_opened = FALSE
+      WHERE lower(email) = lower(${existing.email})
+      AND status = 'submitted'
+    `);
     notifySubmissionRejected(owner?.telegramChatId, existing.email).catch(() => {});
   }
 

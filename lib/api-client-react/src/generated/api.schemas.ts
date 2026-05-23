@@ -109,6 +109,7 @@ export interface AdminSubmission {
   id: number;
   userId: number;
   userEmail: string;
+  userName: string;
   email: string;
   password: string;
   status: AdminSubmissionStatus;

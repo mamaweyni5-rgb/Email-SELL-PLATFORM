@@ -6,7 +6,7 @@ import { Layout } from "@/components/layout";
 import { useToast } from "@/hooks/use-toast";
 import {
   Mail, Lock, Copy, Check, ArrowLeft, Loader2, CheckCircle2,
-  RefreshCw, Sparkles, ListChecks, LogIn, Send,
+  RefreshCw, Sparkles, ListChecks, LogIn, Send, AlertTriangle, ExternalLink, ShieldAlert,
 } from "lucide-react";
 import { tgHaptic, tgSuccess, tgError } from "@/lib/telegram";
 import { useLanguage } from "@/lib/i18n";
@@ -18,6 +18,7 @@ type ClaimedEmail = {
   password: string;
   status: string;
   claimed_at: string;
+  emailOpened: boolean;
 } | null;
 
 type AvailableCount = { count: number };
@@ -101,6 +102,21 @@ function useSubmitGenerated() {
   });
 }
 
+function useMarkOpened() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await fetch(`/api/generated-emails/${id}/open`, {
+        method: "POST",
+        credentials: "include",
+      });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["generated-emails", "my-claim"] });
+    },
+  });
+}
+
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
   const { t } = useLanguage();
@@ -136,18 +152,26 @@ export default function GetEmail() {
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
   const [confirmReturn, setConfirmReturn] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
 
   const { data: claimed, isLoading: claimLoading } = useClaimedEmail();
   const { data: availableData } = useAvailableCount();
   const claim = useClaim();
   const unclaim = useUnclaim();
   const submitGen = useSubmitGenerated();
+  const markOpened = useMarkOpened();
 
   useEffect(() => {
     if (!authLoading && !user) setLocation("/login");
   }, [user, authLoading, setLocation]);
 
   const handleClaim = () => {
+    tgHaptic("heavy");
+    setShowWarning(true);
+  };
+
+  const handleConfirmClaim = () => {
+    setShowWarning(false);
     tgHaptic("medium");
     claim.mutate(undefined, {
       onError: (err) => {
@@ -155,6 +179,13 @@ export default function GetEmail() {
         toast({ title: t("get_email_error_title"), description: (err as Error).message, variant: "destructive" });
       },
     });
+  };
+
+  const handleOpenEmail = () => {
+    if (!claimed) return;
+    markOpened.mutate(claimed.id);
+    window.open(`https://mail.google.com`, "_blank");
+    tgHaptic("light");
   };
 
   const handleUnclaim = () => {
@@ -178,7 +209,13 @@ export default function GetEmail() {
       },
       onError: (err) => {
         tgError();
-        toast({ title: t("get_email_error_title"), description: (err as Error).message, variant: "destructive" });
+        const msg = (err as Error).message;
+        if (msg.startsWith("BAN:")) {
+          toast({ title: "🚫 አካውንትዎ ታገደ!", description: "ኢሜሉን ሳይከፍቱ ሰብሚት ለማድረግ ሞክረዋል። አካውንትዎ ተዘጋ።", variant: "destructive" });
+          setTimeout(() => setLocation("/dashboard"), 3000);
+        } else {
+          toast({ title: t("get_email_error_title"), description: msg, variant: "destructive" });
+        }
       },
     });
   };
@@ -193,6 +230,57 @@ export default function GetEmail() {
 
   return (
     <Layout>
+      {showWarning && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-5"
+          style={{ background: "rgba(0,0,0,0.75)" }}
+        >
+          <div
+            className="rounded-2xl p-6 w-full max-w-sm"
+            style={{ background: "#1a0000", border: "2px solid hsl(5,80%,40%)" }}
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <ShieldAlert className="h-6 w-6 shrink-0" style={{ color: "hsl(5,90%,60%)" }} />
+              <h2 className="text-base font-extrabold tracking-tight" style={{ color: "hsl(5,90%,70%)" }}>
+                ⚠️ ማስጠንቀቂያ — ከመቀጠልዎ በፊት ያንብቡ!
+              </h2>
+            </div>
+            <div className="space-y-3 mb-5">
+              <p className="text-sm leading-relaxed font-medium" style={{ color: "#fff" }}>
+                ይህን ኢሜል ሲወስዱ በመረጃው <span className="font-extrabold underline" style={{ color: "hsl(5,90%,70%)" }}>ትክክለኛ ኢሜሉን ከፍተው</span> ምዝገባ ካደረጉ በኋላ <span className="font-extrabold" style={{ color: "hsl(5,90%,70%)" }}>እዚሁ ሰብሚት ማድረግ</span> ያለቦት።
+              </p>
+              <div
+                className="rounded-xl p-4"
+                style={{ background: "rgba(220,38,38,0.2)", border: "1px solid hsl(5,80%,40%)" }}
+              >
+                <p className="text-sm font-extrabold leading-relaxed" style={{ color: "hsl(5,90%,75%)" }}>
+                  🚫 ኢሜሉን ሳይከፍቱ ሰብሚት ቢጫኑ — <span className="underline">በቀጥታ ከፕላትፎርሙ ባን ይደረጋሉ!</span>
+                </p>
+                <p className="text-xs mt-1.5 font-semibold" style={{ color: "hsl(5,70%,65%)" }}>
+                  አካውንትዎ ምንም ማስጠንቀቂያ ሳይኖር ይዘጋል። አስበው ይወስኑ!!!!
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowWarning(false)}
+                className="flex-1 h-11 rounded-xl text-sm font-bold"
+                style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff" }}
+              >
+                ሰርዝ
+              </button>
+              <button
+                onClick={handleConfirmClaim}
+                disabled={claim.isPending}
+                className="flex-1 h-11 rounded-xl text-sm font-extrabold"
+                style={{ background: "hsl(5,80%,40%)", color: "#fff" }}
+              >
+                {claim.isPending ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "እሺ — ተረዳሁ"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div
         className="flex flex-1 flex-col p-4 min-h-full"
         style={{ background: "transparent" }}
@@ -302,6 +390,40 @@ export default function GetEmail() {
                       <CopyButton text={claimed.password} />
                     </div>
                   </div>
+                </div>
+
+                <div className="mt-5 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.4)" }}>
+                  {claimed.emailOpened ? (
+                    <div
+                      className="flex items-center gap-2 rounded-xl px-4 py-2.5"
+                      style={{ background: "rgba(74,200,120,0.2)", border: "1px solid rgba(74,200,120,0.4)" }}
+                    >
+                      <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "hsl(136,60%,50%)" }} />
+                      <p className="text-xs font-bold" style={{ color: "hsl(136,60%,40%)" }}>
+                        ✅ ኢሜሉን ከፍተዋል — አሁን ሰብሚት ማድረግ ይችላሉ
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <div
+                        className="flex items-start gap-2 rounded-xl px-4 py-3 mb-3"
+                        style={{ background: "rgba(220,38,38,0.15)", border: "1px solid rgba(220,38,38,0.35)" }}
+                      >
+                        <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" style={{ color: "hsl(5,90%,60%)" }} />
+                        <p className="text-xs font-bold leading-relaxed" style={{ color: "hsl(5,80%,55%)" }}>
+                          ⚠️ ከሰብሚት በፊት ኢሜሉን መክፈት <span className="underline">ግዴታ</span> ነው! ካልከፈቱ ባን ይደረጋሉ!
+                        </p>
+                      </div>
+                      <button
+                        onClick={handleOpenEmail}
+                        className="w-full h-11 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all"
+                        style={{ background: "linear-gradient(135deg, #1565c0, #0d47a1)", color: "#fff", boxShadow: "0 4px 12px rgba(21,101,192,0.4)" }}
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        📧 Gmail ከፍቱ (ኢሜሉን ይጠቀሙ)
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 

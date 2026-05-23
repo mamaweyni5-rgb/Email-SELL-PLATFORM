@@ -897,13 +897,15 @@ components:
 
     AdminSubmission:
       type: object
-      required: [id, userId, userEmail, email, password, status, pricePaid, createdAt]
+      required: [id, userId, userEmail, userName, email, password, status, pricePaid, createdAt]
       properties:
         id:
           type: integer
         userId:
           type: integer
         userEmail:
+          type: string
+        userName:
           type: string
         email:
           type: string

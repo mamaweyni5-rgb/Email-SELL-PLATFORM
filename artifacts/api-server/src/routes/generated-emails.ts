@@ -24,7 +24,7 @@ router.get("/generated-emails/available-count", async (_req, res): Promise<void>
 router.get("/generated-emails/my-claim", requireAuth, async (req, res): Promise<void> => {
   const userId = req.session.userId!;
   const { rows } = await pool.query(
-    `SELECT id, name, email, password, status, claimed_at
+    `SELECT id, name, email, password, status, claimed_at, email_opened AS "emailOpened"
      FROM generated_emails
      WHERE claimed_by = $1 AND status = 'claimed'
      LIMIT 1`,
@@ -55,7 +55,7 @@ router.post("/generated-emails/claim", requireAuth, async (req, res): Promise<vo
        LIMIT 1
        FOR UPDATE SKIP LOCKED
      )
-     RETURNING id, name, email, password, status, claimed_at`,
+     RETURNING id, name, email, password, status, claimed_at, email_opened AS "emailOpened"`,
     [userId]
   );
 
@@ -66,6 +66,19 @@ router.post("/generated-emails/claim", requireAuth, async (req, res): Promise<vo
 
   req.log.info({ userId, genEmailId: rows[0].id }, "Generated email claimed");
   res.json(rows[0]);
+});
+
+router.post("/generated-emails/:id/open", requireAuth, async (req, res): Promise<void> => {
+  const userId = req.session.userId!;
+  const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const emailId = parseInt(rawId, 10);
+  if (isNaN(emailId)) { res.status(400).json({ error: "Invalid ID" }); return; }
+  await pool.query(
+    `UPDATE generated_emails SET email_opened = TRUE
+     WHERE id = $1 AND claimed_by = $2 AND status = 'claimed'`,
+    [emailId, userId]
+  );
+  res.json({ success: true });
 });
 
 router.delete("/generated-emails/claim", requireAuth, async (req, res): Promise<void> => {
@@ -90,7 +103,8 @@ router.delete("/generated-emails/claim", requireAuth, async (req, res): Promise<
 
 router.post("/generated-emails/:id/submit", requireAuth, async (req, res): Promise<void> => {
   const userId = req.session.userId!;
-  const emailId = parseInt(req.params.id, 10);
+  const rawSubmitId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const emailId = parseInt(rawSubmitId, 10);
 
   if (isNaN(emailId)) {
     res.status(400).json({ error: "Invalid email ID" });
@@ -98,7 +112,7 @@ router.post("/generated-emails/:id/submit", requireAuth, async (req, res): Promi
   }
 
   const { rows: emailRows } = await pool.query(
-    `SELECT id, email, password FROM generated_emails
+    `SELECT id, email, password, email_opened AS "emailOpened" FROM generated_emails
      WHERE id = $1 AND claimed_by = $2 AND status = 'claimed'`,
     [emailId, userId]
   );
@@ -108,7 +122,15 @@ router.post("/generated-emails/:id/submit", requireAuth, async (req, res): Promi
     return;
   }
 
-  const genEmail = emailRows[0] as { id: number; email: string; password: string };
+  const genEmail = emailRows[0] as { id: number; email: string; password: string; emailOpened: boolean };
+
+  if (!genEmail.emailOpened) {
+    await db.update(usersTable).set({ isBanned: true }).where(eq(usersTable.id, userId));
+    req.log.warn({ userId, genEmailId: emailId }, "User banned for submitting without opening email");
+    res.status(403).json({ error: "BAN: You submitted without opening the email. Your account has been banned." });
+    return;
+  }
+
   const normalizedEmail = genEmail.email.toLowerCase();
 
   const { rows: existingSub } = await pool.query(
