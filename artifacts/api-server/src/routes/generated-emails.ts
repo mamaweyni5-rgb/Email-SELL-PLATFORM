@@ -4,6 +4,7 @@ import { requireAuth } from "../middlewares/requireAuth";
 import { notifyAdminNewSubmission } from "../lib/telegram-bot";
 import { db, usersTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
+import { verifyGmailAccount } from "../lib/verify-gmail";
 
 const router: IRouter = Router();
 
@@ -123,15 +124,21 @@ router.post("/generated-emails/:id/submit", requireAuth, async (req, res): Promi
   }
 
   const genEmail = emailRows[0] as { id: number; email: string; password: string; emailOpened: boolean };
-
-  if (!genEmail.emailOpened) {
-    await db.update(usersTable).set({ isBanned: true }).where(eq(usersTable.id, userId));
-    req.log.warn({ userId, genEmailId: emailId }, "User banned for submitting without opening email");
-    res.status(403).json({ error: "BAN: You submitted without opening the email. Your account has been banned." });
-    return;
-  }
-
   const normalizedEmail = genEmail.email.toLowerCase();
+
+  req.log.info({ userId, genEmailId: emailId, email: normalizedEmail }, "Verifying Gmail account via IMAP...");
+  const verifyResult = await verifyGmailAccount(normalizedEmail, genEmail.password);
+
+  if (!verifyResult.verified) {
+    if (verifyResult.reason === "not_registered") {
+      req.log.warn({ userId, genEmailId: emailId }, "Gmail not registered — submission rejected");
+      res.status(422).json({
+        error: "GMAIL_NOT_REGISTERED: ይህ ኢሜል አካውንት ጎግል ላይ አልተፈጠረም። መጀመሪያ በተሰጠዎ መረጃ Gmail ላይ ተመዝግበው ካጠናቀቁ በኋላ ተመልሰው ሰብሚት ያድርጉ።",
+      });
+      return;
+    }
+    req.log.warn({ userId, genEmailId: emailId }, "Gmail IMAP network error — allowing with warning");
+  }
 
   const { rows: existingSub } = await pool.query(
     "SELECT id FROM submissions WHERE email = $1",

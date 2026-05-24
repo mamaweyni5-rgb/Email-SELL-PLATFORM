@@ -198,6 +198,8 @@ export default function GetEmail() {
     });
   };
 
+  const [showNotRegisteredModal, setShowNotRegisteredModal] = useState(false);
+
   const handleSubmit = () => {
     if (!claimed) return;
     tgHaptic("medium");
@@ -210,8 +212,10 @@ export default function GetEmail() {
       onError: (err) => {
         tgError();
         const msg = (err as Error).message;
-        if (msg.startsWith("BAN:")) {
-          toast({ title: "🚫 አካውንትዎ ታገደ!", description: "ኢሜሉን ሳይከፍቱ ሰብሚት ለማድረግ ሞክረዋል። አካውንትዎ ተዘጋ።", variant: "destructive" });
+        if (msg.startsWith("GMAIL_NOT_REGISTERED:")) {
+          setShowNotRegisteredModal(true);
+        } else if (msg.startsWith("BAN:")) {
+          toast({ title: "🚫 አካውንትዎ ታገደ!", description: "አካውንትዎ ታግዷል። ለእርዳታ አስተዳዳሪን ያነጋግሩ።", variant: "destructive" });
           setTimeout(() => setLocation("/dashboard"), 3000);
         } else {
           toast({ title: t("get_email_error_title"), description: msg, variant: "destructive" });
@@ -281,6 +285,91 @@ export default function GetEmail() {
           </div>
         </div>
       )}
+
+      {showNotRegisteredModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-5"
+          style={{ background: "rgba(0,0,0,0.82)" }}
+        >
+          <div
+            className="rounded-2xl p-6 w-full max-w-sm"
+            style={{ background: "#0d1a00", border: "2px solid hsl(43,90%,48%)" }}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+                style={{ background: "rgba(255,193,7,0.15)", border: "1px solid hsl(43,90%,48%)" }}
+              >
+                <AlertTriangle className="h-6 w-6" style={{ color: "hsl(43,95%,55%)" }} />
+              </div>
+              <h2 className="text-base font-extrabold leading-tight" style={{ color: "hsl(43,95%,65%)" }}>
+                Gmail ላይ ምዝገባ አልተጠናቀቀም!
+              </h2>
+            </div>
+
+            <div className="space-y-3 mb-5">
+              <div
+                className="rounded-xl p-4"
+                style={{ background: "rgba(255,193,7,0.1)", border: "1px solid rgba(255,193,7,0.3)" }}
+              >
+                <p className="text-sm font-semibold leading-relaxed" style={{ color: "#fff" }}>
+                  ስርዓቱ Gmail ላይ ኢሜሉ እንዳልተፈጠረ አረጋግጧል።
+                </p>
+                <p className="text-xs mt-2 leading-relaxed font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
+                  የሰጠናዎ <strong style={{ color: "hsl(43,95%,65%)" }}>ኢሜልና ፓስወርድ</strong> ተጠቅመው ጎግል ላይ አካውንት ይፍጠሩ — ከዚያ ተመልሰው ሰብሚት ያድርጉ።
+                </p>
+              </div>
+
+              <div className="rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.06)" }}>
+                <p className="text-xs font-bold mb-2" style={{ color: "rgba(255,255,255,0.5)" }}>
+                  እንዴት ይመዘገባሉ?
+                </p>
+                <ol className="space-y-1.5">
+                  {[
+                    "ከታች \"Gmail ይክፈቱ\" ይጫኑ",
+                    "\"Create account\" ይምረጡ",
+                    "ከዚ ኢሜሉን፣ ፓስወርዱን ይጠቀሙ",
+                    "ምዝገባ ካጠናቀቁ ወደዚ ተመልሰው ሰብሚት ያድርጉ",
+                  ].map((step, i) => (
+                    <li key={i} className="flex items-start gap-2 text-xs" style={{ color: "rgba(255,255,255,0.75)" }}>
+                      <span
+                        className="w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-[10px] font-extrabold mt-0.5"
+                        style={{ background: "hsl(43,90%,40%)", color: "#0d1a00" }}
+                      >
+                        {i + 1}
+                      </span>
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2.5">
+              <button
+                onClick={() => {
+                  setShowNotRegisteredModal(false);
+                  window.open("https://accounts.google.com/signup", "_blank");
+                  tgHaptic("light");
+                }}
+                className="w-full h-12 rounded-xl text-sm font-extrabold flex items-center justify-center gap-2"
+                style={{ background: "hsl(43,90%,42%)", color: "#0d1a00" }}
+              >
+                <ExternalLink className="h-4 w-4" />
+                Gmail ይክፈቱ — ይመዝገቡ
+              </button>
+              <button
+                onClick={() => setShowNotRegisteredModal(false)}
+                className="w-full h-10 rounded-xl text-sm font-semibold"
+                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}
+              >
+                ዝጋ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div
         className="flex flex-1 flex-col p-4 min-h-full"
         style={{ background: "transparent" }}
@@ -460,12 +549,18 @@ export default function GetEmail() {
                 <button
                   onClick={handleSubmit}
                   disabled={submitGen.isPending}
-                  className="gold-btn w-full h-12 rounded-xl font-bold text-sm"
+                  className="gold-btn w-full rounded-xl font-bold text-sm"
+                  style={{ minHeight: "3.25rem" }}
                 >
                   {submitGen.isPending ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      {t("get_email_submitting")}
+                    <span className="flex flex-col items-center justify-center gap-1 py-2">
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Gmail እየፈተሽን ነው...
+                      </span>
+                      <span className="text-[10px] font-normal opacity-80">
+                        ምዝገባዎን Google ላይ እያረጋገጥን ነው — እባክዎ ይጠብቁ
+                      </span>
                     </span>
                   ) : (
                     t("get_email_submit_btn")
