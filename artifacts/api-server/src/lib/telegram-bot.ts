@@ -31,7 +31,7 @@ function mainMenu(isLoggedIn: boolean): Record<string, unknown> {
   if (!isLoggedIn) {
     return {
       reply_markup: {
-        keyboard: [[{ text: "📝 ምዝገባ" }, { text: "🔑 ግባ" }]],
+        keyboard: [[{ text: "📝 Register" }, { text: "🔑 Login" }]],
         resize_keyboard: true,
         one_time_keyboard: false,
       },
@@ -40,11 +40,11 @@ function mainMenu(isLoggedIn: boolean): Record<string, unknown> {
   return {
     reply_markup: {
       keyboard: [
-        [{ text: "📊 መረጃዬ" }, { text: "📧 ኢሜይል አስገባ" }],
-        [{ text: "✨ ኢሜይል ውሰድ" }, { text: "💸 ወጪ አውጣ" }],
-        [{ text: "📋 ሁኔታዎቼ" }, { text: "💼 ወጪዎቼ" }],
-        [{ text: "🔗 ሪፈራል" }, { text: "📢 ማስታወቂያዎች" }],
-        [{ text: "🚪 ውጣ" }],
+        [{ text: "📊 My Profile" }, { text: "📧 Submit Email" }],
+        [{ text: "✨ Get Email" }, { text: "💸 Withdraw" }],
+        [{ text: "📋 My Submissions" }, { text: "💼 My Withdrawals" }],
+        [{ text: "🔗 Referral" }, { text: "📢 Announcements" }],
+        [{ text: "🚪 Logout" }],
       ],
       resize_keyboard: true,
       one_time_keyboard: false,
@@ -56,10 +56,10 @@ function adminMenu(): Record<string, unknown> {
   return {
     reply_markup: {
       keyboard: [
-        [{ text: "⏳ ጠቅላላ ሁኔታ" }, { text: "📬 ሰብሚሽኖች" }],
-        [{ text: "💸 የወጪ ጥያቄዎች" }, { text: "👥 ዩዘሮች" }],
-        [{ text: "📢 ብሮድካስት" }, { text: "⚙️ ቅንብሮች" }],
-        [{ text: "📤 ኤክስፖርት" }, { text: "🚪 ወደ ዩዘር ሂድ" }],
+        [{ text: "⏳ Overview" }, { text: "📬 Submissions" }],
+        [{ text: "💸 Withdrawals" }, { text: "👥 Users" }],
+        [{ text: "📢 Broadcast" }, { text: "⚙️ Settings" }],
+        [{ text: "📤 Export" }, { text: "🚪 Go to User" }],
       ],
       resize_keyboard: true,
       one_time_keyboard: false,
@@ -70,7 +70,7 @@ function adminMenu(): Record<string, unknown> {
 function cancelKeyboard(): Record<string, unknown> {
   return {
     reply_markup: {
-      keyboard: [[{ text: "❌ ሰርዝ" }]],
+      keyboard: [[{ text: "❌ Cancel" }]],
       resize_keyboard: true,
       one_time_keyboard: false,
     },
@@ -110,9 +110,9 @@ export async function setupWebhook(webhookUrl: string): Promise<void> {
   await callApi("setChatMenuButton", { menu_button: { type: "default" } });
   await callApi("setMyCommands", {
     commands: [
-      { command: "start", description: "ዋና ምናሌ ክፈት" },
-      { command: "help", description: "እርዳታ" },
-      { command: "admin", description: "አድሚን ፓነል" },
+      { command: "start", description: "Open main menu" },
+      { command: "help", description: "Help" },
+      { command: "admin", description: "Admin panel" },
     ],
   });
 }
@@ -148,28 +148,28 @@ export async function handleUpdate(update: TelegramUpdate): Promise<void> {
   const text = (msg.text ?? "").trim();
   const session = getSession(chatId);
 
-  if (text === "❌ ሰርዝ") {
+  if (text === "❌ Cancel") {
     clearSession(chatId);
     if (session.isAdmin) {
-      await sendMessage(chatId, "❌ ተሰርዟል።", adminMenu());
+      await sendMessage(chatId, "❌ Cancelled.", adminMenu());
     } else {
-      await sendMessage(chatId, "❌ ተሰርዟል።", mainMenu(!!session.userId));
+      await sendMessage(chatId, "❌ Cancelled.", mainMenu(!!session.userId));
     }
     return;
   }
 
   if (text === "/start") {
     clearSession(chatId);
-    const firstName = msg.from?.first_name ?? "ወዳጄ";
+    const firstName = msg.from?.first_name ?? "there";
     if (session.userId) {
       const [user] = await db.select({ name: usersTable.name, walletBalance: usersTable.walletBalance }).from(usersTable).where(eq(usersTable.id, session.userId));
       await sendMessage(chatId,
-        `👋 <b>ሰላም ${user?.name ?? firstName}!</b>\n\n💰 ቦርሳ: <b>${user?.walletBalance ?? 0} ETB</b>\n\nምን ማድረግ ትፈልጋለህ?`,
+        `👋 <b>Welcome back, ${user?.name ?? firstName}!</b>\n\n💰 Wallet: <b>${user?.walletBalance ?? 0} ETB</b>\n\nWhat would you like to do?`,
         mainMenu(true)
       );
     } else {
       await sendMessage(chatId,
-        `👋 <b>ሰላም ${firstName}!</b>\n\n🌟 <b>ሜል ማርት</b> እንኳን ደህና መጡ!\n\n💡 ያልተጠቀሙበት Gmail አካውንት ወደ ገንዘብ ይቀይሩ — ለእያንዳንዱ ኢሜይል <b>ተከፋይ ይሁኑ</b>.\n\n👇 ለመጀመር ምዝገባ ወይም ግባ:`,
+        `👋 <b>Hello, ${firstName}!</b>\n\n🌟 Welcome to <b>MailMart</b>!\n\n💡 Turn your unused Gmail accounts into cash — <b>get paid</b> for every email you submit.\n\n👇 Register or login to get started:`,
         mainMenu(false)
       );
     }
@@ -178,13 +178,13 @@ export async function handleUpdate(update: TelegramUpdate): Promise<void> {
 
   if (text === "/admin") {
     setSession(chatId, { step: "await_admin_password" });
-    await sendMessage(chatId, "🔐 አድሚን ፓስወርድ ያስገቡ:", cancelKeyboard());
+    await sendMessage(chatId, "🔐 Enter admin password:", cancelKeyboard());
     return;
   }
 
   if (text === "/help") {
     await sendMessage(chatId,
-      `ℹ️ <b>እርዳታ</b>\n\n📝 <b>ምዝገባ</b> — አዲስ አካውንት ፍጠር\n🔑 <b>ግባ</b> — ወደ አካውንትህ ግባ\n📧 <b>ኢሜይል አስገባ</b> — Gmail አስገባ ለሽያጭ\n💸 <b>ወጪ አውጣ</b> — ገንዘብ ወጪ አድርግ\n📊 <b>መረጃዬ</b> — ቦርሳ እና ስታቲስቲክስ\n\n/start — ወደ ዋና ምናሌ ተመለስ`,
+      `ℹ️ <b>Help</b>\n\n📝 <b>Register</b> — Create a new account\n🔑 <b>Login</b> — Sign in to your account\n📧 <b>Submit Email</b> — Submit a Gmail account for sale\n💸 <b>Withdraw</b> — Withdraw your earnings\n📊 <b>My Profile</b> — View your wallet & stats\n\n/start — Return to the main menu`,
       mainMenu(!!session.userId)
     );
     return;
@@ -224,44 +224,44 @@ export async function handleUpdate(update: TelegramUpdate): Promise<void> {
     case "gen_email_view": await handleGenEmailAction(chatId, text, session.userId!); break;
     default:
       clearSession(chatId);
-      await sendMessage(chatId, "ወደ ዋና ምናሌ ተመለሰሃል። /start", mainMenu(!!session.userId));
+      await sendMessage(chatId, "You've been returned to the main menu. /start", mainMenu(!!session.userId));
   }
 }
 
 async function handleIdleMessage(chatId: string, text: string, session: ReturnType<typeof getSession>): Promise<void> {
   if (!session.userId) {
     switch (text) {
-      case "📝 ምዝገባ":
+      case "📝 Register":
         setSession(chatId, { step: "await_register_name" });
-        await sendMessage(chatId, "📝 <b>ምዝገባ</b>\n\nየማሳያ ስምህን ያስገባ (ለምሳሌ: Abel123):", cancelKeyboard());
+        await sendMessage(chatId, "📝 <b>Register</b>\n\nEnter a display name (e.g. Abel123):", cancelKeyboard());
         break;
-      case "🔑 ግባ":
+      case "🔑 Login":
         setSession(chatId, { step: "await_login_name" });
-        await sendMessage(chatId, "🔑 <b>ግባ</b>\n\nየማሳያ ስምህን ያስገባ:", cancelKeyboard());
+        await sendMessage(chatId, "🔑 <b>Login</b>\n\nEnter your display name:", cancelKeyboard());
         break;
       default:
-        await sendMessage(chatId, "👇 ለመጀመር ምዝገባ ወይም ግባ:", mainMenu(false));
+        await sendMessage(chatId, "👇 Register or login to get started:", mainMenu(false));
     }
     return;
   }
   switch (text) {
-    case "📊 መረጃዬ": await showProfile(chatId, session.userId); break;
-    case "📧 ኢሜይል አስገባ":
+    case "📊 My Profile": await showProfile(chatId, session.userId); break;
+    case "📧 Submit Email":
       setSession(chatId, { step: "await_submit_email" });
-      await sendMessage(chatId, `📧 <b>Gmail አስገባ</b>\n\nየ Gmail አድራሻህን ያስገባ:\n<i>ምሳሌ: example@gmail.com</i>`, cancelKeyboard());
+      await sendMessage(chatId, `📧 <b>Submit Gmail</b>\n\nEnter your Gmail address:\n<i>Example: example@gmail.com</i>`, cancelKeyboard());
       break;
-    case "✨ ኢሜይል ውሰድ": await handleGetEmailMenu(chatId, session.userId!); break;
-    case "💸 ወጪ አውጣ": await startWithdraw(chatId, session.userId); break;
-    case "📋 ሁኔታዎቼ": await showSubmissions(chatId, session.userId); break;
-    case "💼 ወጪዎቼ": await showWithdrawals(chatId, session.userId); break;
-    case "🔗 ሪፈራል": await showReferral(chatId, session.userId); break;
-    case "📢 ማስታወቂያዎች": await showBroadcasts(chatId); break;
-    case "🚪 ውጣ":
+    case "✨ Get Email": await handleGetEmailMenu(chatId, session.userId!); break;
+    case "💸 Withdraw": await startWithdraw(chatId, session.userId); break;
+    case "📋 My Submissions": await showSubmissions(chatId, session.userId); break;
+    case "💼 My Withdrawals": await showWithdrawals(chatId, session.userId); break;
+    case "🔗 Referral": await showReferral(chatId, session.userId); break;
+    case "📢 Announcements": await showBroadcasts(chatId); break;
+    case "🚪 Logout":
       setSession(chatId, { step: "idle", userId: undefined, isAdmin: false });
-      await sendMessage(chatId, "👋 ወጥተሃል። እስከሚቀጥለው!", mainMenu(false));
+      await sendMessage(chatId, "👋 You have been logged out. See you next time!", mainMenu(false));
       break;
     default:
-      await sendMessage(chatId, "👇 ምናሌ ተጠቀም:", mainMenu(true));
+      await sendMessage(chatId, "👇 Use the menu below:", mainMenu(true));
   }
 }
 
@@ -270,7 +270,7 @@ async function showProfile(chatId: string, userId: number): Promise<void> {
     name: usersTable.name, walletBalance: usersTable.walletBalance,
     referralCode: usersTable.referralCode, commissionEarned: usersTable.commissionEarned,
   }).from(usersTable).where(eq(usersTable.id, userId));
-  if (!user) { await sendMessage(chatId, "❌ አካውንት አልተገኘም።", mainMenu(false)); return; }
+  if (!user) { await sendMessage(chatId, "❌ Account not found.", mainMenu(false)); return; }
 
   const [stats] = await db.select({
     total: sql<number>`count(*)::int`,
@@ -279,7 +279,7 @@ async function showProfile(chatId: string, userId: number): Promise<void> {
   }).from(submissionsTable).where(eq(submissionsTable.userId, userId));
 
   await sendMessage(chatId,
-    `📊 <b>የእኔ መረጃ</b>\n\n👤 ስም: <b>${user.name}</b>\n💰 ቦርሳ: <b>${user.walletBalance} ETB</b>\n🏆 ኮሚሽን: <b>${user.commissionEarned} ETB</b>\n\n📧 <b>ሰብሚሽኖች</b>\n• ጠቅላላ: ${stats?.total ?? 0}\n• ✅ ጸድቋል: ${stats?.approved ?? 0}\n• ⏳ በጥበቃ: ${stats?.pending ?? 0}\n\n🔗 ሪፈራል ኮድ: <code>${user.referralCode}</code>`,
+    `📊 <b>My Profile</b>\n\n👤 Name: <b>${user.name}</b>\n💰 Wallet: <b>${user.walletBalance} ETB</b>\n🏆 Commission: <b>${user.commissionEarned} ETB</b>\n\n📧 <b>Submissions</b>\n• Total: ${stats?.total ?? 0}\n• ✅ Approved: ${stats?.approved ?? 0}\n• ⏳ Pending: ${stats?.pending ?? 0}\n\n🔗 Referral Code: <code>${user.referralCode}</code>`,
     mainMenu(true)
   );
 }
@@ -290,7 +290,7 @@ async function showSubmissions(chatId: string, userId: number): Promise<void> {
     pricePaid: submissionsTable.pricePaid, rejectionNote: submissionsTable.rejectionNote,
   }).from(submissionsTable).where(eq(submissionsTable.userId, userId)).orderBy(desc(submissionsTable.createdAt)).limit(10);
 
-  if (rows.length === 0) { await sendMessage(chatId, "📋 እስካሁን ምንም ሰብሚሽን አላቀረብህም።", mainMenu(true)); return; }
+  if (rows.length === 0) { await sendMessage(chatId, "📋 You haven't submitted anything yet.", mainMenu(true)); return; }
 
   const e: Record<string, string> = { pending: "⏳", approved: "✅", rejected: "❌" };
   const lines = rows.map((r) => {
@@ -298,7 +298,7 @@ async function showSubmissions(chatId: string, userId: number): Promise<void> {
     if (r.status === "rejected" && r.rejectionNote) line += `\n   ↳ ${r.rejectionNote}`;
     return line;
   });
-  await sendMessage(chatId, `📋 <b>ሰብሚሽኖቼ</b> (የቅርቡ 10)\n\n${lines.join("\n\n")}`, mainMenu(true));
+  await sendMessage(chatId, `📋 <b>My Submissions</b> (last 10)\n\n${lines.join("\n\n")}`, mainMenu(true));
 }
 
 async function showWithdrawals(chatId: string, userId: number): Promise<void> {
@@ -307,15 +307,15 @@ async function showWithdrawals(chatId: string, userId: number): Promise<void> {
     status: withdrawalsTable.status, adminNote: withdrawalsTable.adminNote,
   }).from(withdrawalsTable).where(eq(withdrawalsTable.userId, userId)).orderBy(desc(withdrawalsTable.createdAt)).limit(10);
 
-  if (rows.length === 0) { await sendMessage(chatId, "💼 እስካሁን ምንም የወጪ ጥያቄ አላቀረብህም።", mainMenu(true)); return; }
+  if (rows.length === 0) { await sendMessage(chatId, "💼 You haven't made any withdrawal requests yet.", mainMenu(true)); return; }
 
   const e: Record<string, string> = { pending: "⏳", completed: "✅", rejected: "❌" };
   const lines = rows.map((r) => {
-    let line = `${e[r.status] ?? "❓"} <b>${r.amount} ETB</b> — ${r.paymentMethod === "telebirr" ? "ቴሌብር" : "ባንክ"}`;
+    let line = `${e[r.status] ?? "❓"} <b>${r.amount} ETB</b> — ${r.paymentMethod === "telebirr" ? "Telebirr" : "Bank"}`;
     if (r.adminNote) line += `\n   ↳ ${r.adminNote}`;
     return line;
   });
-  await sendMessage(chatId, `💼 <b>ወጪዎቼ</b> (የቅርቡ 10)\n\n${lines.join("\n\n")}`, mainMenu(true));
+  await sendMessage(chatId, `💼 <b>My Withdrawals</b> (last 10)\n\n${lines.join("\n\n")}`, mainMenu(true));
 }
 
 async function showReferral(chatId: string, userId: number): Promise<void> {
@@ -323,65 +323,65 @@ async function showReferral(chatId: string, userId: number): Promise<void> {
   const [refCount] = await db.select({ count: sql<number>`count(*)::int` }).from(usersTable).where(eq(usersTable.referredBy, userId));
   const commissionPct = await getCommissionPct();
   await sendMessage(chatId,
-    `🔗 <b>ሪፈራል ፕሮግራም</b>\n\n📌 ሪፈራል ኮድ: <code>${user?.referralCode}</code>\n\n👥 የተጋበዙ ወዳጆች: <b>${refCount?.count ?? 0}</b>\n💰 ኮሚሽን: <b>${user?.commissionEarned ?? 0} ETB</b>\n\n📊 ለእያንዳንዱ ጸድቆ ሰብሚሽን <b>${commissionPct}%</b> ኮሚሽን ታገኛለህ!`,
+    `🔗 <b>Referral Program</b>\n\n📌 Your code: <code>${user?.referralCode}</code>\n\n👥 Friends invited: <b>${refCount?.count ?? 0}</b>\n💰 Commission earned: <b>${user?.commissionEarned ?? 0} ETB</b>\n\n📊 You earn <b>${commissionPct}%</b> commission on every approved submission from your referrals!`,
     mainMenu(true)
   );
 }
 
 async function showBroadcasts(chatId: string): Promise<void> {
   const rows = await db.select({ title: broadcastsTable.title, message: broadcastsTable.message, createdAt: broadcastsTable.createdAt }).from(broadcastsTable).orderBy(desc(broadcastsTable.createdAt)).limit(5);
-  if (rows.length === 0) { await sendMessage(chatId, "📢 አሁን ምንም ማስታወቂያ የለም።", mainMenu(true)); return; }
-  const lines = rows.map((r) => `📢 <b>${r.title}</b>\n${r.message}\n<i>${new Date(r.createdAt).toLocaleDateString("am-ET")}</i>`);
-  await sendMessage(chatId, `📢 <b>ማስታወቂያዎች</b>\n\n${lines.join("\n\n─────────────\n\n")}`, mainMenu(true));
+  if (rows.length === 0) { await sendMessage(chatId, "📢 No announcements right now.", mainMenu(true)); return; }
+  const lines = rows.map((r) => `📢 <b>${r.title}</b>\n${r.message}\n<i>${new Date(r.createdAt).toLocaleDateString("en-US")}</i>`);
+  await sendMessage(chatId, `📢 <b>Announcements</b>\n\n${lines.join("\n\n─────────────\n\n")}`, mainMenu(true));
 }
 
 async function startWithdraw(chatId: string, userId: number): Promise<void> {
   const [user] = await db.select({ walletBalance: usersTable.walletBalance }).from(usersTable).where(eq(usersTable.id, userId));
   if (!user || user.walletBalance < 50) {
-    await sendMessage(chatId, `💸 <b>ወጪ አውጣ</b>\n\n💰 ቦርሳህ: <b>${user?.walletBalance ?? 0} ETB</b>\n\n❌ ቢያንስ <b>50 ETB</b> ሊኖርህ ይገባል።`, mainMenu(true));
+    await sendMessage(chatId, `💸 <b>Withdraw</b>\n\n💰 Your wallet: <b>${user?.walletBalance ?? 0} ETB</b>\n\n❌ You need at least <b>50 ETB</b> to withdraw.`, mainMenu(true));
     return;
   }
   setSession(chatId, { step: "await_withdraw_method" });
-  await sendMessage(chatId, `💸 <b>ወጪ አውጣ</b>\n\n💰 ቦርሳህ: <b>${user.walletBalance} ETB</b>\n\nየክፍያ ዘዴ ምረጥ:`,
-    { reply_markup: { keyboard: [[{ text: "📱 ቴሌብር" }, { text: "🏦 ባንክ" }], [{ text: "❌ ሰርዝ" }]], resize_keyboard: true } }
+  await sendMessage(chatId, `💸 <b>Withdraw</b>\n\n💰 Your wallet: <b>${user.walletBalance} ETB</b>\n\nSelect payment method:`,
+    { reply_markup: { keyboard: [[{ text: "📱 Telebirr" }, { text: "🏦 Bank" }], [{ text: "❌ Cancel" }]], resize_keyboard: true } }
   );
 }
 
 async function handleRegisterName(chatId: string, text: string): Promise<void> {
   const name = text.trim();
-  if (name.length < 3 || name.length > 30) { await sendMessage(chatId, "❌ ስም ከ3 እስከ 30 ፊደላት ሊሆን ይገባል:"); return; }
+  if (name.length < 3 || name.length > 30) { await sendMessage(chatId, "❌ Name must be between 3 and 30 characters:"); return; }
   const [existing] = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.name, name));
-  if (existing) { await sendMessage(chatId, "❌ ይህ ስም ተወስዷል። ሌላ ስም ሞክር:"); return; }
+  if (existing) { await sendMessage(chatId, "❌ That name is already taken. Try another one:"); return; }
   setSession(chatId, { step: "await_register_password", tempName: name });
-  await sendMessage(chatId, `👤 ስም: <b>${name}</b>\n\n🔐 ፓስወርድ ያስገባ (ቢያንስ 6 ፊደል):`);
+  await sendMessage(chatId, `👤 Name: <b>${name}</b>\n\n🔐 Enter a password (at least 6 characters):`);
 }
 
 async function handleRegisterPassword(chatId: string, text: string): Promise<void> {
-  if (text.length < 6) { await sendMessage(chatId, "❌ ፓስወርድ ቢያንስ 6 ፊደል ሊሆን ይገባል:"); return; }
+  if (text.length < 6) { await sendMessage(chatId, "❌ Password must be at least 6 characters:"); return; }
   setSession(chatId, { step: "await_register_confirm_password", tempPassword: text });
-  await sendMessage(chatId, "🔐 ፓስወርድ ደግሞ ያስገባ (ለማረጋገጥ):");
+  await sendMessage(chatId, "🔐 Re-enter your password to confirm:");
 }
 
 async function handleRegisterConfirmPassword(chatId: string, text: string): Promise<void> {
   const session = getSession(chatId);
   if (text !== session.tempPassword) {
     setSession(chatId, { step: "await_register_password", tempPassword: undefined });
-    await sendMessage(chatId, "❌ ፓስወርዱ አልተዛመደም። ፓስወርድ ዳግም ያስገባ:");
+    await sendMessage(chatId, "❌ Passwords do not match. Enter your password again:");
     return;
   }
   setSession(chatId, { step: "await_register_referral" });
-  await sendMessage(chatId, "🔗 ሪፈራል ኮድ አለህ? ካለህ ያስገባ። ከሌለህ <b>ዝለል</b> ተጫን:",
-    { reply_markup: { keyboard: [[{ text: "ዝለል" }], [{ text: "❌ ሰርዝ" }]], resize_keyboard: true } }
+  await sendMessage(chatId, "🔗 Do you have a referral code? Enter it below, or tap <b>Skip</b>:",
+    { reply_markup: { keyboard: [[{ text: "Skip" }], [{ text: "❌ Cancel" }]], resize_keyboard: true } }
   );
 }
 
 async function handleRegisterReferral(chatId: string, text: string): Promise<void> {
   const session = getSession(chatId);
   let referrerId: number | undefined;
-  if (text !== "ዝለል") {
+  if (text !== "Skip") {
     const code = text.trim().toUpperCase();
     const [referrer] = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.referralCode, code));
-    if (!referrer) { await sendMessage(chatId, "❌ ሪፈራል ኮዱ አልተገኘም። ዝለል ተጫን ወይም ትክክለኛ ኮድ ያስገባ:"); return; }
+    if (!referrer) { await sendMessage(chatId, "❌ Referral code not found. Tap Skip or enter a valid code:"); return; }
     referrerId = referrer.id;
   }
 
@@ -401,18 +401,18 @@ async function handleRegisterReferral(chatId: string, text: string): Promise<voi
 
     setSession(chatId, { step: "idle", userId: user.id, tempName: undefined, tempPassword: undefined, isAdmin: false });
     await sendMessage(chatId,
-      `✅ <b>ምዝገባ ተሳካ!</b>\n\n👤 ስም: <b>${user.name}</b>\n🔗 ሪፈራል ኮድ: <code>${newCode}</code>\n\nአሁን Gmail አካውንት ማስገባት ትችላለህ!`,
+      `✅ <b>Registration successful!</b>\n\n👤 Name: <b>${user.name}</b>\n🔗 Referral Code: <code>${newCode}</code>\n\nYou can now submit Gmail accounts!`,
       mainMenu(true)
     );
   } catch {
     clearSession(chatId);
-    await sendMessage(chatId, "❌ ምዝገባ አልተሳካም። ዳግም ሞክር። /start", mainMenu(false));
+    await sendMessage(chatId, "❌ Registration failed. Please try again. /start", mainMenu(false));
   }
 }
 
 async function handleLoginName(chatId: string, text: string): Promise<void> {
   setSession(chatId, { step: "await_login_password", tempName: text.trim() });
-  await sendMessage(chatId, "🔐 ፓስወርድ ያስገባ:");
+  await sendMessage(chatId, "🔐 Enter your password:");
 }
 
 async function handleLoginPassword(chatId: string, text: string): Promise<void> {
@@ -424,26 +424,26 @@ async function handleLoginPassword(chatId: string, text: string): Promise<void> 
 
   if (!user) {
     setSession(chatId, { step: "await_login_name", tempName: undefined });
-    await sendMessage(chatId, "❌ ስም አልተገኘም። ዳግም ሞክር:", cancelKeyboard());
+    await sendMessage(chatId, "❌ Name not found. Try again:", cancelKeyboard());
     return;
   }
-  if (user.isBanned) { clearSession(chatId); await sendMessage(chatId, "⛔ አካውንትህ ታግዷል።", mainMenu(false)); return; }
+  if (user.isBanned) { clearSession(chatId); await sendMessage(chatId, "⛔ Your account has been banned.", mainMenu(false)); return; }
 
   const valid = await bcrypt.compare(text, user.passwordHash);
-  if (!valid) { await sendMessage(chatId, "❌ ፓስወርድ ትክክል አይደለም። ዳግም ሞክር:"); return; }
+  if (!valid) { await sendMessage(chatId, "❌ Incorrect password. Try again:"); return; }
 
   await db.update(usersTable).set({ telegramChatId: chatId }).where(eq(usersTable.id, user.id));
   setSession(chatId, { step: "idle", userId: user.id, tempName: undefined, isAdmin: false });
-  await sendMessage(chatId, `✅ <b>ተገብቷል!</b>\n\n👤 <b>${user.name}</b>\n💰 ቦርሳ: <b>${user.walletBalance} ETB</b>`, mainMenu(true));
+  await sendMessage(chatId, `✅ <b>Logged in!</b>\n\n👤 <b>${user.name}</b>\n💰 Wallet: <b>${user.walletBalance} ETB</b>`, mainMenu(true));
 }
 
 async function handleSubmitEmail(chatId: string, text: string): Promise<void> {
   const email = text.trim().toLowerCase();
-  if (!email.endsWith("@gmail.com")) { await sendMessage(chatId, "❌ ትክክለኛ Gmail አድራሻ ያስገባ (@gmail.com ብቻ):"); return; }
+  if (!email.endsWith("@gmail.com")) { await sendMessage(chatId, "❌ Please enter a valid Gmail address (@gmail.com only):"); return; }
   const [existing] = await db.select({ id: submissionsTable.id }).from(submissionsTable).where(eq(submissionsTable.email, email));
-  if (existing) { await sendMessage(chatId, "❌ ይህ ኢሜይል አስቀድሞ ቀርቧል። ሌላ ሞክር:"); return; }
+  if (existing) { await sendMessage(chatId, "❌ This email has already been submitted. Try another one:"); return; }
   setSession(chatId, { step: "await_submit_password", tempEmail: email });
-  await sendMessage(chatId, `📧 ኢሜይል: <code>${email}</code>\n\n🔑 የዚሁ Gmail ፓስወርድ ያስገባ:`);
+  await sendMessage(chatId, `📧 Email: <code>${email}</code>\n\n🔑 Enter the password for this Gmail account:`);
 }
 
 async function handleSubmitPassword(chatId: string, text: string): Promise<void> {
@@ -451,14 +451,14 @@ async function handleSubmitPassword(chatId: string, text: string): Promise<void>
   const email = session.tempEmail!;
   const password = text.trim();
 
-  await sendMessage(chatId, `⏳ <b>Gmail ፍተሻ ላይ ነን...</b>\n\n📧 <code>${email}</code>\n\nትንሽ ይጠብቁ።`);
+  await sendMessage(chatId, `⏳ <b>Verifying Gmail...</b>\n\n📧 <code>${email}</code>\n\nPlease wait.`);
 
   const verifyResult = await verifyGmailAccount(email.toLowerCase(), password);
 
   if (verifyResult.verified === false && verifyResult.reason === "not_registered") {
     await sendMessage(
       chatId,
-      `❌ <b>Gmail አካውንት አልተፈጠረም!</b>\n\n📧 ኢሜይል: <code>${email}</code>\n\n⚠️ ይህ ኢሜይል Gmail ላይ አልተፈጠረም ወይም ፓስወርዱ ስህተት ነው።\n\n👉 Gmail ላይ ተመዝግበህ ከጨረስክ በኋላ እንደገና ሞክር።`,
+      `❌ <b>Gmail account not found!</b>\n\n📧 Email: <code>${email}</code>\n\n⚠️ This email does not exist on Gmail or the password is incorrect.\n\n👉 Please try again after registering the account on Gmail.`,
       mainMenu(true)
     );
     clearSession(chatId);
@@ -483,7 +483,7 @@ async function handleSubmitPassword(chatId: string, text: string): Promise<void>
 
   clearSession(chatId);
   await sendMessage(chatId,
-    `✅ <b>ሰብሚሽን ተቀብሏል!</b>\n\n📧 ኢሜይል: <code>${row.email}</code>\n💰 ዋጋ: <b>${row.pricePaid} ETB</b> (ሲጸድቅ ይታከላል)\n\n⏳ ሲጸድቅ ወዲያው ትነገርለህ!`,
+    `✅ <b>Submission received!</b>\n\n📧 Email: <code>${row.email}</code>\n💰 Price: <b>${row.pricePaid} ETB</b> (added once approved)\n\n⏳ You will be notified as soon as it is reviewed!`,
     mainMenu(true)
   );
 }
@@ -495,12 +495,12 @@ function genEmailClaimedKeyboard(emailOpened: boolean): Record<string, unknown> 
     reply_markup: {
       keyboard: emailOpened
         ? [
-            [{ text: "📤 ሰብሚት አድርግ" }],
-            [{ text: "↩️ ኢሜይሉን መልስ" }, { text: "❌ ሰርዝ" }],
+            [{ text: "📤 Submit" }],
+            [{ text: "↩️ Return Email" }, { text: "❌ Cancel" }],
           ]
         : [
-            [{ text: "📧 Gmail ከፈቻለሁ" }],
-            [{ text: "↩️ ኢሜይሉን መልስ" }, { text: "❌ ሰርዝ" }],
+            [{ text: "📧 I Opened Gmail" }],
+            [{ text: "↩️ Return Email" }, { text: "❌ Cancel" }],
           ],
       resize_keyboard: true,
       one_time_keyboard: false,
@@ -511,7 +511,7 @@ function genEmailClaimedKeyboard(emailOpened: boolean): Record<string, unknown> 
 function genEmailConfirmKeyboard(): Record<string, unknown> {
   return {
     reply_markup: {
-      keyboard: [[{ text: "✅ ወሰድ" }, { text: "❌ ሰርዝ" }]],
+      keyboard: [[{ text: "✅ Take it" }, { text: "❌ Cancel" }]],
       resize_keyboard: true,
       one_time_keyboard: false,
     },
@@ -533,26 +533,25 @@ async function getClaimedEmail(userId: number): Promise<GenEmailRow | null> {
 }
 
 function buildClaimedEmailMessage(row: GenEmailRow): string {
-  const nameLine = row.name ? `\n👤 ስም: <code>${row.name}</code>` : "";
+  const nameLine = row.name ? `\n👤 Name: <code>${row.name}</code>` : "";
   const openedStatus = row.email_opened
-    ? "✅ Gmail ከፍተዋል — አሁን ሰብሚት ማድረግ ይችላሉ!"
-    : "⚠️ <b>ከሰብሚት በፊት Gmail መክፈት ግዴታ ነው!</b>";
+    ? "✅ Gmail opened — you can now submit!"
+    : "⚠️ <b>You must open Gmail before submitting!</b>";
   return (
-    `✨ <b>የእርስዎ ኢሜይል</b>${nameLine}\n` +
+    `✨ <b>Your Email</b>${nameLine}\n` +
     `📧 <code>${row.email}</code>\n` +
     `🔑 <code>${row.password}</code>\n\n` +
     `${openedStatus}\n\n` +
-    `📋 <b>ደረጃዎች:</b>\n` +
-    `1️⃣ ኢሜሉን እና ፓስወርዱን ኮፒ ያድርጉ\n` +
-    `2️⃣ Gmail ክፈቱ (accounts.google.com) → አዲስ ምዝገባ\n` +
-    `3️⃣ ምዝገባ ካጠናቀቁ <b>"📧 Gmail ከፈቻለሁ"</b> ይጫኑ\n` +
-    `4️⃣ <b>"📤 ሰብሚት አድርግ"</b> ይጫኑ`
+    `📋 <b>Steps:</b>\n` +
+    `1️⃣ Copy the email and password above\n` +
+    `2️⃣ Go to Gmail (accounts.google.com) → Create account\n` +
+    `3️⃣ After signing up, tap <b>"📧 I Opened Gmail"</b>\n` +
+    `4️⃣ Tap <b>"📤 Submit"</b>`
   );
 }
 
-// Entry point: user taps "✨ ኢሜይል ውሰድ"
+// Entry point: user taps "✨ Get Email"
 async function handleGetEmailMenu(chatId: string, userId: number): Promise<void> {
-  // Check if user already has a claimed email
   const existing = await getClaimedEmail(userId);
   if (existing) {
     setSession(chatId, { step: "gen_email_view" });
@@ -560,7 +559,6 @@ async function handleGetEmailMenu(chatId: string, userId: number): Promise<void>
     return;
   }
 
-  // Show available count + warning
   const { rows } = await pool.query(
     "SELECT COUNT(*)::int AS count FROM generated_emails WHERE status = 'available'"
   );
@@ -568,7 +566,7 @@ async function handleGetEmailMenu(chatId: string, userId: number): Promise<void>
 
   if (count === 0) {
     await sendMessage(chatId,
-      `😔 <b>አሁን ዝግጁ ኢሜይል የለም።</b>\n\nቆይተው እንደገና ይሞክሩ።`,
+      `😔 <b>No emails available right now.</b>\n\nPlease check back later.`,
       mainMenu(true)
     );
     return;
@@ -576,25 +574,24 @@ async function handleGetEmailMenu(chatId: string, userId: number): Promise<void>
 
   setSession(chatId, { step: "gen_email_confirm" });
   await sendMessage(chatId,
-    `✨ <b>ኢሜይል ውሰድ</b>\n\n` +
-    `📦 ዝግጁ ኢሜይሎች: <b>${count}</b>\n\n` +
-    `⚠️ <b>ማስጠንቀቂያ — ከመቀጠልዎ በፊት ያንብቡ!</b>\n\n` +
-    `• ኢሜሉን ሲወስዱ <b>ትክክለኛ Gmail ምዝገባ</b> ማድረግ ግዴታ ነው\n` +
-    `• ሳይከፍቱ ሰብሚት ቢያደርጉ — <b>አካውንትዎ ይታገዳል!</b>\n\n` +
-    `"✅ ወሰድ" ተጭነው ኢሜይሉን ይውሰዱ።`,
+    `✨ <b>Get Email</b>\n\n` +
+    `📦 Available emails: <b>${count}</b>\n\n` +
+    `⚠️ <b>Warning — please read before continuing!</b>\n\n` +
+    `• You must complete a <b>real Gmail sign-up</b> with the assigned email\n` +
+    `• Submitting without opening Gmail will get your <b>account banned!</b>\n\n` +
+    `Tap <b>"✅ Take it"</b> to claim your email.`,
     genEmailConfirmKeyboard()
   );
 }
 
-// Step: gen_email_confirm — waiting for "✅ ወሰድ" or "❌ ሰርዝ"
+// Step: gen_email_confirm — waiting for "✅ Take it" or "❌ Cancel"
 async function handleGenEmailConfirm(chatId: string, text: string, userId: number): Promise<void> {
-  if (text !== "✅ ወሰድ") {
+  if (text !== "✅ Take it") {
     clearSession(chatId);
-    await sendMessage(chatId, "❌ ተሰርዟል።", mainMenu(true));
+    await sendMessage(chatId, "❌ Cancelled.", mainMenu(true));
     return;
   }
 
-  // Check again — no double-claim
   const existing = await getClaimedEmail(userId);
   if (existing) {
     setSession(chatId, { step: "gen_email_view" });
@@ -602,7 +599,6 @@ async function handleGenEmailConfirm(chatId: string, text: string, userId: numbe
     return;
   }
 
-  // Claim one
   const { rows } = await pool.query(
     `UPDATE generated_emails
      SET status = 'claimed', claimed_by = $1, claimed_at = NOW()
@@ -616,7 +612,7 @@ async function handleGenEmailConfirm(chatId: string, text: string, userId: numbe
 
   if (rows.length === 0) {
     clearSession(chatId);
-    await sendMessage(chatId, "😔 <b>ኢሜይል አልተገኘም።</b> ሌላ ሰው ወስዶታል — እንደገና ሞክሩ።", mainMenu(true));
+    await sendMessage(chatId, "😔 <b>No email available.</b> Someone else just took it — please try again.", mainMenu(true));
     return;
   }
 
@@ -625,61 +621,60 @@ async function handleGenEmailConfirm(chatId: string, text: string, userId: numbe
   await sendMessage(chatId, buildClaimedEmailMessage(row), genEmailClaimedKeyboard(row.email_opened));
 }
 
-// Step: gen_email_view — "📧 Gmail ከፈቻለሁ" | "📤 ሰብሚት አድርግ" | "↩️ ኢሜይሉን መልስ"
+// Step: gen_email_view — "📧 I Opened Gmail" | "📤 Submit" | "↩️ Return Email"
 async function handleGenEmailAction(chatId: string, text: string, userId: number): Promise<void> {
   const row = await getClaimedEmail(userId);
   if (!row) {
     clearSession(chatId);
-    await sendMessage(chatId, "⚠️ ኢሜይሉ አልተገኘም። ዳግም ይሞክሩ።", mainMenu(true));
+    await sendMessage(chatId, "⚠️ Email not found. Please try again.", mainMenu(true));
     return;
   }
 
-  if (text === "📧 Gmail ከፈቻለሁ") {
+  if (text === "📧 I Opened Gmail") {
     await pool.query(
       "UPDATE generated_emails SET email_opened = TRUE WHERE id = $1 AND claimed_by = $2",
       [row.id, userId]
     );
     await sendMessage(chatId,
-      `✅ <b>ተመዝግቧል!</b>\n\n📧 <code>${row.email}</code>\n🔑 <code>${row.password}</code>\n\n` +
-      `✅ Gmail ከፍተዋል — አሁን <b>"📤 ሰብሚት አድርግ"</b> ይጫኑ!`,
+      `✅ <b>Confirmed!</b>\n\n📧 <code>${row.email}</code>\n🔑 <code>${row.password}</code>\n\n` +
+      `✅ Gmail opened — now tap <b>"📤 Submit"</b>!`,
       genEmailClaimedKeyboard(true)
     );
     return;
   }
 
-  if (text === "↩️ ኢሜይሉን መልስ") {
+  if (text === "↩️ Return Email") {
     await pool.query(
       `UPDATE generated_emails SET status = 'available', claimed_by = NULL,
        claimed_at = NULL, email_opened = FALSE WHERE id = $1 AND claimed_by = $2`,
       [row.id, userId]
     );
     clearSession(chatId);
-    await sendMessage(chatId, "↩️ ኢሜይሉ ተመልሷል።", mainMenu(true));
+    await sendMessage(chatId, "↩️ Email returned successfully.", mainMenu(true));
     return;
   }
 
-  if (text === "📤 ሰብሚት አድርግ") {
+  if (text === "📤 Submit") {
     if (!row.email_opened) {
       await sendMessage(chatId,
-        `⚠️ <b>ቅድሚያ Gmail መክፈት ያስፈልጋል!</b>\n\n` +
-        `"📧 Gmail ከፈቻለሁ" ከጫኑ በኋላ ሰብሚት ማድረግ ይችላሉ።`,
+        `⚠️ <b>You must open Gmail first!</b>\n\n` +
+        `Tap <b>"📧 I Opened Gmail"</b> after signing up, then submit.`,
         genEmailClaimedKeyboard(false)
       );
       return;
     }
 
-    await sendMessage(chatId, `⏳ <b>Gmail ፍተሻ ላይ ነን...</b>\n\nትንሽ ይጠብቁ።`);
+    await sendMessage(chatId, `⏳ <b>Verifying Gmail...</b>\n\nPlease wait.`);
 
     const verifyResult = await verifyGmailAccount(row.email.toLowerCase(), row.password);
 
     if (verifyResult.verified === false && verifyResult.reason === "not_registered") {
       await sendMessage(chatId,
-        `❌ <b>Gmail አካውንት አልተፈጠረም!</b>\n\n📧 <code>${row.email}</code>\n\n` +
-        `ኢሜሉ Gmail ላይ አልተፈጠረም ወይም ፓስወርዱ ትክክል አይደለም።\n\n` +
-        `👉 Gmail ላይ ተመዝግበህ ከጨረስህ በኋላ <b>"📧 Gmail ከፈቻለሁ"</b> ብለህ ሰብሚት ሞክር።`,
+        `❌ <b>Gmail account not found!</b>\n\n📧 <code>${row.email}</code>\n\n` +
+        `This email was not registered on Gmail or the password is incorrect.\n\n` +
+        `👉 Complete the Gmail sign-up, then tap <b>"📧 I Opened Gmail"</b> and try submitting again.`,
         genEmailClaimedKeyboard(false)
       );
-      // reset email_opened so they have to re-confirm
       await pool.query("UPDATE generated_emails SET email_opened = FALSE WHERE id = $1", [row.id]);
       return;
     }
@@ -688,7 +683,6 @@ async function handleGenEmailAction(chatId: string, text: string, userId: number
       logger.warn({ chatId, emailId: row.id }, "Gmail IMAP network error in gen_email bot flow — allowing");
     }
 
-    // Check for duplicate submission
     const { rows: existingSub } = await pool.query(
       "SELECT id FROM submissions WHERE email = $1",
       [row.email.toLowerCase()]
@@ -696,7 +690,7 @@ async function handleGenEmailAction(chatId: string, text: string, userId: number
     if (existingSub.length > 0) {
       await pool.query("UPDATE generated_emails SET status = 'submitted' WHERE id = $1", [row.id]);
       clearSession(chatId);
-      await sendMessage(chatId, "⚠️ ይህ ኢሜይል አስቀድሞ ቀርቧል።", mainMenu(true));
+      await sendMessage(chatId, "⚠️ This email has already been submitted.", mainMenu(true));
       return;
     }
 
@@ -722,61 +716,61 @@ async function handleGenEmailAction(chatId: string, text: string, userId: number
 
     clearSession(chatId);
     await sendMessage(chatId,
-      `✅ <b>ሰብሚሽን ተቀብሏል!</b>\n\n📧 ኢሜይል: <code>${subRows[0].email}</code>\n` +
-      `💰 ዋጋ: <b>${price} ETB</b> (ሲጸድቅ ይታከላል)\n\n⏳ ሲጸድቅ ወዲያው ትነገርለህ!`,
+      `✅ <b>Submission received!</b>\n\n📧 Email: <code>${subRows[0].email}</code>\n` +
+      `💰 Price: <b>${price} ETB</b> (added once approved)\n\n⏳ You will be notified once it is reviewed!`,
       mainMenu(true)
     );
     return;
   }
 
-  // Unknown button
+  // Unknown button — re-show current state
   await sendMessage(chatId, buildClaimedEmailMessage(row), genEmailClaimedKeyboard(row.email_opened));
 }
 
 async function handleWithdrawMethod(chatId: string, text: string): Promise<void> {
-  if (text === "📱 ቴሌብር") {
+  if (text === "📱 Telebirr") {
     setSession(chatId, { step: "await_withdraw_amount", tempWithdrawMethod: "telebirr" });
-    await sendMessage(chatId, "💸 ምን ያህል ETB ወጪ ማድረግ ትፈልጋለህ? (ቢያንስ 50 ETB):", cancelKeyboard());
-  } else if (text === "🏦 ባንክ") {
+    await sendMessage(chatId, "💸 How much ETB would you like to withdraw? (Minimum 50 ETB):", cancelKeyboard());
+  } else if (text === "🏦 Bank") {
     setSession(chatId, { step: "await_withdraw_amount", tempWithdrawMethod: "bank" });
-    await sendMessage(chatId, "💸 ምን ያህል ETB ወጪ ማድረግ ትፈልጋለህ? (ቢያንስ 50 ETB):", cancelKeyboard());
+    await sendMessage(chatId, "💸 How much ETB would you like to withdraw? (Minimum 50 ETB):", cancelKeyboard());
   } else {
-    await sendMessage(chatId, "📱 ቴሌብር ወይም 🏦 ባንክ ምረጥ:");
+    await sendMessage(chatId, "Please select 📱 Telebirr or 🏦 Bank:");
   }
 }
 
 async function handleWithdrawAmount(chatId: string, text: string): Promise<void> {
   const session = getSession(chatId);
   const amount = parseInt(text, 10);
-  if (isNaN(amount) || amount < 50) { await sendMessage(chatId, "❌ ቢያንስ 50 ETB ያስገባ:"); return; }
+  if (isNaN(amount) || amount < 50) { await sendMessage(chatId, "❌ Please enter at least 50 ETB:"); return; }
   const [user] = await db.select({ walletBalance: usersTable.walletBalance }).from(usersTable).where(eq(usersTable.id, session.userId!));
   if (!user || user.walletBalance < amount) {
     clearSession(chatId);
-    await sendMessage(chatId, `❌ በቂ ቦርሳ የለህም። ቦርሳህ: <b>${user?.walletBalance ?? 0} ETB</b>`, mainMenu(true));
+    await sendMessage(chatId, `❌ Insufficient balance. Your wallet: <b>${user?.walletBalance ?? 0} ETB</b>`, mainMenu(true));
     return;
   }
   setSession(chatId, { tempWithdrawAmount: amount });
   if (session.tempWithdrawMethod === "telebirr") {
     setSession(chatId, { step: "await_withdraw_telebirr_number" });
-    await sendMessage(chatId, "📱 የቴሌብር ስልክ ቁጥርህን ያስገባ (ምሳሌ: 0912345678):");
+    await sendMessage(chatId, "📱 Enter your Telebirr phone number (e.g. 0912345678):");
   } else {
     setSession(chatId, { step: "await_withdraw_bank_name" });
-    await sendMessage(chatId, "🏦 የባንክ ስምህን ያስገባ (ምሳሌ: CBE, Awash, Abyssinia):");
+    await sendMessage(chatId, "🏦 Enter your bank name (e.g. CBE, Awash, Abyssinia):");
   }
 }
 
 async function handleWithdrawTelebirrNumber(chatId: string, text: string): Promise<void> {
   const num = text.trim().replace(/\s/g, "");
   if (!/^0[79]\d{8}$/.test(num) && !/^\+2519\d{8}$/.test(num)) {
-    await sendMessage(chatId, "❌ ትክክለኛ ስልክ ቁጥር ያስገባ (ምሳሌ: 0912345678):"); return;
+    await sendMessage(chatId, "❌ Please enter a valid phone number (e.g. 0912345678):"); return;
   }
   setSession(chatId, { step: "await_withdraw_telebirr_name", tempWithdrawTelebirrNumber: num });
-  await sendMessage(chatId, "👤 ሙሉ ስምህን (በቴሌብር ላይ ያለ) ያስገባ:");
+  await sendMessage(chatId, "👤 Enter your full name (as registered on Telebirr):");
 }
 
 async function handleWithdrawTelebirrName(chatId: string, text: string): Promise<void> {
   const session = getSession(chatId);
-  if (text.trim().length < 2) { await sendMessage(chatId, "❌ ትክክለኛ ስም ያስገባ:"); return; }
+  if (text.trim().length < 2) { await sendMessage(chatId, "❌ Please enter a valid name:"); return; }
   await finalizeWithdrawal(chatId, {
     userId: session.userId!, amount: session.tempWithdrawAmount!, paymentMethod: "telebirr",
     telebirrNumber: session.tempWithdrawTelebirrNumber!, telebirrName: text.trim(),
@@ -785,17 +779,17 @@ async function handleWithdrawTelebirrName(chatId: string, text: string): Promise
 
 async function handleWithdrawBankName(chatId: string, text: string): Promise<void> {
   setSession(chatId, { step: "await_withdraw_bank_account_number", tempWithdrawBankName: text.trim() });
-  await sendMessage(chatId, "💳 የባንክ አካውንት ቁጥርህን ያስገባ:");
+  await sendMessage(chatId, "💳 Enter your bank account number:");
 }
 
 async function handleWithdrawBankAccountNumber(chatId: string, text: string): Promise<void> {
   setSession(chatId, { step: "await_withdraw_bank_account_name", tempWithdrawBankAccountNumber: text.trim() });
-  await sendMessage(chatId, "👤 ሙሉ ስምህን (በባንክ ላይ ያለ) ያስገባ:");
+  await sendMessage(chatId, "👤 Enter your full name (as registered at the bank):");
 }
 
 async function handleWithdrawBankAccountName(chatId: string, text: string): Promise<void> {
   const session = getSession(chatId);
-  if (text.trim().length < 2) { await sendMessage(chatId, "❌ ትክክለኛ ስም ያስገባ:"); return; }
+  if (text.trim().length < 2) { await sendMessage(chatId, "❌ Please enter a valid name:"); return; }
   await finalizeWithdrawal(chatId, {
     userId: session.userId!, amount: session.tempWithdrawAmount!, paymentMethod: "bank",
     bankName: session.tempWithdrawBankName, bankAccountNumber: session.tempWithdrawBankAccountNumber,
@@ -810,7 +804,7 @@ async function finalizeWithdrawal(chatId: string, data: {
 }): Promise<void> {
   const [user] = await db.select({ walletBalance: usersTable.walletBalance }).from(usersTable).where(eq(usersTable.id, data.userId));
   if (!user || user.walletBalance < data.amount) {
-    clearSession(chatId); await sendMessage(chatId, `❌ በቂ ቦርሳ የለህም።`, mainMenu(true)); return;
+    clearSession(chatId); await sendMessage(chatId, `❌ Insufficient balance.`, mainMenu(true)); return;
   }
   await db.update(usersTable).set({ walletBalance: user.walletBalance - data.amount }).where(eq(usersTable.id, data.userId));
   await db.insert(withdrawalsTable).values({
@@ -821,10 +815,10 @@ async function finalizeWithdrawal(chatId: string, data: {
   });
   clearSession(chatId);
   const payInfo = data.paymentMethod === "telebirr"
-    ? `📱 ቴሌብር: <code>${data.telebirrNumber}</code>`
-    : `🏦 ባንክ: ${data.bankName} — <code>${data.bankAccountNumber}</code>`;
+    ? `📱 Telebirr: <code>${data.telebirrNumber}</code>`
+    : `🏦 Bank: ${data.bankName} — <code>${data.bankAccountNumber}</code>`;
   await sendMessage(chatId,
-    `✅ <b>የወጪ ጥያቄ ተቀብሏል!</b>\n\n💰 መጠን: <b>${data.amount} ETB</b>\n${payInfo}\n\n⏳ አድሚን ሲያጸድቀው ትነገርለሃለህ!`,
+    `✅ <b>Withdrawal request submitted!</b>\n\n💰 Amount: <b>${data.amount} ETB</b>\n${payInfo}\n\n⏳ You will be notified once the admin processes it!`,
     mainMenu(true)
   );
 }
@@ -832,61 +826,61 @@ async function finalizeWithdrawal(chatId: string, data: {
 async function handleAdminPassword(chatId: string, text: string): Promise<void> {
   const DEFAULT_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "mailtrade@admin2024";
   const [row] = await db.select({ value: settingsTable.value }).from(settingsTable).where(eq(settingsTable.key, "admin_password_hash"));
-  let valid = row ? await bcrypt.compare(text, row.value) : text === DEFAULT_ADMIN_PASSWORD;
+  const valid = row ? await bcrypt.compare(text, row.value) : text === DEFAULT_ADMIN_PASSWORD;
   if (!valid) {
     clearSession(chatId);
     const s = getSession(chatId);
-    await sendMessage(chatId, "❌ ፓስወርድ ትክክል አይደለም።", mainMenu(!!s.userId));
+    await sendMessage(chatId, "❌ Incorrect password.", mainMenu(!!s.userId));
     return;
   }
   setSession(chatId, { step: "admin_idle", isAdmin: true });
-  await sendMessage(chatId, `🔐 <b>አድሚን ፓነል</b>\n\nእንኳን ደህና መጡ!`, adminMenu());
+  await sendMessage(chatId, `🔐 <b>Admin Panel</b>\n\nWelcome!`, adminMenu());
 }
 
 async function handleAdminMessage(chatId: string, text: string, session: ReturnType<typeof getSession>): Promise<void> {
   switch (text) {
-    case "⏳ ጠቅላላ ሁኔታ": await showAdminStats(chatId); break;
-    case "📬 ሰብሚሽኖች": await showAdminSubmissions(chatId); break;
-    case "✅ አጸድቅ":
+    case "⏳ Overview": await showAdminStats(chatId); break;
+    case "📬 Submissions": await showAdminSubmissions(chatId); break;
+    case "✅ Approve":
       setSession(chatId, { step: "await_admin_approve_id" });
-      await sendMessage(chatId, "✅ የሚጸድቀው ሰብሚሽን ID ያስገባ:", cancelKeyboard()); break;
-    case "❌ ውደቅ":
+      await sendMessage(chatId, "✅ Enter the submission ID to approve:", cancelKeyboard()); break;
+    case "❌ Reject":
       setSession(chatId, { step: "await_admin_reject_id" });
-      await sendMessage(chatId, "❌ የሚወደቀው ሰብሚሽን ID ያስገባ:", cancelKeyboard()); break;
-    case "💸 የወጪ ጥያቄዎች": await showAdminWithdrawals(chatId); break;
-    case "💳 ወጪ አስተዳድር":
+      await sendMessage(chatId, "❌ Enter the submission ID to reject:", cancelKeyboard()); break;
+    case "💸 Withdrawals": await showAdminWithdrawals(chatId); break;
+    case "💳 Manage Withdrawal":
       setSession(chatId, { step: "await_admin_withdrawal_id" });
-      await sendMessage(chatId, "💳 የወጪ ID ያስገባ:", cancelKeyboard()); break;
-    case "👥 ዩዘሮች": await showAdminUsers(chatId); break;
-    case "🚫 ዩዘር ታጠቅ/ፍታ":
+      await sendMessage(chatId, "💳 Enter withdrawal ID:", cancelKeyboard()); break;
+    case "👥 Users": await showAdminUsers(chatId); break;
+    case "🚫 Ban/Unban User":
       setSession(chatId, { step: "await_admin_ban_id" });
-      await sendMessage(chatId, "🚫 የሚታጠቀው/የሚፈታው ዩዘር ID ያስገባ:", cancelKeyboard()); break;
-    case "📢 ብሮድካስት":
+      await sendMessage(chatId, "🚫 Enter the user ID to ban or unban:", cancelKeyboard()); break;
+    case "📢 Broadcast":
       setSession(chatId, { step: "await_admin_broadcast_title" });
-      await sendMessage(chatId, "📢 የብሮድካስት ርዕስ ያስገባ:", cancelKeyboard()); break;
-    case "⚙️ ቅንብሮች": await showAdminSettings(chatId); break;
-    case "💰 ዋጋ ቀይር":
+      await sendMessage(chatId, "📢 Enter the broadcast title:", cancelKeyboard()); break;
+    case "⚙️ Settings": await showAdminSettings(chatId); break;
+    case "💰 Change Price":
       setSession(chatId, { step: "await_admin_settings_price" });
-      await sendMessage(chatId, "💰 አዲሱ ዋጋ በETB ያስገባ:", cancelKeyboard()); break;
-    case "📊 ኮሚሽን ቀይር":
+      await sendMessage(chatId, "💰 Enter the new price in ETB:", cancelKeyboard()); break;
+    case "📊 Change Commission":
       setSession(chatId, { step: "await_admin_settings_commission" });
-      await sendMessage(chatId, "📊 አዲሱ ሪፈራል ኮሚሽን % ያስገባ (ምሳሌ: 10):", cancelKeyboard()); break;
-    case "🔑 ፓስወርድ ቀይር":
+      await sendMessage(chatId, "📊 Enter the new referral commission % (e.g. 10):", cancelKeyboard()); break;
+    case "🔑 Change Password":
       setSession(chatId, { step: "await_admin_new_password" });
-      await sendMessage(chatId, "🔑 አዲሱ አድሚን ፓስወርድ ያስገባ (ቢያንስ 8 ፊደል):", cancelKeyboard()); break;
-    case "📤 ኤክስፖርት": await showAdminExport(chatId); break;
-    case "📋 ሁሉም ሰብሚሽን": await exportData(chatId, "submissions"); break;
-    case "✅ ጸድቆ ሰብሚሽን": await exportData(chatId, "approved-submissions"); break;
-    case "💸 ወጪዎች ኤክስፖርት": await exportData(chatId, "withdrawals"); break;
-    case "👥 ዩዘሮች ኤክስፖርት": await exportData(chatId, "users"); break;
-    case "🚪 ወደ ዩዘር ሂድ":
+      await sendMessage(chatId, "🔑 Enter the new admin password (at least 8 characters):", cancelKeyboard()); break;
+    case "📤 Export": await showAdminExport(chatId); break;
+    case "📋 All Submissions": await exportData(chatId, "submissions"); break;
+    case "✅ Approved Submissions": await exportData(chatId, "approved-submissions"); break;
+    case "💸 Export Withdrawals": await exportData(chatId, "withdrawals"); break;
+    case "👥 Export Users": await exportData(chatId, "users"); break;
+    case "🚪 Go to User":
       setSession(chatId, { step: "idle", isAdmin: false });
-      await sendMessage(chatId, "👤 ወደ ዩዘር ምናሌ ተመልሰሃል።", mainMenu(!!session.userId)); break;
-    case "🚪 ወደ ምናሌ":
+      await sendMessage(chatId, "👤 Switched to user mode.", mainMenu(!!session.userId)); break;
+    case "🚪 Back to Menu":
       setSession(chatId, { step: "admin_idle", isAdmin: true });
-      await sendMessage(chatId, "🔐 አድሚን ፓነል:", adminMenu()); break;
+      await sendMessage(chatId, "🔐 Admin Panel:", adminMenu()); break;
     default:
-      await sendMessage(chatId, "ምናሌ ተጠቀም:", adminMenu());
+      await sendMessage(chatId, "Use the menu below:", adminMenu());
   }
 }
 
@@ -904,7 +898,7 @@ async function showAdminStats(chatId: string): Promise<void> {
   const [wdStats] = await db.select({ pending: sql<number>`count(*) filter (where ${withdrawalsTable.status} = 'pending')::int` }).from(withdrawalsTable);
 
   await sendMessage(chatId,
-    `⏳ <b>ጠቅላላ ሁኔታ</b>\n\n👥 ዩዘሮች: <b>${userCount.count}</b> (${userCount.botUsers} ቦቱ ላይ)\n\n📬 ሰብሚሽኖች:\n• ጠቅላላ: ${subStats.total}\n• ⏳ ጠብቋቸው: ${subStats.pending}\n• ✅ ጸድቋቸው: ${subStats.approved}\n• 💰 ጠቅላላ ክፍያ: ${subStats.totalPayout} ETB\n\n💸 ⏳ ጠቅቷቸው ወጪ: <b>${wdStats.pending}</b>`,
+    `⏳ <b>Overview</b>\n\n👥 Users: <b>${userCount.count}</b> (${userCount.botUsers} via bot)\n\n📬 Submissions:\n• Total: ${subStats.total}\n• ⏳ Pending: ${subStats.pending}\n• ✅ Approved: ${subStats.approved}\n• 💰 Total Paid: ${subStats.totalPayout} ETB\n\n💸 ⏳ Pending Withdrawals: <b>${wdStats.pending}</b>`,
     adminMenu()
   );
 }
@@ -917,25 +911,25 @@ async function showAdminSubmissions(chatId: string): Promise<void> {
   }).from(submissionsTable).leftJoin(usersTable, eq(submissionsTable.userId, usersTable.id))
     .where(eq(submissionsTable.status, "pending")).orderBy(submissionsTable.createdAt).limit(10);
 
-  if (rows.length === 0) { await sendMessage(chatId, "✅ ምንም ጠቅቷቸው ሰብሚሽን የለም!", adminMenu()); return; }
+  if (rows.length === 0) { await sendMessage(chatId, "✅ No pending submissions!", adminMenu()); return; }
 
   const lines = rows.map((r) =>
     `🆔 <b>#${r.id}</b> | 👤 ${r.userName ?? "?"}\n📧 <code>${r.email}</code>\n🔑 <code>${r.password}</code>\n💰 ${r.pricePaid} ETB`
   );
   await sendMessage(chatId,
-    `📬 <b>ጠቅቷቸው ሰብሚሽኖች (${rows.length})</b>\n\n${lines.join("\n\n─────────────────\n\n")}`,
-    { reply_markup: { keyboard: [[{ text: "✅ አጸድቅ" }, { text: "❌ ውደቅ" }], [{ text: "📬 ሰብሚሽኖች" }, { text: "🚪 ወደ ምናሌ" }]], resize_keyboard: true } }
+    `📬 <b>Pending Submissions (${rows.length})</b>\n\n${lines.join("\n\n─────────────────\n\n")}`,
+    { reply_markup: { keyboard: [[{ text: "✅ Approve" }, { text: "❌ Reject" }], [{ text: "📬 Submissions" }, { text: "🚪 Back to Menu" }]], resize_keyboard: true } }
   );
 }
 
 async function handleAdminApproveId(chatId: string, text: string): Promise<void> {
   const id = parseInt(text, 10);
-  if (isNaN(id)) { await sendMessage(chatId, "❌ ትክክለኛ ID ያስገባ:"); return; }
+  if (isNaN(id)) { await sendMessage(chatId, "❌ Please enter a valid ID:"); return; }
   const [existing] = await db.select().from(submissionsTable).where(eq(submissionsTable.id, id));
-  if (!existing) { await sendMessage(chatId, `❌ ሰብሚሽን #${id} አልተገኘም:`); return; }
+  if (!existing) { await sendMessage(chatId, `❌ Submission #${id} not found:`); return; }
   if (existing.status === "approved") {
     setSession(chatId, { step: "admin_idle", isAdmin: true });
-    await sendMessage(chatId, `ℹ️ ሰብሚሽን #${id} አስቀድሞ ጸድቋል:`, adminMenu()); return;
+    await sendMessage(chatId, `ℹ️ Submission #${id} is already approved.`, adminMenu()); return;
   }
   const [owner] = await db.select({ telegramChatId: usersTable.telegramChatId, referredBy: usersTable.referredBy }).from(usersTable).where(eq(usersTable.id, existing.userId));
   await db.update(usersTable).set({ walletBalance: sql`${usersTable.walletBalance} + ${existing.pricePaid}` }).where(eq(usersTable.id, existing.userId));
@@ -952,26 +946,26 @@ async function handleAdminApproveId(chatId: string, text: string): Promise<void>
   await db.update(submissionsTable).set({ status: "approved", rejectionNote: null }).where(eq(submissionsTable.id, id));
   notifySubmissionApproved(owner?.telegramChatId, existing.email, existing.pricePaid).catch(() => {});
   setSession(chatId, { step: "admin_idle", isAdmin: true });
-  await sendMessage(chatId, `✅ ሰብሚሽን #${id} ጸድቋል! <b>${existing.pricePaid} ETB</b> ለዩዘሩ ተጨምሯል።`, adminMenu());
+  await sendMessage(chatId, `✅ Submission #${id} approved! <b>${existing.pricePaid} ETB</b> added to the user's wallet.`, adminMenu());
 }
 
 async function handleAdminRejectId(chatId: string, text: string): Promise<void> {
   const id = parseInt(text, 10);
-  if (isNaN(id)) { await sendMessage(chatId, "❌ ትክክለኛ ID ያስገባ:"); return; }
+  if (isNaN(id)) { await sendMessage(chatId, "❌ Please enter a valid ID:"); return; }
   const [existing] = await db.select({ id: submissionsTable.id }).from(submissionsTable).where(eq(submissionsTable.id, id));
-  if (!existing) { await sendMessage(chatId, `❌ ሰብሚሽን #${id} አልተገኘም:`); return; }
+  if (!existing) { await sendMessage(chatId, `❌ Submission #${id} not found:`); return; }
   setSession(chatId, { step: "await_admin_reject_note", tempRejectId: id });
-  await sendMessage(chatId, `❌ ሰብሚሽን #${id} ለምን ትውድቀዋለህ?\n(ምክንያት ያስገባ ወይም <b>ዝለል</b> ተጫን)`,
-    { reply_markup: { keyboard: [[{ text: "ዝለል" }], [{ text: "❌ ሰርዝ" }]], resize_keyboard: true } }
+  await sendMessage(chatId, `❌ Why are you rejecting submission #${id}?\n(Enter a reason or tap <b>Skip</b>)`,
+    { reply_markup: { keyboard: [[{ text: "Skip" }], [{ text: "❌ Cancel" }]], resize_keyboard: true } }
   );
 }
 
 async function handleAdminRejectNote(chatId: string, text: string): Promise<void> {
   const session = getSession(chatId);
   const id = session.tempRejectId!;
-  const note = text === "ዝለል" ? null : text.trim();
+  const note = text === "Skip" ? null : text.trim();
   const [existing] = await db.select().from(submissionsTable).where(eq(submissionsTable.id, id));
-  if (!existing) { setSession(chatId, { step: "admin_idle", isAdmin: true }); await sendMessage(chatId, "❌ አልተገኘም:", adminMenu()); return; }
+  if (!existing) { setSession(chatId, { step: "admin_idle", isAdmin: true }); await sendMessage(chatId, "❌ Not found.", adminMenu()); return; }
   const [owner] = await db.select({ telegramChatId: usersTable.telegramChatId }).from(usersTable).where(eq(usersTable.id, existing.userId));
   if (existing.status === "approved") {
     await db.update(usersTable).set({ walletBalance: sql`${usersTable.walletBalance} - ${existing.pricePaid}` }).where(eq(usersTable.id, existing.userId));
@@ -980,7 +974,7 @@ async function handleAdminRejectNote(chatId: string, text: string): Promise<void
   await db.update(submissionsTable).set({ status: "rejected", rejectionNote: note }).where(eq(submissionsTable.id, id));
   notifySubmissionRejected(owner?.telegramChatId, existing.email).catch(() => {});
   setSession(chatId, { step: "admin_idle", isAdmin: true, tempRejectId: undefined });
-  await sendMessage(chatId, `❌ ሰብሚሽን #${id} ውድቋል${note ? `: ${note}` : "."}`, adminMenu());
+  await sendMessage(chatId, `❌ Submission #${id} rejected${note ? `: ${note}` : "."}`, adminMenu());
 }
 
 async function showAdminWithdrawals(chatId: string): Promise<void> {
@@ -993,28 +987,28 @@ async function showAdminWithdrawals(chatId: string): Promise<void> {
   }).from(withdrawalsTable).leftJoin(usersTable, eq(withdrawalsTable.userId, usersTable.id))
     .where(eq(withdrawalsTable.status, "pending")).orderBy(withdrawalsTable.createdAt).limit(10);
 
-  if (rows.length === 0) { await sendMessage(chatId, "✅ ምንም ጠቅቷቸው ወጪ የለም!", adminMenu()); return; }
+  if (rows.length === 0) { await sendMessage(chatId, "✅ No pending withdrawals!", adminMenu()); return; }
 
   const lines = rows.map((r) => {
     const payInfo = r.paymentMethod === "telebirr"
-      ? `📱 ቴሌብር: <code>${r.telebirrNumber}</code> (${r.telebirrName})`
+      ? `📱 Telebirr: <code>${r.telebirrNumber}</code> (${r.telebirrName})`
       : `🏦 ${r.bankName}: <code>${r.bankAccountNumber}</code> (${r.bankAccountName})`;
     return `🆔 <b>#${r.id}</b> | 👤 ${r.userName ?? "?"}\n💰 ${r.amount} ETB\n${payInfo}`;
   });
   await sendMessage(chatId,
-    `💸 <b>ጠቅቷቸው ወጪዎች (${rows.length})</b>\n\n${lines.join("\n\n─────────────────\n\n")}`,
-    { reply_markup: { keyboard: [[{ text: "💳 ወጪ አስተዳድር" }, { text: "💸 የወጪ ጥያቄዎች" }], [{ text: "🚪 ወደ ምናሌ" }]], resize_keyboard: true } }
+    `💸 <b>Pending Withdrawals (${rows.length})</b>\n\n${lines.join("\n\n─────────────────\n\n")}`,
+    { reply_markup: { keyboard: [[{ text: "💳 Manage Withdrawal" }, { text: "💸 Withdrawals" }], [{ text: "🚪 Back to Menu" }]], resize_keyboard: true } }
   );
 }
 
 async function handleAdminWithdrawalId(chatId: string, text: string): Promise<void> {
   const id = parseInt(text, 10);
-  if (isNaN(id)) { await sendMessage(chatId, "❌ ትክክለኛ ID ያስገባ:"); return; }
+  if (isNaN(id)) { await sendMessage(chatId, "❌ Please enter a valid ID:"); return; }
   const [existing] = await db.select({ id: withdrawalsTable.id, amount: withdrawalsTable.amount, status: withdrawalsTable.status }).from(withdrawalsTable).where(eq(withdrawalsTable.id, id));
-  if (!existing) { await sendMessage(chatId, `❌ ወጪ #${id} አልተገኘም:`); return; }
+  if (!existing) { await sendMessage(chatId, `❌ Withdrawal #${id} not found:`); return; }
   setSession(chatId, { step: "await_admin_withdrawal_action", tempWithdrawalId: id });
-  await sendMessage(chatId, `💳 ወጪ #${id} — <b>${existing.amount} ETB</b> (${existing.status})\n\nምን ማድረግ ትፈልጋለህ?`,
-    { reply_markup: { keyboard: [[{ text: "✅ ተፈጻሚ" }, { text: "❌ ውደቅ" }], [{ text: "❌ ሰርዝ" }]], resize_keyboard: true } }
+  await sendMessage(chatId, `💳 Withdrawal #${id} — <b>${existing.amount} ETB</b> (${existing.status})\n\nWhat would you like to do?`,
+    { reply_markup: { keyboard: [[{ text: "✅ Complete" }, { text: "❌ Reject" }], [{ text: "❌ Cancel" }]], resize_keyboard: true } }
   );
 }
 
@@ -1022,22 +1016,22 @@ async function handleAdminWithdrawalAction(chatId: string, text: string): Promis
   const session = getSession(chatId);
   const id = session.tempWithdrawalId!;
   const [existing] = await db.select().from(withdrawalsTable).where(eq(withdrawalsTable.id, id));
-  if (!existing) { setSession(chatId, { step: "admin_idle", isAdmin: true }); await sendMessage(chatId, "❌ አልተገኘም:", adminMenu()); return; }
+  if (!existing) { setSession(chatId, { step: "admin_idle", isAdmin: true }); await sendMessage(chatId, "❌ Not found.", adminMenu()); return; }
   const [owner] = await db.select({ telegramChatId: usersTable.telegramChatId }).from(usersTable).where(eq(usersTable.id, existing.userId));
 
-  if (text === "✅ ተፈጻሚ") {
+  if (text === "✅ Complete") {
     await db.update(withdrawalsTable).set({ status: "completed" }).where(eq(withdrawalsTable.id, id));
     notifyWithdrawalCompleted(owner?.telegramChatId, existing.amount, existing.telebirrNumber).catch(() => {});
     setSession(chatId, { step: "admin_idle", isAdmin: true, tempWithdrawalId: undefined });
-    await sendMessage(chatId, `✅ ወጪ #${id} ተፈጻሚ! <b>${existing.amount} ETB</b> ተልኳል።`, adminMenu());
-  } else if (text === "❌ ውደቅ") {
+    await sendMessage(chatId, `✅ Withdrawal #${id} completed! <b>${existing.amount} ETB</b> sent.`, adminMenu());
+  } else if (text === "❌ Reject") {
     await db.update(usersTable).set({ walletBalance: sql`${usersTable.walletBalance} + ${existing.amount}` }).where(eq(usersTable.id, existing.userId));
     await db.update(withdrawalsTable).set({ status: "rejected" }).where(eq(withdrawalsTable.id, id));
     notifyWithdrawalRejected(owner?.telegramChatId, existing.amount, null).catch(() => {});
     setSession(chatId, { step: "admin_idle", isAdmin: true, tempWithdrawalId: undefined });
-    await sendMessage(chatId, `❌ ወጪ #${id} ውድቋል! <b>${existing.amount} ETB</b> ወደ ቦርሳ ተመልሷል።`, adminMenu());
+    await sendMessage(chatId, `❌ Withdrawal #${id} rejected! <b>${existing.amount} ETB</b> returned to wallet.`, adminMenu());
   } else {
-    await sendMessage(chatId, "✅ ተፈጻሚ ወይም ❌ ውደቅ ምረጥ:");
+    await sendMessage(chatId, "Please select ✅ Complete or ❌ Reject:");
   }
 }
 
@@ -1047,25 +1041,25 @@ async function showAdminUsers(chatId: string): Promise<void> {
   }).from(usersTable).orderBy(desc(usersTable.createdAt)).limit(15);
 
   const lines = users.map((u) => `🆔 #${u.id} | ${u.isBanned ? "🚫" : "✅"} <b>${u.name ?? "?"}</b> — ${u.walletBalance} ETB`);
-  await sendMessage(chatId, `👥 <b>ዩዘሮች (የቅርቡ 15)</b>\n\n${lines.join("\n")}`,
-    { reply_markup: { keyboard: [[{ text: "🚫 ዩዘር ታጠቅ/ፍታ" }, { text: "👥 ዩዘሮች" }], [{ text: "🚪 ወደ ምናሌ" }]], resize_keyboard: true } }
+  await sendMessage(chatId, `👥 <b>Users (last 15)</b>\n\n${lines.join("\n")}`,
+    { reply_markup: { keyboard: [[{ text: "🚫 Ban/Unban User" }, { text: "👥 Users" }], [{ text: "🚪 Back to Menu" }]], resize_keyboard: true } }
   );
 }
 
 async function handleAdminBanId(chatId: string, text: string): Promise<void> {
   const id = parseInt(text, 10);
-  if (isNaN(id)) { await sendMessage(chatId, "❌ ትክክለኛ ID ያስገባ:"); return; }
+  if (isNaN(id)) { await sendMessage(chatId, "❌ Please enter a valid ID:"); return; }
   const [user] = await db.select({ name: usersTable.name, isBanned: usersTable.isBanned }).from(usersTable).where(eq(usersTable.id, id));
-  if (!user) { await sendMessage(chatId, `❌ ዩዘር #${id} አልተገኘም:`); return; }
+  if (!user) { await sendMessage(chatId, `❌ User #${id} not found:`); return; }
   const newBanned = !user.isBanned;
   await db.update(usersTable).set({ isBanned: newBanned }).where(eq(usersTable.id, id));
   setSession(chatId, { step: "admin_idle", isAdmin: true });
-  await sendMessage(chatId, `${newBanned ? "🚫" : "✅"} ዩዘር <b>${user.name}</b> (#${id}) ${newBanned ? "ታጠቀ!" : "ተፈታ!"}`, adminMenu());
+  await sendMessage(chatId, `${newBanned ? "🚫" : "✅"} User <b>${user.name}</b> (#${id}) has been ${newBanned ? "banned!" : "unbanned!"}`, adminMenu());
 }
 
 async function handleAdminBroadcastTitle(chatId: string, text: string): Promise<void> {
   setSession(chatId, { step: "await_admin_broadcast_message", tempBroadcastTitle: text.trim() });
-  await sendMessage(chatId, `📢 ርዕስ: <b>${text.trim()}</b>\n\nየብሮድካስት መልዕክት ያስገባ:`, cancelKeyboard());
+  await sendMessage(chatId, `📢 Title: <b>${text.trim()}</b>\n\nEnter the broadcast message:`, cancelKeyboard());
 }
 
 async function handleAdminBroadcastMessage(chatId: string, text: string): Promise<void> {
@@ -1076,49 +1070,49 @@ async function handleAdminBroadcastMessage(chatId: string, text: string): Promis
   const telegramUsers = users.filter((u) => u.telegramChatId);
   await Promise.allSettled(telegramUsers.map((u) => sendBroadcastMessage(u.telegramChatId!, title, text.trim()).catch(() => {})));
   setSession(chatId, { step: "admin_idle", isAdmin: true, tempBroadcastTitle: undefined });
-  await sendMessage(chatId, `✅ ብሮድካስት ለ <b>${telegramUsers.length}</b> ዩዘሮች ተልኳል!`, adminMenu());
+  await sendMessage(chatId, `✅ Broadcast sent to <b>${telegramUsers.length}</b> users!`, adminMenu());
 }
 
 async function showAdminSettings(chatId: string): Promise<void> {
   const price = await getPricePerEmail();
   const commission = await getCommissionPct();
-  await sendMessage(chatId, `⚙️ <b>ቅንብሮች</b>\n\n💰 ዋጋ ለኢሜይል: <b>${price} ETB</b>\n📊 ሪፈራል ኮሚሽን: <b>${commission}%</b>`,
-    { reply_markup: { keyboard: [[{ text: "💰 ዋጋ ቀይር" }, { text: "📊 ኮሚሽን ቀይር" }], [{ text: "🔑 ፓስወርድ ቀይር" }, { text: "🚪 ወደ ምናሌ" }]], resize_keyboard: true } }
+  await sendMessage(chatId, `⚙️ <b>Settings</b>\n\n💰 Price per email: <b>${price} ETB</b>\n📊 Referral commission: <b>${commission}%</b>`,
+    { reply_markup: { keyboard: [[{ text: "💰 Change Price" }, { text: "📊 Change Commission" }], [{ text: "🔑 Change Password" }, { text: "🚪 Back to Menu" }]], resize_keyboard: true } }
   );
 }
 
 async function handleAdminSettingsPrice(chatId: string, text: string): Promise<void> {
   const price = parseInt(text, 10);
-  if (isNaN(price) || price < 1) { await sendMessage(chatId, "❌ ትክክለኛ ዋጋ ያስገባ:"); return; }
+  if (isNaN(price) || price < 1) { await sendMessage(chatId, "❌ Please enter a valid price:"); return; }
   await db.insert(settingsTable).values({ key: "price_per_email", value: String(price) }).onConflictDoUpdate({ target: settingsTable.key, set: { value: String(price) } });
   setSession(chatId, { step: "admin_idle", isAdmin: true });
-  await sendMessage(chatId, `✅ ዋጋ ወደ <b>${price} ETB</b> ተቀይሯል!`, adminMenu());
+  await sendMessage(chatId, `✅ Price updated to <b>${price} ETB</b>!`, adminMenu());
 }
 
 async function handleAdminSettingsCommission(chatId: string, text: string): Promise<void> {
   const pct = parseInt(text, 10);
-  if (isNaN(pct) || pct < 0 || pct > 100) { await sendMessage(chatId, "❌ ትክክለኛ % ያስገባ (0-100):"); return; }
+  if (isNaN(pct) || pct < 0 || pct > 100) { await sendMessage(chatId, "❌ Please enter a valid % (0–100):"); return; }
   await db.insert(settingsTable).values({ key: "referral_commission_pct", value: String(pct) }).onConflictDoUpdate({ target: settingsTable.key, set: { value: String(pct) } });
   setSession(chatId, { step: "admin_idle", isAdmin: true });
-  await sendMessage(chatId, `✅ ሪፈራል ኮሚሽን ወደ <b>${pct}%</b> ተቀይሯል!`, adminMenu());
+  await sendMessage(chatId, `✅ Referral commission updated to <b>${pct}%</b>!`, adminMenu());
 }
 
 async function handleAdminNewPassword(chatId: string, text: string): Promise<void> {
-  if (text.length < 8) { await sendMessage(chatId, "❌ ፓስወርድ ቢያንስ 8 ፊደል ሊሆን ይገባል:"); return; }
+  if (text.length < 8) { await sendMessage(chatId, "❌ Password must be at least 8 characters:"); return; }
   const hash = await bcrypt.hash(text, 10);
   await db.insert(settingsTable).values({ key: "admin_password_hash", value: hash }).onConflictDoUpdate({ target: settingsTable.key, set: { value: hash } });
   setSession(chatId, { step: "admin_idle", isAdmin: true });
-  await sendMessage(chatId, "✅ አድሚን ፓስወርድ ተቀይሯል!", adminMenu());
+  await sendMessage(chatId, "✅ Admin password updated!", adminMenu());
 }
 
 async function showAdminExport(chatId: string): Promise<void> {
-  await sendMessage(chatId, "📤 <b>ኤክስፖርት</b>\n\nምን ኤክስፖርት ማድረግ ትፈልጋለህ?",
+  await sendMessage(chatId, "📤 <b>Export</b>\n\nWhat would you like to export?",
     {
       reply_markup: {
         keyboard: [
-          [{ text: "📋 ሁሉም ሰብሚሽን" }, { text: "✅ ጸድቆ ሰብሚሽን" }],
-          [{ text: "💸 ወጪዎች ኤክስፖርት" }, { text: "👥 ዩዘሮች ኤክስፖርት" }],
-          [{ text: "🚪 ወደ ምናሌ" }],
+          [{ text: "📋 All Submissions" }, { text: "✅ Approved Submissions" }],
+          [{ text: "💸 Export Withdrawals" }, { text: "👥 Export Users" }],
+          [{ text: "🚪 Back to Menu" }],
         ],
         resize_keyboard: true,
       },
@@ -1143,7 +1137,7 @@ async function exportData(chatId: string, type: string): Promise<void> {
       createdAt: submissionsTable.createdAt, status: submissionsTable.status,
     }).from(submissionsTable).leftJoin(usersTable, eq(submissionsTable.userId, usersTable.id)).orderBy(submissionsTable.createdAt);
     const filtered = type === "approved-submissions" ? rows.filter((r) => r.status === "approved") : rows;
-    if (!filtered.length) { await sendMessage(chatId, "❌ ምንም ዳታ የለም:", adminMenu()); return; }
+    if (!filtered.length) { await sendMessage(chatId, "❌ No data found.", adminMenu()); return; }
     csv = toCSV(["ID", "Seller", "Email", "Password", "Price(ETB)", "Date", "Status"],
       filtered.map((r) => [r.id, r.userName, r.email, r.password, r.pricePaid, new Date(r.createdAt).toISOString().slice(0, 16), r.status]));
     filename = `${type}-${new Date().toISOString().slice(0, 10)}.csv`;
@@ -1156,7 +1150,7 @@ async function exportData(chatId: string, type: string): Promise<void> {
       bankAccountName: withdrawalsTable.bankAccountName, amount: withdrawalsTable.amount,
       createdAt: withdrawalsTable.createdAt, status: withdrawalsTable.status,
     }).from(withdrawalsTable).leftJoin(usersTable, eq(withdrawalsTable.userId, usersTable.id)).orderBy(withdrawalsTable.createdAt);
-    if (!rows.length) { await sendMessage(chatId, "❌ ምንም ዳታ የለም:", adminMenu()); return; }
+    if (!rows.length) { await sendMessage(chatId, "❌ No data found.", adminMenu()); return; }
     csv = toCSV(["ID", "User", "Method", "Number", "Name", "Bank", "Amount(ETB)", "Date", "Status"],
       rows.map((r) => [r.id, r.userEmail, r.paymentMethod,
         r.paymentMethod === "bank" ? r.bankAccountNumber : r.telebirrNumber,
@@ -1169,7 +1163,7 @@ async function exportData(chatId: string, type: string): Promise<void> {
       id: usersTable.id, name: usersTable.name, email: usersTable.email,
       walletBalance: usersTable.walletBalance, isBanned: usersTable.isBanned, createdAt: usersTable.createdAt,
     }).from(usersTable).orderBy(usersTable.createdAt);
-    if (!users.length) { await sendMessage(chatId, "❌ ምንም ዳታ የለም:", adminMenu()); return; }
+    if (!users.length) { await sendMessage(chatId, "❌ No data found.", adminMenu()); return; }
     csv = toCSV(["ID", "Name", "Email", "Wallet(ETB)", "Banned", "Joined"],
       users.map((u) => [u.id, u.name ?? "", u.email ?? "", u.walletBalance, u.isBanned ? "Yes" : "No", new Date(u.createdAt).toISOString().slice(0, 16)]));
     filename = `users-${new Date().toISOString().slice(0, 10)}.csv`;
@@ -1178,30 +1172,30 @@ async function exportData(chatId: string, type: string): Promise<void> {
 
   const result = await sendDocumentToAdmin(filename, csv, caption);
   if (result.ok) {
-    await sendMessage(chatId, `✅ <b>${filename}</b> ለአድሚን ቴሌግራም ተልኳል!`, adminMenu());
+    await sendMessage(chatId, `✅ <b>${filename}</b> sent to admin Telegram!`, adminMenu());
   } else {
-    await sendMessage(chatId, `❌ ኤክስፖርት አልተሳካም: ${result.error}`, adminMenu());
+    await sendMessage(chatId, `❌ Export failed: ${result.error}`, adminMenu());
   }
 }
 
 export async function notifySubmissionApproved(chatId: string | null | undefined, email: string, amount: number): Promise<void> {
   if (!chatId) return;
-  await sendMessage(chatId, `✅ <b>አካውንት ጸድቋል!</b>\n\n📧 ኢሜይል: <code>${email}</code>\n💰 ክፍያ: <b>${amount} ETB</b> ወደ ቦርሳህ ተጨምሯል!\n\n📊 ቦርሳ ለማየት <b>📊 መረጃዬ</b> ተጫን:`);
+  await sendMessage(chatId, `✅ <b>Submission approved!</b>\n\n📧 Email: <code>${email}</code>\n💰 Payment: <b>${amount} ETB</b> has been added to your wallet!\n\n📊 Tap <b>📊 My Profile</b> to check your balance.`);
 }
 
 export async function notifySubmissionRejected(chatId: string | null | undefined, email: string): Promise<void> {
   if (!chatId) return;
-  await sendMessage(chatId, `❌ <b>አካውንት አልጸደቀም</b>\n\n📧 ኢሜይል: <code>${email}</code>\n\nምክንያቱ ትክክለኛ ምስክር ወረቀት አለመቅረቡ ሊሆን ይችላል። ሌላ አካውንት ሊያቀርቡ ይችላሉ።`);
+  await sendMessage(chatId, `❌ <b>Submission not approved</b>\n\n📧 Email: <code>${email}</code>\n\nThis may be because the credentials could not be verified. You can submit another account.`);
 }
 
 export async function notifyWithdrawalCompleted(chatId: string | null | undefined, amount: number, telebirrNumber: string): Promise<void> {
   if (!chatId) return;
-  await sendMessage(chatId, `💸 <b>ክፍያ ተልኳል!</b>\n\n💰 መጠን: <b>${amount} ETB</b>\n📱 ቁጥር: <code>${telebirrNumber}</code>`);
+  await sendMessage(chatId, `💸 <b>Payment sent!</b>\n\n💰 Amount: <b>${amount} ETB</b>\n📱 Number: <code>${telebirrNumber}</code>`);
 }
 
 export async function notifyWithdrawalRejected(chatId: string | null | undefined, amount: number, note?: string | null): Promise<void> {
   if (!chatId) return;
-  await sendMessage(chatId, `❌ <b>የወጪ ጥያቄ አልተቀበለም</b>\n\n💰 መጠን: <b>${amount} ETB</b> ወደ ቦርሳህ ተመልሷል።${note ? `\n📝 ምክንያት: ${note}` : ""}`);
+  await sendMessage(chatId, `❌ <b>Withdrawal request rejected</b>\n\n💰 Amount: <b>${amount} ETB</b> has been returned to your wallet.${note ? `\n📝 Reason: ${note}` : ""}`);
 }
 
 export async function notifyAdminNewSubmission(opts: {
@@ -1212,7 +1206,7 @@ export async function notifyAdminNewSubmission(opts: {
   if (!adminChatId) return;
   const userLabel = opts.userName ?? opts.userEmail ?? `ID: ${opts.userId}`;
   await sendMessage(adminChatId,
-    `📬 <b>አዲስ ሰብሚሽን #${opts.submissionId}</b>\n\n👤 <b>ዩዘር:</b> ${userLabel}\n📧 <b>ኢሜይል:</b> <code>${opts.submittedEmail}</code>\n🔑 <b>ፓስወርድ:</b> <code>${opts.submittedPassword}</code>\n💰 <b>ዋጋ:</b> ${opts.pricePaid} ETB\n⏰ ${new Date().toLocaleString("am-ET", { timeZone: "Africa/Addis_Ababa" })}`
+    `📬 <b>New Submission #${opts.submissionId}</b>\n\n👤 <b>User:</b> ${userLabel}\n📧 <b>Email:</b> <code>${opts.submittedEmail}</code>\n🔑 <b>Password:</b> <code>${opts.submittedPassword}</code>\n💰 <b>Price:</b> ${opts.pricePaid} ETB\n⏰ ${new Date().toLocaleString("en-US", { timeZone: "Africa/Addis_Ababa" })}`
   );
 }
 
