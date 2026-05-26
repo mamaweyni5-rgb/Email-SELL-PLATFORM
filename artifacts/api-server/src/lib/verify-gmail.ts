@@ -36,13 +36,25 @@ export async function verifyGmailAccount(
     await client.logout();
     return { verified: true };
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
+    // imapflow surfaces auth failures via dedicated properties, not err.message
+    // err.message is just "Command failed" for all command-level errors
+    const imapErr = err as Record<string, unknown>;
     const isAuthErr =
-      msg.includes("Authentication failed") ||
-      msg.includes("AUTHENTICATIONFAILED") ||
-      msg.includes("Invalid credentials") ||
-      msg.includes("Username and Password not accepted") ||
-      msg.includes("NO [AUTHENTICATIONFAILED]");
+      imapErr["authenticationFailed"] === true ||
+      imapErr["serverResponseCode"] === "AUTHENTICATIONFAILED" ||
+      (typeof imapErr["response"] === "string" && (
+        imapErr["response"].includes("AUTHENTICATIONFAILED") ||
+        imapErr["response"].includes("Invalid credentials") ||
+        imapErr["response"].includes("Username and Password not accepted")
+      )) ||
+      // fallback: check message for older imapflow versions
+      (err instanceof Error && (
+        err.message.includes("Authentication failed") ||
+        err.message.includes("AUTHENTICATIONFAILED") ||
+        err.message.includes("Invalid credentials") ||
+        err.message.includes("Username and Password not accepted") ||
+        err.message.includes("NO [AUTHENTICATIONFAILED]")
+      ));
     if (isAuthErr) return { verified: false, reason: "not_registered" };
     return { verified: false, reason: "network_error" };
   } finally {
