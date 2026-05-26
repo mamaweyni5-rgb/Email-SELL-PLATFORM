@@ -1,6 +1,6 @@
 import { logger } from "./logger";
 import { getSession, setSession, clearSession } from "./bot-state";
-import { db, usersTable, submissionsTable, withdrawalsTable, settingsTable, broadcastsTable } from "@workspace/db";
+import { db, usersTable, submissionsTable, withdrawalsTable, settingsTable, broadcastsTable, pool } from "@workspace/db";
 import { eq, sql, desc } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { verifyGmailAccount } from "./verify-gmail";
@@ -41,9 +41,10 @@ function mainMenu(isLoggedIn: boolean): Record<string, unknown> {
     reply_markup: {
       keyboard: [
         [{ text: "📊 መረጃዬ" }, { text: "📧 ኢሜይል አስገባ" }],
-        [{ text: "💸 ወጪ አውጣ" }, { text: "📋 ሁኔታዎቼ" }],
-        [{ text: "💼 ወጪዎቼ" }, { text: "🔗 ሪፈራል" }],
-        [{ text: "📢 ማስታወቂያዎች" }, { text: "🚪 ውጣ" }],
+        [{ text: "✨ ኢሜይል ውሰድ" }, { text: "💸 ወጪ አውጣ" }],
+        [{ text: "📋 ሁኔታዎቼ" }, { text: "💼 ወጪዎቼ" }],
+        [{ text: "🔗 ሪፈራል" }, { text: "📢 ማስታወቂያዎች" }],
+        [{ text: "🚪 ውጣ" }],
       ],
       resize_keyboard: true,
       one_time_keyboard: false,
@@ -219,6 +220,8 @@ export async function handleUpdate(update: TelegramUpdate): Promise<void> {
     case "await_admin_settings_price": await handleAdminSettingsPrice(chatId, text); break;
     case "await_admin_settings_commission": await handleAdminSettingsCommission(chatId, text); break;
     case "await_admin_new_password": await handleAdminNewPassword(chatId, text); break;
+    case "gen_email_confirm": await handleGenEmailConfirm(chatId, text, session.userId!); break;
+    case "gen_email_view": await handleGenEmailAction(chatId, text, session.userId!); break;
     default:
       clearSession(chatId);
       await sendMessage(chatId, "ወደ ዋና ምናሌ ተመለሰሃል። /start", mainMenu(!!session.userId));
@@ -247,6 +250,7 @@ async function handleIdleMessage(chatId: string, text: string, session: ReturnTy
       setSession(chatId, { step: "await_submit_email" });
       await sendMessage(chatId, `📧 <b>Gmail አስገባ</b>\n\nየ Gmail አድራሻህን ያስገባ:\n<i>ምሳሌ: example@gmail.com</i>`, cancelKeyboard());
       break;
+    case "✨ ኢሜይል ውሰድ": await handleGetEmailMenu(chatId, session.userId!); break;
     case "💸 ወጪ አውጣ": await startWithdraw(chatId, session.userId); break;
     case "📋 ሁኔታዎቼ": await showSubmissions(chatId, session.userId); break;
     case "💼 ወጪዎቼ": await showWithdrawals(chatId, session.userId); break;
@@ -482,6 +486,251 @@ async function handleSubmitPassword(chatId: string, text: string): Promise<void>
     `✅ <b>ሰብሚሽን ተቀብሏል!</b>\n\n📧 ኢሜይል: <code>${row.email}</code>\n💰 ዋጋ: <b>${row.pricePaid} ETB</b> (ሲጸድቅ ይታከላል)\n\n⏳ ሲጸድቅ ወዲያው ትነገርለህ!`,
     mainMenu(true)
   );
+}
+
+// ── Generated Email keyboards ─────────────────────────────────────────────
+
+function genEmailClaimedKeyboard(emailOpened: boolean): Record<string, unknown> {
+  return {
+    reply_markup: {
+      keyboard: emailOpened
+        ? [
+            [{ text: "📤 ሰብሚት አድርግ" }],
+            [{ text: "↩️ ኢሜይሉን መልስ" }, { text: "❌ ሰርዝ" }],
+          ]
+        : [
+            [{ text: "📧 Gmail ከፈቻለሁ" }],
+            [{ text: "↩️ ኢሜይሉን መልስ" }, { text: "❌ ሰርዝ" }],
+          ],
+      resize_keyboard: true,
+      one_time_keyboard: false,
+    },
+  };
+}
+
+function genEmailConfirmKeyboard(): Record<string, unknown> {
+  return {
+    reply_markup: {
+      keyboard: [[{ text: "✅ ወሰድ" }, { text: "❌ ሰርዝ" }]],
+      resize_keyboard: true,
+      one_time_keyboard: false,
+    },
+  };
+}
+
+type GenEmailRow = {
+  id: number; name: string | null; email: string;
+  password: string; status: string; email_opened: boolean;
+};
+
+async function getClaimedEmail(userId: number): Promise<GenEmailRow | null> {
+  const { rows } = await pool.query(
+    `SELECT id, name, email, password, status, email_opened FROM generated_emails
+     WHERE claimed_by = $1 AND status = 'claimed' LIMIT 1`,
+    [userId]
+  );
+  return (rows[0] as GenEmailRow) ?? null;
+}
+
+function buildClaimedEmailMessage(row: GenEmailRow): string {
+  const nameLine = row.name ? `\n👤 ስም: <code>${row.name}</code>` : "";
+  const openedStatus = row.email_opened
+    ? "✅ Gmail ከፍተዋል — አሁን ሰብሚት ማድረግ ይችላሉ!"
+    : "⚠️ <b>ከሰብሚት በፊት Gmail መክፈት ግዴታ ነው!</b>";
+  return (
+    `✨ <b>የእርስዎ ኢሜይል</b>${nameLine}\n` +
+    `📧 <code>${row.email}</code>\n` +
+    `🔑 <code>${row.password}</code>\n\n` +
+    `${openedStatus}\n\n` +
+    `📋 <b>ደረጃዎች:</b>\n` +
+    `1️⃣ ኢሜሉን እና ፓስወርዱን ኮፒ ያድርጉ\n` +
+    `2️⃣ Gmail ክፈቱ (accounts.google.com) → አዲስ ምዝገባ\n` +
+    `3️⃣ ምዝገባ ካጠናቀቁ <b>"📧 Gmail ከፈቻለሁ"</b> ይጫኑ\n` +
+    `4️⃣ <b>"📤 ሰብሚት አድርግ"</b> ይጫኑ`
+  );
+}
+
+// Entry point: user taps "✨ ኢሜይል ውሰድ"
+async function handleGetEmailMenu(chatId: string, userId: number): Promise<void> {
+  // Check if user already has a claimed email
+  const existing = await getClaimedEmail(userId);
+  if (existing) {
+    setSession(chatId, { step: "gen_email_view" });
+    await sendMessage(chatId, buildClaimedEmailMessage(existing), genEmailClaimedKeyboard(existing.email_opened));
+    return;
+  }
+
+  // Show available count + warning
+  const { rows } = await pool.query(
+    "SELECT COUNT(*)::int AS count FROM generated_emails WHERE status = 'available'"
+  );
+  const count = (rows[0] as { count: number }).count;
+
+  if (count === 0) {
+    await sendMessage(chatId,
+      `😔 <b>አሁን ዝግጁ ኢሜይል የለም።</b>\n\nቆይተው እንደገና ይሞክሩ።`,
+      mainMenu(true)
+    );
+    return;
+  }
+
+  setSession(chatId, { step: "gen_email_confirm" });
+  await sendMessage(chatId,
+    `✨ <b>ኢሜይል ውሰድ</b>\n\n` +
+    `📦 ዝግጁ ኢሜይሎች: <b>${count}</b>\n\n` +
+    `⚠️ <b>ማስጠንቀቂያ — ከመቀጠልዎ በፊት ያንብቡ!</b>\n\n` +
+    `• ኢሜሉን ሲወስዱ <b>ትክክለኛ Gmail ምዝገባ</b> ማድረግ ግዴታ ነው\n` +
+    `• ሳይከፍቱ ሰብሚት ቢያደርጉ — <b>አካውንትዎ ይታገዳል!</b>\n\n` +
+    `"✅ ወሰድ" ተጭነው ኢሜይሉን ይውሰዱ።`,
+    genEmailConfirmKeyboard()
+  );
+}
+
+// Step: gen_email_confirm — waiting for "✅ ወሰድ" or "❌ ሰርዝ"
+async function handleGenEmailConfirm(chatId: string, text: string, userId: number): Promise<void> {
+  if (text !== "✅ ወሰድ") {
+    clearSession(chatId);
+    await sendMessage(chatId, "❌ ተሰርዟል።", mainMenu(true));
+    return;
+  }
+
+  // Check again — no double-claim
+  const existing = await getClaimedEmail(userId);
+  if (existing) {
+    setSession(chatId, { step: "gen_email_view" });
+    await sendMessage(chatId, buildClaimedEmailMessage(existing), genEmailClaimedKeyboard(existing.email_opened));
+    return;
+  }
+
+  // Claim one
+  const { rows } = await pool.query(
+    `UPDATE generated_emails
+     SET status = 'claimed', claimed_by = $1, claimed_at = NOW()
+     WHERE id = (
+       SELECT id FROM generated_emails WHERE status = 'available'
+       ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED
+     )
+     RETURNING id, name, email, password, status, email_opened`,
+    [userId]
+  );
+
+  if (rows.length === 0) {
+    clearSession(chatId);
+    await sendMessage(chatId, "😔 <b>ኢሜይል አልተገኘም።</b> ሌላ ሰው ወስዶታል — እንደገና ሞክሩ።", mainMenu(true));
+    return;
+  }
+
+  const row = rows[0] as GenEmailRow;
+  setSession(chatId, { step: "gen_email_view" });
+  await sendMessage(chatId, buildClaimedEmailMessage(row), genEmailClaimedKeyboard(row.email_opened));
+}
+
+// Step: gen_email_view — "📧 Gmail ከፈቻለሁ" | "📤 ሰብሚት አድርግ" | "↩️ ኢሜይሉን መልስ"
+async function handleGenEmailAction(chatId: string, text: string, userId: number): Promise<void> {
+  const row = await getClaimedEmail(userId);
+  if (!row) {
+    clearSession(chatId);
+    await sendMessage(chatId, "⚠️ ኢሜይሉ አልተገኘም። ዳግም ይሞክሩ።", mainMenu(true));
+    return;
+  }
+
+  if (text === "📧 Gmail ከፈቻለሁ") {
+    await pool.query(
+      "UPDATE generated_emails SET email_opened = TRUE WHERE id = $1 AND claimed_by = $2",
+      [row.id, userId]
+    );
+    await sendMessage(chatId,
+      `✅ <b>ተመዝግቧል!</b>\n\n📧 <code>${row.email}</code>\n🔑 <code>${row.password}</code>\n\n` +
+      `✅ Gmail ከፍተዋል — አሁን <b>"📤 ሰብሚት አድርግ"</b> ይጫኑ!`,
+      genEmailClaimedKeyboard(true)
+    );
+    return;
+  }
+
+  if (text === "↩️ ኢሜይሉን መልስ") {
+    await pool.query(
+      `UPDATE generated_emails SET status = 'available', claimed_by = NULL,
+       claimed_at = NULL, email_opened = FALSE WHERE id = $1 AND claimed_by = $2`,
+      [row.id, userId]
+    );
+    clearSession(chatId);
+    await sendMessage(chatId, "↩️ ኢሜይሉ ተመልሷል።", mainMenu(true));
+    return;
+  }
+
+  if (text === "📤 ሰብሚት አድርግ") {
+    if (!row.email_opened) {
+      await sendMessage(chatId,
+        `⚠️ <b>ቅድሚያ Gmail መክፈት ያስፈልጋል!</b>\n\n` +
+        `"📧 Gmail ከፈቻለሁ" ከጫኑ በኋላ ሰብሚት ማድረግ ይችላሉ።`,
+        genEmailClaimedKeyboard(false)
+      );
+      return;
+    }
+
+    await sendMessage(chatId, `⏳ <b>Gmail ፍተሻ ላይ ነን...</b>\n\nትንሽ ይጠብቁ።`);
+
+    const verifyResult = await verifyGmailAccount(row.email.toLowerCase(), row.password);
+
+    if (verifyResult.verified === false && verifyResult.reason === "not_registered") {
+      await sendMessage(chatId,
+        `❌ <b>Gmail አካውንት አልተፈጠረም!</b>\n\n📧 <code>${row.email}</code>\n\n` +
+        `ኢሜሉ Gmail ላይ አልተፈጠረም ወይም ፓስወርዱ ትክክል አይደለም።\n\n` +
+        `👉 Gmail ላይ ተመዝግበህ ከጨረስህ በኋላ <b>"📧 Gmail ከፈቻለሁ"</b> ብለህ ሰብሚት ሞክር።`,
+        genEmailClaimedKeyboard(false)
+      );
+      // reset email_opened so they have to re-confirm
+      await pool.query("UPDATE generated_emails SET email_opened = FALSE WHERE id = $1", [row.id]);
+      return;
+    }
+
+    if (verifyResult.verified === false && verifyResult.reason === "network_error") {
+      logger.warn({ chatId, emailId: row.id }, "Gmail IMAP network error in gen_email bot flow — allowing");
+    }
+
+    // Check for duplicate submission
+    const { rows: existingSub } = await pool.query(
+      "SELECT id FROM submissions WHERE email = $1",
+      [row.email.toLowerCase()]
+    );
+    if (existingSub.length > 0) {
+      await pool.query("UPDATE generated_emails SET status = 'submitted' WHERE id = $1", [row.id]);
+      clearSession(chatId);
+      await sendMessage(chatId, "⚠️ ይህ ኢሜይል አስቀድሞ ቀርቧል።", mainMenu(true));
+      return;
+    }
+
+    const price = await getPricePerEmail();
+    const { rows: subRows } = await pool.query(
+      `INSERT INTO submissions (user_id, email, password, status, price_paid)
+       VALUES ($1, $2, $3, 'pending', $4)
+       RETURNING id, email, price_paid`,
+      [userId, row.email.toLowerCase(), row.password, price]
+    );
+    await pool.query("UPDATE generated_emails SET status = 'submitted' WHERE id = $1", [row.id]);
+
+    const [user] = await db.select({ name: usersTable.name }).from(usersTable).where(eq(usersTable.id, userId));
+    notifyAdminNewSubmission({
+      submissionId: subRows[0].id,
+      submittedEmail: subRows[0].email,
+      submittedPassword: row.password,
+      userId,
+      userName: user?.name ?? null,
+      userEmail: null,
+      pricePaid: price,
+    }).catch(() => {});
+
+    clearSession(chatId);
+    await sendMessage(chatId,
+      `✅ <b>ሰብሚሽን ተቀብሏል!</b>\n\n📧 ኢሜይል: <code>${subRows[0].email}</code>\n` +
+      `💰 ዋጋ: <b>${price} ETB</b> (ሲጸድቅ ይታከላል)\n\n⏳ ሲጸድቅ ወዲያው ትነገርለህ!`,
+      mainMenu(true)
+    );
+    return;
+  }
+
+  // Unknown button
+  await sendMessage(chatId, buildClaimedEmailMessage(row), genEmailClaimedKeyboard(row.email_opened));
 }
 
 async function handleWithdrawMethod(chatId: string, text: string): Promise<void> {

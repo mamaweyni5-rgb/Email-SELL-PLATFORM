@@ -27,7 +27,9 @@ export type BotStep =
   | "await_admin_broadcast_message"
   | "await_admin_settings_price"
   | "await_admin_settings_commission"
-  | "await_admin_new_password";
+  | "await_admin_new_password"
+  | "gen_email_confirm"
+  | "gen_email_view";
 
 export interface BotSession {
   step: BotStep;
