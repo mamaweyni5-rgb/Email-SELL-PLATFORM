@@ -59,7 +59,8 @@ function adminMenu(): Record<string, unknown> {
         [{ text: "⏳ Overview" }, { text: "📬 Submissions" }],
         [{ text: "💸 Withdrawals" }, { text: "👥 Users" }],
         [{ text: "📢 Broadcast" }, { text: "⚙️ Settings" }],
-        [{ text: "📤 Export" }, { text: "🚪 Go to User" }],
+        [{ text: "✨ Email Pool" }, { text: "📤 Export" }],
+        [{ text: "🚪 Go to User" }],
       ],
       resize_keyboard: true,
       one_time_keyboard: false,
@@ -220,6 +221,7 @@ export async function handleUpdate(update: TelegramUpdate): Promise<void> {
     case "await_admin_settings_price": await handleAdminSettingsPrice(chatId, text); break;
     case "await_admin_settings_commission": await handleAdminSettingsCommission(chatId, text); break;
     case "await_admin_new_password": await handleAdminNewPassword(chatId, text); break;
+    case "await_admin_email_pool": await handleAdminEmailPool(chatId, text); break;
     case "gen_email_confirm": await handleGenEmailConfirm(chatId, text, session.userId!); break;
     case "gen_email_view": await handleGenEmailAction(chatId, text, session.userId!); break;
     default:
@@ -868,6 +870,7 @@ async function handleAdminMessage(chatId: string, text: string, session: ReturnT
     case "🔑 Change Password":
       setSession(chatId, { step: "await_admin_new_password" });
       await sendMessage(chatId, "🔑 Enter the new admin password (at least 8 characters):", cancelKeyboard()); break;
+    case "✨ Email Pool": await showAdminEmailPool(chatId); break;
     case "📤 Export": await showAdminExport(chatId); break;
     case "📋 All Submissions": await exportData(chatId, "submissions"); break;
     case "✅ Approved Submissions": await exportData(chatId, "approved-submissions"); break;
@@ -1103,6 +1106,76 @@ async function handleAdminNewPassword(chatId: string, text: string): Promise<voi
   await db.insert(settingsTable).values({ key: "admin_password_hash", value: hash }).onConflictDoUpdate({ target: settingsTable.key, set: { value: hash } });
   setSession(chatId, { step: "admin_idle", isAdmin: true });
   await sendMessage(chatId, "✅ Admin password updated!", adminMenu());
+}
+
+async function showAdminEmailPool(chatId: string): Promise<void> {
+  const { rows } = await pool.query(
+    `SELECT
+       COUNT(*) FILTER (WHERE status = 'available')::int AS available,
+       COUNT(*) FILTER (WHERE status = 'claimed')::int   AS claimed,
+       COUNT(*) FILTER (WHERE status = 'submitted')::int AS submitted,
+       COUNT(*)::int                                      AS total
+     FROM generated_emails`
+  );
+  const s = rows[0] as { available: number; claimed: number; submitted: number; total: number };
+
+  setSession(chatId, { step: "await_admin_email_pool" });
+  await sendMessage(chatId,
+    `✨ <b>Email Pool</b>\n\n` +
+    `📦 Available: <b>${s.available}</b>\n` +
+    `🔒 Claimed:   <b>${s.claimed}</b>\n` +
+    `✅ Submitted: <b>${s.submitted}</b>\n` +
+    `📊 Total:     <b>${s.total}</b>\n\n` +
+    `➕ <b>Add emails — one per line:</b>\n` +
+    `<code>email@gmail.com:password</code>\n` +
+    `<code>Name:email@gmail.com:password</code>\n\n` +
+    `Send your list now, or tap Cancel.`,
+    cancelKeyboard()
+  );
+}
+
+async function handleAdminEmailPool(chatId: string, text: string): Promise<void> {
+  const lines = text.trim().split("\n").filter(Boolean);
+
+  const parsed: { name: string | null; email: string; password: string }[] = [];
+  for (const line of lines) {
+    const parts = line.split(":").map((p) => p.trim());
+    if (parts.length === 3 && parts[1].includes("@")) {
+      parsed.push({ name: parts[0] || null, email: parts[1].toLowerCase(), password: parts[2] });
+    } else if (parts.length === 2 && parts[0].includes("@")) {
+      parsed.push({ name: null, email: parts[0].toLowerCase(), password: parts[1] });
+    }
+  }
+
+  if (parsed.length === 0) {
+    await sendMessage(chatId,
+      `❌ No valid entries found.\n\nUse format:\n<code>email@gmail.com:password</code>\nor\n<code>Name:email@gmail.com:password</code>`,
+      cancelKeyboard()
+    );
+    return;
+  }
+
+  let added = 0;
+  let skipped = 0;
+  for (const entry of parsed) {
+    try {
+      const { rowCount } = await pool.query(
+        `INSERT INTO generated_emails (name, email, password)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (email) DO NOTHING`,
+        [entry.name, entry.email, entry.password]
+      );
+      if ((rowCount ?? 0) > 0) added++; else skipped++;
+    } catch {
+      skipped++;
+    }
+  }
+
+  setSession(chatId, { step: "admin_idle", isAdmin: true });
+  await sendMessage(chatId,
+    `✅ <b>Done!</b>\n\n➕ Added: <b>${added}</b>\n⏭️ Skipped (duplicates): <b>${skipped}</b>`,
+    adminMenu()
+  );
 }
 
 async function showAdminExport(chatId: string): Promise<void> {
