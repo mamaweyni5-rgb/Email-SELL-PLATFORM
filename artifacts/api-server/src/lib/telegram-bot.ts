@@ -3,6 +3,7 @@ import { getSession, setSession, clearSession } from "./bot-state";
 import { db, usersTable, submissionsTable, withdrawalsTable, settingsTable, broadcastsTable } from "@workspace/db";
 import { eq, sql, desc } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import { verifyGmailAccount } from "./verify-gmail";
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -443,15 +444,36 @@ async function handleSubmitEmail(chatId: string, text: string): Promise<void> {
 
 async function handleSubmitPassword(chatId: string, text: string): Promise<void> {
   const session = getSession(chatId);
+  const email = session.tempEmail!;
+  const password = text.trim();
+
+  await sendMessage(chatId, `⏳ <b>Gmail ፍተሻ ላይ ነን...</b>\n\n📧 <code>${email}</code>\n\nትንሽ ይጠብቁ።`);
+
+  const verifyResult = await verifyGmailAccount(email.toLowerCase(), password);
+
+  if (verifyResult.verified === false && verifyResult.reason === "not_registered") {
+    await sendMessage(
+      chatId,
+      `❌ <b>Gmail አካውንት አልተፈጠረም!</b>\n\n📧 ኢሜይል: <code>${email}</code>\n\n⚠️ ይህ ኢሜይል Gmail ላይ አልተፈጠረም ወይም ፓስወርዱ ስህተት ነው።\n\n👉 Gmail ላይ ተመዝግበህ ከጨረስክ በኋላ እንደገና ሞክር።`,
+      mainMenu(true)
+    );
+    clearSession(chatId);
+    return;
+  }
+
+  if (verifyResult.verified === false && verifyResult.reason === "network_error") {
+    logger.warn({ chatId, email }, "Gmail IMAP network error in bot — allowing with warning");
+  }
+
   const price = await getPricePerEmail();
   const [row] = await db.insert(submissionsTable).values({
-    userId: session.userId!, email: session.tempEmail!, password: text.trim(),
+    userId: session.userId!, email: email.toLowerCase(), password,
     status: "pending", pricePaid: price,
   }).returning({ id: submissionsTable.id, email: submissionsTable.email, pricePaid: submissionsTable.pricePaid });
 
   const [user] = await db.select({ name: usersTable.name }).from(usersTable).where(eq(usersTable.id, session.userId!));
   notifyAdminNewSubmission({
-    submissionId: row.id, submittedEmail: row.email, submittedPassword: text.trim(),
+    submissionId: row.id, submittedEmail: row.email, submittedPassword: password,
     userId: session.userId!, userName: user?.name ?? null, userEmail: null, pricePaid: row.pricePaid,
   }).catch(() => {});
 
