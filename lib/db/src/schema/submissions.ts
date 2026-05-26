@@ -5,6 +5,7 @@ export const submissionsTable = pgTable("submissions", {
   userId: integer("user_id").notNull(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
+  recoveryEmail: text("recovery_email"),
   status: text("status").notNull().default("pending"),
   pricePaid: integer("price_paid").notNull().default(0),
   rejectionNote: text("rejection_note"),

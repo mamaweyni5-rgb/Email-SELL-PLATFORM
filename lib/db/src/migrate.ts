@@ -119,6 +119,10 @@ export async function runMigrations(): Promise<void> {
     await client.query(`
       ALTER TABLE generated_emails ADD COLUMN IF NOT EXISTS email_opened BOOLEAN NOT NULL DEFAULT FALSE;
     `);
+
+    await client.query(`
+      ALTER TABLE submissions ADD COLUMN IF NOT EXISTS recovery_email TEXT;
+    `);
   } finally {
     client.release();
   }

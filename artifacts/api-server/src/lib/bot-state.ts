@@ -8,6 +8,8 @@ export type BotStep =
   | "await_login_password"
   | "await_submit_email"
   | "await_submit_password"
+  | "await_submit_recovery_email"
+  | "await_bulk_submit"
   | "await_withdraw_method"
   | "await_withdraw_amount"
   | "await_withdraw_telebirr_number"
@@ -38,6 +40,7 @@ export interface BotSession {
   tempName?: string;
   tempPassword?: string;
   tempEmail?: string;
+  tempRecoveryEmail?: string;
   tempWithdrawMethod?: "telebirr" | "bank";
   tempWithdrawAmount?: number;
   tempWithdrawTelebirrNumber?: string;

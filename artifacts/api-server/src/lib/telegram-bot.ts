@@ -27,6 +27,8 @@ async function sendMessage(chatId: string, text: string, extra?: Record<string, 
   await callApi("sendMessage", { chat_id: chatId, text, parse_mode: "HTML", ...extra });
 }
 
+// ── Keyboards ─────────────────────────────────────────────────────────────
+
 function mainMenu(isLoggedIn: boolean): Record<string, unknown> {
   if (!isLoggedIn) {
     return {
@@ -40,11 +42,9 @@ function mainMenu(isLoggedIn: boolean): Record<string, unknown> {
   return {
     reply_markup: {
       keyboard: [
-        [{ text: "📊 My Profile" }, { text: "📧 Submit Email" }],
-        [{ text: "✨ Get Email" }, { text: "💸 Withdraw" }],
-        [{ text: "📋 My Submissions" }, { text: "💼 My Withdrawals" }],
-        [{ text: "🔗 Referral" }, { text: "📢 Announcements" }],
-        [{ text: "🚪 Logout" }],
+        [{ text: "+ Register a new Gmail" }, { text: "📋 My accounts" }],
+        [{ text: "💰 Balance" }, { text: "👥 My referrals" }],
+        [{ text: "⚙️ Settings" }, { text: "💬 Help" }],
       ],
       resize_keyboard: true,
       one_time_keyboard: false,
@@ -78,6 +78,32 @@ function cancelKeyboard(): Record<string, unknown> {
   };
 }
 
+function cancelRegistrationKeyboard(): Record<string, unknown> {
+  return {
+    reply_markup: {
+      keyboard: [[{ text: "⊖ Cancel registration" }]],
+      resize_keyboard: true,
+      one_time_keyboard: false,
+    },
+  };
+}
+
+function registerChoiceKeyboard(): Record<string, unknown> {
+  return {
+    reply_markup: {
+      keyboard: [
+        [{ text: "📝 Submit my own" }, { text: "🔄 Generate new name" }],
+        [{ text: "📋 Bulk submit" }],
+        [{ text: "⊖ Cancel registration" }],
+      ],
+      resize_keyboard: true,
+      one_time_keyboard: false,
+    },
+  };
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
 async function getPricePerEmail(): Promise<number> {
   const [row] = await db.select({ value: settingsTable.value }).from(settingsTable).where(eq(settingsTable.key, "price_per_email"));
   return row ? parseInt(row.value, 10) : 20;
@@ -91,6 +117,8 @@ async function getCommissionPct(): Promise<number> {
 function generateReferralCode(): string {
   return Math.random().toString(36).substring(2, 10).toUpperCase();
 }
+
+// ── Webhook setup ──────────────────────────────────────────────────────────
 
 export async function setupWebhook(webhookUrl: string): Promise<void> {
   if (!BOT_TOKEN) {
@@ -117,6 +145,8 @@ export async function setupWebhook(webhookUrl: string): Promise<void> {
     ],
   });
 }
+
+// ── Update handler ─────────────────────────────────────────────────────────
 
 export type TelegramUpdate = {
   update_id: number;
@@ -149,12 +179,13 @@ export async function handleUpdate(update: TelegramUpdate): Promise<void> {
   const text = (msg.text ?? "").trim();
   const session = getSession(chatId);
 
-  if (text === "❌ Cancel") {
+  // Global cancel / back
+  if (text === "❌ Cancel" || text === "⊖ Cancel registration" || text === "⬅️ Back") {
     clearSession(chatId);
     if (session.isAdmin) {
       await sendMessage(chatId, "❌ Cancelled.", adminMenu());
     } else {
-      await sendMessage(chatId, "❌ Cancelled.", mainMenu(!!session.userId));
+      await sendMessage(chatId, "Use the menu below:", mainMenu(!!session.userId));
     }
     return;
   }
@@ -165,12 +196,12 @@ export async function handleUpdate(update: TelegramUpdate): Promise<void> {
     if (session.userId) {
       const [user] = await db.select({ name: usersTable.name, walletBalance: usersTable.walletBalance }).from(usersTable).where(eq(usersTable.id, session.userId));
       await sendMessage(chatId,
-        `👋 <b>Welcome back, ${user?.name ?? firstName}!</b>\n\n💰 Wallet: <b>${user?.walletBalance ?? 0} ETB</b>\n\nWhat would you like to do?`,
+        `YOU CAN EARN FOR EACH GMAIL ACCOUNT YOU CREATE! ✅💰\n\n<b>STEP 1)</b> Register a new Gmail account using the credentials we provide.\n\n<b>STEP 2)</b> Submit the account here and get paid.\n\n👋 Welcome back, <b>${user?.name ?? firstName}</b>!\n💰 Wallet: <b>${user?.walletBalance ?? 0} ETB</b>`,
         mainMenu(true)
       );
     } else {
       await sendMessage(chatId,
-        `👋 <b>Hello, ${firstName}!</b>\n\n🌟 Welcome to <b>MailMart</b>!\n\n💡 Turn your unused Gmail accounts into cash — <b>get paid</b> for every email you submit.\n\n👇 Register or login to get started:`,
+        `YOU CAN EARN FOR EACH GMAIL ACCOUNT YOU CREATE! ✅💰\n\n<b>STEP 1)</b> Register a new Gmail account using the credentials we provide.\n\n<b>STEP 2)</b> Submit the account here and get paid.\n\n👋 Hello, <b>${firstName}</b>! Register or login to get started:`,
         mainMenu(false)
       );
     }
@@ -184,10 +215,7 @@ export async function handleUpdate(update: TelegramUpdate): Promise<void> {
   }
 
   if (text === "/help") {
-    await sendMessage(chatId,
-      `ℹ️ <b>Help</b>\n\n📝 <b>Register</b> — Create a new account\n🔑 <b>Login</b> — Sign in to your account\n📧 <b>Submit Email</b> — Submit a Gmail account for sale\n💸 <b>Withdraw</b> — Withdraw your earnings\n📊 <b>My Profile</b> — View your wallet & stats\n\n/start — Return to the main menu`,
-      mainMenu(!!session.userId)
-    );
+    await showHelp(chatId);
     return;
   }
 
@@ -201,6 +229,8 @@ export async function handleUpdate(update: TelegramUpdate): Promise<void> {
     case "await_login_password": await handleLoginPassword(chatId, text); break;
     case "await_submit_email": await handleSubmitEmail(chatId, text); break;
     case "await_submit_password": await handleSubmitPassword(chatId, text); break;
+    case "await_submit_recovery_email": await handleSubmitRecoveryEmail(chatId, text); break;
+    case "await_bulk_submit": await handleBulkSubmit(chatId, text); break;
     case "await_withdraw_method": await handleWithdrawMethod(chatId, text); break;
     case "await_withdraw_amount": await handleWithdrawAmount(chatId, text); break;
     case "await_withdraw_telebirr_number": await handleWithdrawTelebirrNumber(chatId, text); break;
@@ -230,6 +260,8 @@ export async function handleUpdate(update: TelegramUpdate): Promise<void> {
   }
 }
 
+// ── Idle message router ────────────────────────────────────────────────────
+
 async function handleIdleMessage(chatId: string, text: string, session: ReturnType<typeof getSession>): Promise<void> {
   if (!session.userId) {
     switch (text) {
@@ -246,61 +278,117 @@ async function handleIdleMessage(chatId: string, text: string, session: ReturnTy
     }
     return;
   }
+
   switch (text) {
-    case "📊 My Profile": await showProfile(chatId, session.userId); break;
-    case "📧 Submit Email":
-      setSession(chatId, { step: "await_submit_email" });
-      await sendMessage(chatId, `📧 <b>Submit Gmail</b>\n\nEnter your Gmail address:\n<i>Example: example@gmail.com</i>`, cancelKeyboard());
+    // ── Main menu ──────────────────────────────────────────────────────────
+    case "+ Register a new Gmail":
+    case "+ Register new Gmail":
+      await sendMessage(chatId,
+        `Do you want us to generate a login and password for you or you already have an account?`,
+        registerChoiceKeyboard()
+      );
       break;
-    case "✨ Get Email": await handleGetEmailMenu(chatId, session.userId!); break;
-    case "💸 Withdraw": await startWithdraw(chatId, session.userId); break;
-    case "📋 My Submissions": await showSubmissions(chatId, session.userId); break;
-    case "💼 My Withdrawals": await showWithdrawals(chatId, session.userId); break;
-    case "🔗 Referral": await showReferral(chatId, session.userId); break;
-    case "📢 Announcements": await showBroadcasts(chatId); break;
+
+    case "📋 My accounts": await showMyAccounts(chatId, session.userId); break;
+    case "💰 Balance":     await showBalance(chatId, session.userId);    break;
+    case "👥 My referrals": await showReferral(chatId, session.userId);  break;
+    case "⚙️ Settings":   await showSettings(chatId, session.userId);   break;
+    case "💬 Help":        await showHelp(chatId);                       break;
+
+    // ── Register choice ────────────────────────────────────────────────────
+    case "📝 Submit my own":
+      setSession(chatId, { step: "await_submit_email" });
+      await sendMessage(chatId, "📋 Please enter your Gmail email address:", cancelRegistrationKeyboard());
+      break;
+
+    case "🔄 Generate new name":
+      await handleGetEmailMenu(chatId, session.userId!);
+      break;
+
+    case "📋 Bulk submit":
+      setSession(chatId, { step: "await_bulk_submit" });
+      await sendMessage(chatId,
+        `📋 <b>Bulk Submit</b>\n\nEnter Gmail accounts one per line:\n<code>email@gmail.com:password</code>\nor\n<code>email@gmail.com:password:recovery@email.com</code>\n\nSend your list now:`,
+        cancelRegistrationKeyboard()
+      );
+      break;
+
+    // ── My accounts sub-buttons ────────────────────────────────────────────
+    case "🔄 Refresh":
+      await showMyAccounts(chatId, session.userId);
+      break;
+
+    // ── Balance sub-buttons ────────────────────────────────────────────────
+    case "💸 Withdraw":           await startWithdraw(chatId, session.userId);     break;
+    case "📋 Withdrawal History": await showWithdrawals(chatId, session.userId);   break;
+
+    // ── Settings sub-buttons ───────────────────────────────────────────────
     case "🚪 Logout":
       setSession(chatId, { step: "idle", userId: undefined, isAdmin: false });
       await sendMessage(chatId, "👋 You have been logged out. See you next time!", mainMenu(false));
       break;
+
     default:
       await sendMessage(chatId, "👇 Use the menu below:", mainMenu(true));
   }
 }
 
-async function showProfile(chatId: string, userId: number): Promise<void> {
+// ── User views ─────────────────────────────────────────────────────────────
+
+async function showBalance(chatId: string, userId: number): Promise<void> {
   const [user] = await db.select({
-    name: usersTable.name, walletBalance: usersTable.walletBalance,
-    referralCode: usersTable.referralCode, commissionEarned: usersTable.commissionEarned,
+    name: usersTable.name, walletBalance: usersTable.walletBalance, commissionEarned: usersTable.commissionEarned,
   }).from(usersTable).where(eq(usersTable.id, userId));
   if (!user) { await sendMessage(chatId, "❌ Account not found.", mainMenu(false)); return; }
 
-  const [stats] = await db.select({
-    total: sql<number>`count(*)::int`,
-    approved: sql<number>`count(*) filter (where ${submissionsTable.status} = 'approved')::int`,
-    pending: sql<number>`count(*) filter (where ${submissionsTable.status} = 'pending')::int`,
-  }).from(submissionsTable).where(eq(submissionsTable.userId, userId));
-
   await sendMessage(chatId,
-    `📊 <b>My Profile</b>\n\n👤 Name: <b>${user.name}</b>\n💰 Wallet: <b>${user.walletBalance} ETB</b>\n🏆 Commission: <b>${user.commissionEarned} ETB</b>\n\n📧 <b>Submissions</b>\n• Total: ${stats?.total ?? 0}\n• ✅ Approved: ${stats?.approved ?? 0}\n• ⏳ Pending: ${stats?.pending ?? 0}\n\n🔗 Referral Code: <code>${user.referralCode}</code>`,
-    mainMenu(true)
+    `💰 <b>Balance</b>\n\n👤 ${user.name}\n\n💵 Wallet: <b>${user.walletBalance} ETB</b>\n🏆 Commission earned: <b>${user.commissionEarned} ETB</b>`,
+    {
+      reply_markup: {
+        keyboard: [[{ text: "💸 Withdraw" }, { text: "📋 Withdrawal History" }], [{ text: "⬅️ Back" }]],
+        resize_keyboard: true,
+        one_time_keyboard: false,
+      },
+    }
   );
 }
 
-async function showSubmissions(chatId: string, userId: number): Promise<void> {
+async function showMyAccounts(chatId: string, userId: number): Promise<void> {
   const rows = await db.select({
     email: submissionsTable.email, status: submissionsTable.status,
     pricePaid: submissionsTable.pricePaid, rejectionNote: submissionsTable.rejectionNote,
+    createdAt: submissionsTable.createdAt,
   }).from(submissionsTable).where(eq(submissionsTable.userId, userId)).orderBy(desc(submissionsTable.createdAt)).limit(10);
 
-  if (rows.length === 0) { await sendMessage(chatId, "📋 You haven't submitted anything yet.", mainMenu(true)); return; }
+  const total = rows.length;
+  const paid    = rows.filter((r) => r.status === "approved").length;
+  const pending  = rows.filter((r) => r.status === "pending").length;
+  const declined = rows.filter((r) => r.status === "rejected").length;
 
-  const e: Record<string, string> = { pending: "⏳", approved: "✅", rejected: "❌" };
-  const lines = rows.map((r) => {
-    let line = `${e[r.status] ?? "❓"} <code>${r.email}</code> — ${r.pricePaid} ETB`;
-    if (r.status === "rejected" && r.rejectionNote) line += `\n   ↳ ${r.rejectionNote}`;
-    return line;
+  const icon: Record<string, string>  = { approved: "✅", pending: "🔄", rejected: "❌" };
+  const label: Record<string, string> = { approved: "paid", pending: "processing", rejected: "declined" };
+
+  const summary = total === 0
+    ? "No accounts submitted yet."
+    : `📊 Summary:\n✅ Paid: ${paid}  ⏳ Pending: ${pending}  ❌ Declined: ${declined}`;
+
+  const lines = rows.map((r, i) => {
+    const date = new Date(r.createdAt).toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "numeric" });
+    let entry = `${i + 1}. ${icon[r.status] ?? "❓"} Create account on GOOGLE\n💰 ${r.pricePaid} ETB | 📅 ${date} | ${label[r.status] ?? r.status}\n📧 <code>${r.email}</code>`;
+    if (r.status === "rejected" && r.rejectionNote) entry += `\n   ↳ ${r.rejectionNote}`;
+    return entry;
   });
-  await sendMessage(chatId, `📋 <b>My Submissions</b> (last 10)\n\n${lines.join("\n\n")}`, mainMenu(true));
+
+  await sendMessage(chatId,
+    `📋 <b>Your submitted accounts (${total}):</b>\n\n${summary}${lines.length ? `\n\n${lines.join("\n\n")}` : ""}`,
+    {
+      reply_markup: {
+        keyboard: [[{ text: "🔄 Refresh" }, { text: "+ Register new Gmail" }], [{ text: "⬅️ Back" }]],
+        resize_keyboard: true,
+        one_time_keyboard: false,
+      },
+    }
+  );
 }
 
 async function showWithdrawals(chatId: string, userId: number): Promise<void> {
@@ -309,7 +397,11 @@ async function showWithdrawals(chatId: string, userId: number): Promise<void> {
     status: withdrawalsTable.status, adminNote: withdrawalsTable.adminNote,
   }).from(withdrawalsTable).where(eq(withdrawalsTable.userId, userId)).orderBy(desc(withdrawalsTable.createdAt)).limit(10);
 
-  if (rows.length === 0) { await sendMessage(chatId, "💼 You haven't made any withdrawal requests yet.", mainMenu(true)); return; }
+  if (rows.length === 0) {
+    await sendMessage(chatId, "💼 No withdrawal requests yet.",
+      { reply_markup: { keyboard: [[{ text: "⬅️ Back" }]], resize_keyboard: true } });
+    return;
+  }
 
   const e: Record<string, string> = { pending: "⏳", completed: "✅", rejected: "❌" };
   const lines = rows.map((r) => {
@@ -317,7 +409,8 @@ async function showWithdrawals(chatId: string, userId: number): Promise<void> {
     if (r.adminNote) line += `\n   ↳ ${r.adminNote}`;
     return line;
   });
-  await sendMessage(chatId, `💼 <b>My Withdrawals</b> (last 10)\n\n${lines.join("\n\n")}`, mainMenu(true));
+  await sendMessage(chatId, `💼 <b>Withdrawal History</b> (last 10)\n\n${lines.join("\n\n")}`,
+    { reply_markup: { keyboard: [[{ text: "⬅️ Back" }]], resize_keyboard: true } });
 }
 
 async function showReferral(chatId: string, userId: number): Promise<void> {
@@ -325,22 +418,50 @@ async function showReferral(chatId: string, userId: number): Promise<void> {
   const [refCount] = await db.select({ count: sql<number>`count(*)::int` }).from(usersTable).where(eq(usersTable.referredBy, userId));
   const commissionPct = await getCommissionPct();
   await sendMessage(chatId,
-    `🔗 <b>Referral Program</b>\n\n📌 Your code: <code>${user?.referralCode}</code>\n\n👥 Friends invited: <b>${refCount?.count ?? 0}</b>\n💰 Commission earned: <b>${user?.commissionEarned ?? 0} ETB</b>\n\n📊 You earn <b>${commissionPct}%</b> commission on every approved submission from your referrals!`,
-    mainMenu(true)
+    `👥 <b>My Referrals</b>\n\n📌 Your code: <code>${user?.referralCode}</code>\n\n👥 Friends invited: <b>${refCount?.count ?? 0}</b>\n💰 Commission earned: <b>${user?.commissionEarned ?? 0} ETB</b>\n\n📊 You earn <b>${commissionPct}%</b> commission on every approved submission from your referrals!`,
+    { reply_markup: { keyboard: [[{ text: "⬅️ Back" }]], resize_keyboard: true } }
   );
 }
 
-async function showBroadcasts(chatId: string): Promise<void> {
-  const rows = await db.select({ title: broadcastsTable.title, message: broadcastsTable.message, createdAt: broadcastsTable.createdAt }).from(broadcastsTable).orderBy(desc(broadcastsTable.createdAt)).limit(5);
-  if (rows.length === 0) { await sendMessage(chatId, "📢 No announcements right now.", mainMenu(true)); return; }
-  const lines = rows.map((r) => `📢 <b>${r.title}</b>\n${r.message}\n<i>${new Date(r.createdAt).toLocaleDateString("en-US")}</i>`);
-  await sendMessage(chatId, `📢 <b>Announcements</b>\n\n${lines.join("\n\n─────────────\n\n")}`, mainMenu(true));
+async function showSettings(chatId: string, _userId: number): Promise<void> {
+  await sendMessage(chatId,
+    `⚙️ <b>Settings</b>\n\nManage your account settings below.`,
+    {
+      reply_markup: {
+        keyboard: [[{ text: "🚪 Logout" }], [{ text: "⬅️ Back" }]],
+        resize_keyboard: true,
+        one_time_keyboard: false,
+      },
+    }
+  );
 }
+
+async function showHelp(chatId: string): Promise<void> {
+  const rows = await db.select({ title: broadcastsTable.title, message: broadcastsTable.message })
+    .from(broadcastsTable).orderBy(desc(broadcastsTable.createdAt)).limit(3);
+
+  const announcementSection = rows.length
+    ? `\n\n📢 <b>Latest Announcements</b>\n\n${rows.map((r) => `• <b>${r.title}</b>\n${r.message}`).join("\n\n")}`
+    : "";
+
+  await sendMessage(chatId,
+    `💬 <b>Help</b>\n\n` +
+    `+ <b>Register a new Gmail</b> — Submit a Gmail account and get paid\n` +
+    `📋 <b>My accounts</b> — View your submission history\n` +
+    `💰 <b>Balance</b> — Check your wallet and withdraw\n` +
+    `👥 <b>My referrals</b> — Refer friends and earn commission\n\n` +
+    `Technical support: @support${announcementSection}`,
+    { reply_markup: { keyboard: [[{ text: "⬅️ Back" }]], resize_keyboard: true } }
+  );
+}
+
+// ── Withdraw flow ──────────────────────────────────────────────────────────
 
 async function startWithdraw(chatId: string, userId: number): Promise<void> {
   const [user] = await db.select({ walletBalance: usersTable.walletBalance }).from(usersTable).where(eq(usersTable.id, userId));
   if (!user || user.walletBalance < 50) {
-    await sendMessage(chatId, `💸 <b>Withdraw</b>\n\n💰 Your wallet: <b>${user?.walletBalance ?? 0} ETB</b>\n\n❌ You need at least <b>50 ETB</b> to withdraw.`, mainMenu(true));
+    await sendMessage(chatId, `💸 <b>Withdraw</b>\n\n💰 Your wallet: <b>${user?.walletBalance ?? 0} ETB</b>\n\n❌ You need at least <b>50 ETB</b> to withdraw.`,
+      { reply_markup: { keyboard: [[{ text: "⬅️ Back" }]], resize_keyboard: true } });
     return;
   }
   setSession(chatId, { step: "await_withdraw_method" });
@@ -348,6 +469,8 @@ async function startWithdraw(chatId: string, userId: number): Promise<void> {
     { reply_markup: { keyboard: [[{ text: "📱 Telebirr" }, { text: "🏦 Bank" }], [{ text: "❌ Cancel" }]], resize_keyboard: true } }
   );
 }
+
+// ── Register flow ──────────────────────────────────────────────────────────
 
 async function handleRegisterName(chatId: string, text: string): Promise<void> {
   const name = text.trim();
@@ -403,7 +526,7 @@ async function handleRegisterReferral(chatId: string, text: string): Promise<voi
 
     setSession(chatId, { step: "idle", userId: user.id, tempName: undefined, tempPassword: undefined, isAdmin: false });
     await sendMessage(chatId,
-      `✅ <b>Registration successful!</b>\n\n👤 Name: <b>${user.name}</b>\n🔗 Referral Code: <code>${newCode}</code>\n\nYou can now submit Gmail accounts!`,
+      `✅ <b>Registration successful!</b>\n\n👤 Name: <b>${user.name}</b>\n🔗 Referral Code: <code>${newCode}</code>\n\nTap <b>+ Register a new Gmail</b> to submit your first account!`,
       mainMenu(true)
     );
   } catch {
@@ -411,6 +534,8 @@ async function handleRegisterReferral(chatId: string, text: string): Promise<voi
     await sendMessage(chatId, "❌ Registration failed. Please try again. /start", mainMenu(false));
   }
 }
+
+// ── Login flow ─────────────────────────────────────────────────────────────
 
 async function handleLoginName(chatId: string, text: string): Promise<void> {
   setSession(chatId, { step: "await_login_password", tempName: text.trim() });
@@ -439,41 +564,76 @@ async function handleLoginPassword(chatId: string, text: string): Promise<void> 
   await sendMessage(chatId, `✅ <b>Logged in!</b>\n\n👤 <b>${user.name}</b>\n💰 Wallet: <b>${user.walletBalance} ETB</b>`, mainMenu(true));
 }
 
+// ── Submit own email flow ──────────────────────────────────────────────────
+
 async function handleSubmitEmail(chatId: string, text: string): Promise<void> {
   const email = text.trim().toLowerCase();
-  if (!email.endsWith("@gmail.com")) { await sendMessage(chatId, "❌ Please enter a valid Gmail address (@gmail.com only):"); return; }
+  if (!email.endsWith("@gmail.com")) {
+    await sendMessage(chatId, "❌ Please enter a valid Gmail address (@gmail.com only):", cancelRegistrationKeyboard());
+    return;
+  }
   const [existing] = await db.select({ id: submissionsTable.id }).from(submissionsTable).where(eq(submissionsTable.email, email));
-  if (existing) { await sendMessage(chatId, "❌ This email has already been submitted. Try another one:"); return; }
+  if (existing) {
+    await sendMessage(chatId, "❌ This email has already been submitted. Try another one:", cancelRegistrationKeyboard());
+    return;
+  }
   setSession(chatId, { step: "await_submit_password", tempEmail: email });
-  await sendMessage(chatId, `📧 Email: <code>${email}</code>\n\n🔑 Enter the password for this Gmail account:`);
+  await sendMessage(chatId, `🔒 Please enter your password:`, cancelRegistrationKeyboard());
 }
 
 async function handleSubmitPassword(chatId: string, text: string): Promise<void> {
+  const password = text.trim();
+  if (password.length < 6) {
+    await sendMessage(chatId, "❌ Password must be at least 6 characters:", cancelRegistrationKeyboard());
+    return;
+  }
+  setSession(chatId, { step: "await_submit_recovery_email", tempPassword: password });
+  await sendMessage(chatId,
+    `📋 Please enter your recovery email address:\n<i>(or type <b>Skip</b> to skip)</i>`,
+    { reply_markup: { keyboard: [[{ text: "Skip" }], [{ text: "⊖ Cancel registration" }]], resize_keyboard: true } }
+  );
+}
+
+async function handleSubmitRecoveryEmail(chatId: string, text: string): Promise<void> {
   const session = getSession(chatId);
   const email = session.tempEmail!;
-  const password = text.trim();
+  const password = session.tempPassword!;
+  const recoveryEmail = text === "Skip" ? null : text.trim().toLowerCase();
 
-  await sendMessage(chatId, `⏳ <b>Verifying Gmail...</b>\n\n📧 <code>${email}</code>\n\nPlease wait.`);
-
-  const verifyResult = await verifyGmailAccount(email.toLowerCase(), password);
-
-  if (verifyResult.verified === false && verifyResult.reason === "not_registered") {
-    await sendMessage(
-      chatId,
-      `❌ <b>Gmail account not found!</b>\n\n📧 Email: <code>${email}</code>\n\n⚠️ This email does not exist on Gmail or the password is incorrect.\n\n👉 Please try again after registering the account on Gmail.`,
-      mainMenu(true)
-    );
-    clearSession(chatId);
+  if (recoveryEmail !== null && !recoveryEmail.includes("@")) {
+    await sendMessage(chatId, "❌ Please enter a valid email address or tap Skip:",
+      { reply_markup: { keyboard: [[{ text: "Skip" }], [{ text: "⊖ Cancel registration" }]], resize_keyboard: true } });
     return;
   }
 
+  await sendMessage(chatId, `🔍 Checking if credentials are unique...`);
+
+  // Re-check uniqueness
+  const [existing] = await db.select({ id: submissionsTable.id }).from(submissionsTable).where(eq(submissionsTable.email, email));
+  if (existing) {
+    clearSession(chatId);
+    await sendMessage(chatId, "❌ This email has already been submitted by someone else.", mainMenu(true));
+    return;
+  }
+
+  // IMAP verification
+  const verifyResult = await verifyGmailAccount(email, password);
+  if (verifyResult.verified === false && verifyResult.reason === "not_registered") {
+    clearSession(chatId);
+    await sendMessage(chatId,
+      `❌ <b>Gmail account not found!</b>\n\n📧 <code>${email}</code>\n\n⚠️ This email does not exist on Gmail or the password is incorrect.\n\n👉 Please create the Gmail account first, then submit again.`,
+      mainMenu(true)
+    );
+    return;
+  }
   if (verifyResult.verified === false && verifyResult.reason === "network_error") {
-    logger.warn({ chatId, email }, "Gmail IMAP network error in bot — allowing with warning");
+    logger.warn({ chatId, email }, "Gmail IMAP network error in bot — allowing");
   }
 
   const price = await getPricePerEmail();
   const [row] = await db.insert(submissionsTable).values({
-    userId: session.userId!, email: email.toLowerCase(), password,
+    userId: session.userId!, email, password,
+    recoveryEmail: recoveryEmail ?? undefined,
     status: "pending", pricePaid: price,
   }).returning({ id: submissionsTable.id, email: submissionsTable.email, pricePaid: submissionsTable.pricePaid });
 
@@ -485,25 +645,77 @@ async function handleSubmitPassword(chatId: string, text: string): Promise<void>
 
   clearSession(chatId);
   await sendMessage(chatId,
-    `✅ <b>Submission received!</b>\n\n📧 Email: <code>${row.email}</code>\n💰 Price: <b>${row.pricePaid} ETB</b> (added once approved)\n\n⏳ You will be notified as soon as it is reviewed!`,
+    `✅ <b>Submission received!</b>\n\n📧 Email: <code>${row.email}</code>\n💰 Price: <b>${row.pricePaid} ETB</b> (added once approved)\n\n⏳ You will be notified once it is reviewed!`,
     mainMenu(true)
   );
 }
 
-// ── Generated Email keyboards ─────────────────────────────────────────────
+// ── Bulk submit flow ───────────────────────────────────────────────────────
+
+async function handleBulkSubmit(chatId: string, text: string): Promise<void> {
+  const session = getSession(chatId);
+  const lines = text.trim().split("\n").filter(Boolean);
+
+  const parsed: { email: string; password: string; recovery: string | null }[] = [];
+  for (const line of lines) {
+    const parts = line.split(":").map((p) => p.trim());
+    if (parts.length >= 2 && parts[0].includes("@gmail.com")) {
+      parsed.push({ email: parts[0].toLowerCase(), password: parts[1], recovery: parts[2] ?? null });
+    }
+  }
+
+  if (parsed.length === 0) {
+    await sendMessage(chatId,
+      `❌ No valid entries found.\n\nFormat:\n<code>email@gmail.com:password</code>\nor\n<code>email@gmail.com:password:recovery@email.com</code>`,
+      cancelRegistrationKeyboard()
+    );
+    return;
+  }
+
+  await sendMessage(chatId, `🔍 Processing ${parsed.length} email(s)...`);
+
+  const price = await getPricePerEmail();
+  let added = 0;
+  let skipped = 0;
+
+  for (const entry of parsed) {
+    try {
+      const [existing] = await db.select({ id: submissionsTable.id }).from(submissionsTable).where(eq(submissionsTable.email, entry.email));
+      if (existing) { skipped++; continue; }
+
+      const [row] = await db.insert(submissionsTable).values({
+        userId: session.userId!, email: entry.email, password: entry.password,
+        recoveryEmail: entry.recovery ?? undefined,
+        status: "pending", pricePaid: price,
+      }).returning({ id: submissionsTable.id, email: submissionsTable.email, pricePaid: submissionsTable.pricePaid });
+
+      const [user] = await db.select({ name: usersTable.name }).from(usersTable).where(eq(usersTable.id, session.userId!));
+      notifyAdminNewSubmission({
+        submissionId: row.id, submittedEmail: row.email, submittedPassword: entry.password,
+        userId: session.userId!, userName: user?.name ?? null, userEmail: null, pricePaid: price,
+      }).catch(() => {});
+
+      added++;
+    } catch {
+      skipped++;
+    }
+  }
+
+  clearSession(chatId);
+  await sendMessage(chatId,
+    `✅ <b>Bulk submit done!</b>\n\n✅ Submitted: <b>${added}</b>\n❌ Skipped (duplicates/errors): <b>${skipped}</b>\n\n💰 Each approved account will add <b>${price} ETB</b> to your wallet.`,
+    mainMenu(true)
+  );
+}
+
+// ── Generated Email flow ───────────────────────────────────────────────────
 
 function genEmailClaimedKeyboard(emailOpened: boolean): Record<string, unknown> {
   return {
     reply_markup: {
       keyboard: emailOpened
-        ? [
-            [{ text: "📤 Submit" }],
-            [{ text: "↩️ Return Email" }, { text: "❌ Cancel" }],
-          ]
-        : [
-            [{ text: "📧 I Opened Gmail" }],
-            [{ text: "↩️ Return Email" }, { text: "❌ Cancel" }],
-          ],
+        ? [[{ text: "📤 Submit" }], [{ text: "↩️ Return Email" }, { text: "⊖ Cancel registration" }]]
+        : [[{ text: "📧 I Opened Gmail" }], [{ text: "↩️ Return Email" }, { text: "⊖ Cancel registration" }]],
       resize_keyboard: true,
       one_time_keyboard: false,
     },
@@ -513,7 +725,7 @@ function genEmailClaimedKeyboard(emailOpened: boolean): Record<string, unknown> 
 function genEmailConfirmKeyboard(): Record<string, unknown> {
   return {
     reply_markup: {
-      keyboard: [[{ text: "✅ Take it" }, { text: "❌ Cancel" }]],
+      keyboard: [[{ text: "✅ Take it" }, { text: "⊖ Cancel registration" }]],
       resize_keyboard: true,
       one_time_keyboard: false,
     },
@@ -535,24 +747,24 @@ async function getClaimedEmail(userId: number): Promise<GenEmailRow | null> {
 }
 
 function buildClaimedEmailMessage(row: GenEmailRow): string {
-  const nameLine = row.name ? `\n👤 Name: <code>${row.name}</code>` : "";
+  const nameLine = row.name ? `\nFirst name: <code>${row.name}</code>` : "";
   const openedStatus = row.email_opened
     ? "✅ Gmail opened — you can now submit!"
-    : "⚠️ <b>You must open Gmail before submitting!</b>";
+    : "🔒 Be sure to use the specified data, otherwise the account will not be paid.";
   return (
-    `✨ <b>Your Email</b>${nameLine}\n` +
-    `📧 <code>${row.email}</code>\n` +
-    `🔑 <code>${row.password}</code>\n\n` +
+    `Register a Gmail account using the specified data and get paid!\n\n` +
+    `${nameLine}\n` +
+    `Email: <code>${row.email}</code>\n` +
+    `Password: <code>${row.password}</code>\n\n` +
     `${openedStatus}\n\n` +
-    `📋 <b>Steps:</b>\n` +
+    `<b>Steps:</b>\n` +
     `1️⃣ Copy the email and password above\n` +
-    `2️⃣ Go to Gmail (accounts.google.com) → Create account\n` +
+    `2️⃣ Go to accounts.google.com → Create account\n` +
     `3️⃣ After signing up, tap <b>"📧 I Opened Gmail"</b>\n` +
     `4️⃣ Tap <b>"📤 Submit"</b>`
   );
 }
 
-// Entry point: user taps "✨ Get Email"
 async function handleGetEmailMenu(chatId: string, userId: number): Promise<void> {
   const existing = await getClaimedEmail(userId);
   if (existing) {
@@ -567,30 +779,21 @@ async function handleGetEmailMenu(chatId: string, userId: number): Promise<void>
   const count = (rows[0] as { count: number }).count;
 
   if (count === 0) {
-    await sendMessage(chatId,
-      `😔 <b>No emails available right now.</b>\n\nPlease check back later.`,
-      mainMenu(true)
-    );
+    await sendMessage(chatId, `😔 <b>No emails available right now.</b>\n\nPlease check back later.`, mainMenu(true));
     return;
   }
 
   setSession(chatId, { step: "gen_email_confirm" });
   await sendMessage(chatId,
-    `✨ <b>Get Email</b>\n\n` +
-    `📦 Available emails: <b>${count}</b>\n\n` +
-    `⚠️ <b>Warning — please read before continuing!</b>\n\n` +
-    `• You must complete a <b>real Gmail sign-up</b> with the assigned email\n` +
-    `• Submitting without opening Gmail will get your <b>account banned!</b>\n\n` +
-    `Tap <b>"✅ Take it"</b> to claim your email.`,
+    `✨ <b>Generate new name</b>\n\n📦 Available: <b>${count}</b>\n\n⚠️ <b>Warning — please read before continuing!</b>\n\n• You must complete a <b>real Gmail sign-up</b> with the assigned credentials\n• Submitting without opening Gmail will get your <b>account banned!</b>\n\nTap <b>"✅ Take it"</b> to claim your credentials.`,
     genEmailConfirmKeyboard()
   );
 }
 
-// Step: gen_email_confirm — waiting for "✅ Take it" or "❌ Cancel"
 async function handleGenEmailConfirm(chatId: string, text: string, userId: number): Promise<void> {
   if (text !== "✅ Take it") {
     clearSession(chatId);
-    await sendMessage(chatId, "❌ Cancelled.", mainMenu(true));
+    await sendMessage(chatId, "Use the menu below:", mainMenu(true));
     return;
   }
 
@@ -620,10 +823,9 @@ async function handleGenEmailConfirm(chatId: string, text: string, userId: numbe
 
   const row = rows[0] as GenEmailRow;
   setSession(chatId, { step: "gen_email_view" });
-  await sendMessage(chatId, buildClaimedEmailMessage(row), genEmailClaimedKeyboard(row.email_opened));
+  await sendMessage(chatId, `Wait a moment...\n\n${buildClaimedEmailMessage(row)}`, genEmailClaimedKeyboard(row.email_opened));
 }
 
-// Step: gen_email_view — "📧 I Opened Gmail" | "📤 Submit" | "↩️ Return Email"
 async function handleGenEmailAction(chatId: string, text: string, userId: number): Promise<void> {
   const row = await getClaimedEmail(userId);
   if (!row) {
@@ -638,8 +840,7 @@ async function handleGenEmailAction(chatId: string, text: string, userId: number
       [row.id, userId]
     );
     await sendMessage(chatId,
-      `✅ <b>Confirmed!</b>\n\n📧 <code>${row.email}</code>\n🔑 <code>${row.password}</code>\n\n` +
-      `✅ Gmail opened — now tap <b>"📤 Submit"</b>!`,
+      `✅ <b>Confirmed!</b>\n\nEmail: <code>${row.email}</code>\nPassword: <code>${row.password}</code>\n\n✅ Gmail opened — now tap <b>"📤 Submit"</b>!`,
       genEmailClaimedKeyboard(true)
     );
     return;
@@ -659,22 +860,19 @@ async function handleGenEmailAction(chatId: string, text: string, userId: number
   if (text === "📤 Submit") {
     if (!row.email_opened) {
       await sendMessage(chatId,
-        `⚠️ <b>You must open Gmail first!</b>\n\n` +
-        `Tap <b>"📧 I Opened Gmail"</b> after signing up, then submit.`,
+        `⚠️ <b>You must open Gmail first!</b>\n\nTap <b>"📧 I Opened Gmail"</b> after signing up, then submit.`,
         genEmailClaimedKeyboard(false)
       );
       return;
     }
 
-    await sendMessage(chatId, `⏳ <b>Verifying Gmail...</b>\n\nPlease wait.`);
+    await sendMessage(chatId, `🔍 Checking if credentials are unique...`);
 
     const verifyResult = await verifyGmailAccount(row.email.toLowerCase(), row.password);
 
     if (verifyResult.verified === false && verifyResult.reason === "not_registered") {
       await sendMessage(chatId,
-        `❌ <b>Gmail account not found!</b>\n\n📧 <code>${row.email}</code>\n\n` +
-        `This email was not registered on Gmail or the password is incorrect.\n\n` +
-        `👉 Complete the Gmail sign-up, then tap <b>"📧 I Opened Gmail"</b> and try submitting again.`,
+        `❌ <b>Gmail account not found!</b>\n\n📧 <code>${row.email}</code>\n\nThis email was not registered on Gmail or the password is incorrect.\n\n👉 Complete the Gmail sign-up, then tap <b>"📧 I Opened Gmail"</b> and try submitting again.`,
         genEmailClaimedKeyboard(false)
       );
       await pool.query("UPDATE generated_emails SET email_opened = FALSE WHERE id = $1", [row.id]);
@@ -685,10 +883,7 @@ async function handleGenEmailAction(chatId: string, text: string, userId: number
       logger.warn({ chatId, emailId: row.id }, "Gmail IMAP network error in gen_email bot flow — allowing");
     }
 
-    const { rows: existingSub } = await pool.query(
-      "SELECT id FROM submissions WHERE email = $1",
-      [row.email.toLowerCase()]
-    );
+    const { rows: existingSub } = await pool.query("SELECT id FROM submissions WHERE email = $1", [row.email.toLowerCase()]);
     if (existingSub.length > 0) {
       await pool.query("UPDATE generated_emails SET status = 'submitted' WHERE id = $1", [row.id]);
       clearSession(chatId);
@@ -707,27 +902,23 @@ async function handleGenEmailAction(chatId: string, text: string, userId: number
 
     const [user] = await db.select({ name: usersTable.name }).from(usersTable).where(eq(usersTable.id, userId));
     notifyAdminNewSubmission({
-      submissionId: subRows[0].id,
-      submittedEmail: subRows[0].email,
-      submittedPassword: row.password,
-      userId,
-      userName: user?.name ?? null,
-      userEmail: null,
-      pricePaid: price,
+      submissionId: subRows[0].id, submittedEmail: subRows[0].email,
+      submittedPassword: row.password, userId,
+      userName: user?.name ?? null, userEmail: null, pricePaid: price,
     }).catch(() => {});
 
     clearSession(chatId);
     await sendMessage(chatId,
-      `✅ <b>Submission received!</b>\n\n📧 Email: <code>${subRows[0].email}</code>\n` +
-      `💰 Price: <b>${price} ETB</b> (added once approved)\n\n⏳ You will be notified once it is reviewed!`,
+      `✅ <b>Submission received!</b>\n\n📧 <code>${subRows[0].email}</code>\n💰 Price: <b>${price} ETB</b> (added once approved)\n\n⏳ You will be notified once it is reviewed!`,
       mainMenu(true)
     );
     return;
   }
 
-  // Unknown button — re-show current state
   await sendMessage(chatId, buildClaimedEmailMessage(row), genEmailClaimedKeyboard(row.email_opened));
 }
+
+// ── Withdraw flow ──────────────────────────────────────────────────────────
 
 async function handleWithdrawMethod(chatId: string, text: string): Promise<void> {
   if (text === "📱 Telebirr") {
@@ -825,6 +1016,8 @@ async function finalizeWithdrawal(chatId: string, data: {
   );
 }
 
+// ── Admin: login ───────────────────────────────────────────────────────────
+
 async function handleAdminPassword(chatId: string, text: string): Promise<void> {
   const DEFAULT_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "mailtrade@admin2024";
   const [row] = await db.select({ value: settingsTable.value }).from(settingsTable).where(eq(settingsTable.key, "admin_password_hash"));
@@ -838,6 +1031,8 @@ async function handleAdminPassword(chatId: string, text: string): Promise<void> 
   setSession(chatId, { step: "admin_idle", isAdmin: true });
   await sendMessage(chatId, `🔐 <b>Admin Panel</b>\n\nWelcome!`, adminMenu());
 }
+
+// ── Admin: message router ──────────────────────────────────────────────────
 
 async function handleAdminMessage(chatId: string, text: string, session: ReturnType<typeof getSession>): Promise<void> {
   switch (text) {
@@ -887,6 +1082,8 @@ async function handleAdminMessage(chatId: string, text: string, session: ReturnT
   }
 }
 
+// ── Admin: stats ───────────────────────────────────────────────────────────
+
 async function showAdminStats(chatId: string): Promise<void> {
   const [userCount] = await db.select({
     count: sql<number>`count(*)::int`,
@@ -905,6 +1102,8 @@ async function showAdminStats(chatId: string): Promise<void> {
     adminMenu()
   );
 }
+
+// ── Admin: submissions ─────────────────────────────────────────────────────
 
 async function showAdminSubmissions(chatId: string): Promise<void> {
   const rows = await db.select({
@@ -980,6 +1179,8 @@ async function handleAdminRejectNote(chatId: string, text: string): Promise<void
   await sendMessage(chatId, `❌ Submission #${id} rejected${note ? `: ${note}` : "."}`, adminMenu());
 }
 
+// ── Admin: withdrawals ─────────────────────────────────────────────────────
+
 async function showAdminWithdrawals(chatId: string): Promise<void> {
   const rows = await db.select({
     id: withdrawalsTable.id, userName: usersTable.name, amount: withdrawalsTable.amount,
@@ -1038,6 +1239,8 @@ async function handleAdminWithdrawalAction(chatId: string, text: string): Promis
   }
 }
 
+// ── Admin: users ───────────────────────────────────────────────────────────
+
 async function showAdminUsers(chatId: string): Promise<void> {
   const users = await db.select({
     id: usersTable.id, name: usersTable.name, walletBalance: usersTable.walletBalance, isBanned: usersTable.isBanned,
@@ -1060,6 +1263,8 @@ async function handleAdminBanId(chatId: string, text: string): Promise<void> {
   await sendMessage(chatId, `${newBanned ? "🚫" : "✅"} User <b>${user.name}</b> (#${id}) has been ${newBanned ? "banned!" : "unbanned!"}`, adminMenu());
 }
 
+// ── Admin: broadcast ───────────────────────────────────────────────────────
+
 async function handleAdminBroadcastTitle(chatId: string, text: string): Promise<void> {
   setSession(chatId, { step: "await_admin_broadcast_message", tempBroadcastTitle: text.trim() });
   await sendMessage(chatId, `📢 Title: <b>${text.trim()}</b>\n\nEnter the broadcast message:`, cancelKeyboard());
@@ -1075,6 +1280,8 @@ async function handleAdminBroadcastMessage(chatId: string, text: string): Promis
   setSession(chatId, { step: "admin_idle", isAdmin: true, tempBroadcastTitle: undefined });
   await sendMessage(chatId, `✅ Broadcast sent to <b>${telegramUsers.length}</b> users!`, adminMenu());
 }
+
+// ── Admin: settings ────────────────────────────────────────────────────────
 
 async function showAdminSettings(chatId: string): Promise<void> {
   const price = await getPricePerEmail();
@@ -1107,6 +1314,8 @@ async function handleAdminNewPassword(chatId: string, text: string): Promise<voi
   setSession(chatId, { step: "admin_idle", isAdmin: true });
   await sendMessage(chatId, "✅ Admin password updated!", adminMenu());
 }
+
+// ── Admin: email pool ──────────────────────────────────────────────────────
 
 async function showAdminEmailPool(chatId: string): Promise<void> {
   const { rows } = await pool.query(
@@ -1177,6 +1386,8 @@ async function handleAdminEmailPool(chatId: string, text: string): Promise<void>
     adminMenu()
   );
 }
+
+// ── Admin: export ──────────────────────────────────────────────────────────
 
 async function showAdminExport(chatId: string): Promise<void> {
   await sendMessage(chatId, "📤 <b>Export</b>\n\nWhat would you like to export?",
@@ -1251,9 +1462,11 @@ async function exportData(chatId: string, type: string): Promise<void> {
   }
 }
 
+// ── Notification helpers ───────────────────────────────────────────────────
+
 export async function notifySubmissionApproved(chatId: string | null | undefined, email: string, amount: number): Promise<void> {
   if (!chatId) return;
-  await sendMessage(chatId, `✅ <b>Submission approved!</b>\n\n📧 Email: <code>${email}</code>\n💰 Payment: <b>${amount} ETB</b> has been added to your wallet!\n\n📊 Tap <b>📊 My Profile</b> to check your balance.`);
+  await sendMessage(chatId, `✅ <b>Submission approved!</b>\n\n📧 Email: <code>${email}</code>\n💰 Payment: <b>${amount} ETB</b> has been added to your wallet!\n\n📊 Tap <b>💰 Balance</b> to check your wallet.`);
 }
 
 export async function notifySubmissionRejected(chatId: string | null | undefined, email: string): Promise<void> {
