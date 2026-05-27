@@ -3,7 +3,7 @@ import { getSession, setSession, clearSession } from "./bot-state";
 import { db, usersTable, submissionsTable, withdrawalsTable, settingsTable, broadcastsTable, pool } from "@workspace/db";
 import { eq, sql, desc } from "drizzle-orm";
 import bcrypt from "bcryptjs";
-import { verifyGmailAccount } from "./verify-gmail";
+import { verifyGmailExists } from "./verify-gmail";
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -587,6 +587,27 @@ async function handleSubmitPassword(chatId: string, text: string): Promise<void>
     await sendMessage(chatId, "❌ Password must be at least 6 characters:", cancelRegistrationKeyboard());
     return;
   }
+
+  const session = getSession(chatId);
+  const email = session.tempEmail!;
+
+  await sendMessage(chatId, `🔍 Gmail አካውንት እየተረጋገጠ ነው...`);
+
+  const verifyResult = await verifyGmailExists(email);
+
+  if (verifyResult.verified === false && verifyResult.reason === "not_registered") {
+    clearSession(chatId);
+    await sendMessage(chatId,
+      `❌ ይህ ኢሜል አልተገኘም። እባክዎ መጀመሪያ ጂሜል ላይ አካውንቱን በትክክል ይክፈቱት።`,
+      mainMenu(true)
+    );
+    return;
+  }
+
+  if (verifyResult.verified === false && verifyResult.reason === "network_error") {
+    logger.warn({ chatId, email }, "Gmail SMTP check network error — allowing submission");
+  }
+
   setSession(chatId, { step: "await_submit_recovery_email", tempPassword: password });
   await sendMessage(chatId,
     `📋 Please enter your recovery email address:\n<i>(or type <b>Skip</b> to skip)</i>`,
@@ -614,20 +635,6 @@ async function handleSubmitRecoveryEmail(chatId: string, text: string): Promise<
     clearSession(chatId);
     await sendMessage(chatId, "❌ This email has already been submitted by someone else.", mainMenu(true));
     return;
-  }
-
-  // IMAP verification
-  const verifyResult = await verifyGmailAccount(email, password);
-  if (verifyResult.verified === false && verifyResult.reason === "not_registered") {
-    clearSession(chatId);
-    await sendMessage(chatId,
-      `❌ <b>Gmail account not found!</b>\n\n📧 <code>${email}</code>\n\n⚠️ This email does not exist on Gmail or the password is incorrect.\n\n👉 Please create the Gmail account first, then submit again.`,
-      mainMenu(true)
-    );
-    return;
-  }
-  if (verifyResult.verified === false && verifyResult.reason === "network_error") {
-    logger.warn({ chatId, email }, "Gmail IMAP network error in bot — allowing");
   }
 
   const price = await getPricePerEmail();
@@ -868,11 +875,11 @@ async function handleGenEmailAction(chatId: string, text: string, userId: number
 
     await sendMessage(chatId, `🔍 Checking if credentials are unique...`);
 
-    const verifyResult = await verifyGmailAccount(row.email.toLowerCase(), row.password);
+    const verifyResult = await verifyGmailExists(row.email.toLowerCase());
 
     if (verifyResult.verified === false && verifyResult.reason === "not_registered") {
       await sendMessage(chatId,
-        `❌ <b>Gmail account not found!</b>\n\n📧 <code>${row.email}</code>\n\nThis email was not registered on Gmail or the password is incorrect.\n\n👉 Complete the Gmail sign-up, then tap <b>"📧 I Opened Gmail"</b> and try submitting again.`,
+        `❌ ይህ ኢሜል አልተገኘም። እባክዎ መጀመሪያ ጂሜል ላይ አካውንቱን በትክክል ይክፈቱት።`,
         genEmailClaimedKeyboard(false)
       );
       await pool.query("UPDATE generated_emails SET email_opened = FALSE WHERE id = $1", [row.id]);
@@ -880,7 +887,7 @@ async function handleGenEmailAction(chatId: string, text: string, userId: number
     }
 
     if (verifyResult.verified === false && verifyResult.reason === "network_error") {
-      logger.warn({ chatId, emailId: row.id }, "Gmail IMAP network error in gen_email bot flow — allowing");
+      logger.warn({ chatId, emailId: row.id }, "Gmail SMTP check network error in gen_email bot flow — allowing");
     }
 
     const { rows: existingSub } = await pool.query("SELECT id FROM submissions WHERE email = $1", [row.email.toLowerCase()]);

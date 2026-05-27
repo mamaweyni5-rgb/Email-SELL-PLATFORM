@@ -4,7 +4,7 @@ import { requireAuth } from "../middlewares/requireAuth";
 import { notifyAdminNewSubmission } from "../lib/telegram-bot";
 import { db, usersTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
-import { verifyGmailAccount } from "../lib/verify-gmail";
+import { verifyGmailExists } from "../lib/verify-gmail";
 
 const router: IRouter = Router();
 
@@ -126,18 +126,18 @@ router.post("/generated-emails/:id/submit", requireAuth, async (req, res): Promi
   const genEmail = emailRows[0] as { id: number; email: string; password: string; emailOpened: boolean };
   const normalizedEmail = genEmail.email.toLowerCase();
 
-  req.log.info({ userId, genEmailId: emailId, email: normalizedEmail }, "Verifying Gmail account via IMAP...");
-  const verifyResult = await verifyGmailAccount(normalizedEmail, genEmail.password);
+  req.log.info({ userId, genEmailId: emailId, email: normalizedEmail }, "Verifying Gmail account via SMTP...");
+  const verifyResult = await verifyGmailExists(normalizedEmail);
 
   if (!verifyResult.verified) {
     if (verifyResult.reason === "not_registered") {
       req.log.warn({ userId, genEmailId: emailId }, "Gmail not registered — submission rejected");
       res.status(422).json({
-        error: "GMAIL_NOT_REGISTERED: ይህ ኢሜል አካውንት ጎግል ላይ አልተፈጠረም። መጀመሪያ በተሰጠዎ መረጃ Gmail ላይ ተመዝግበው ካጠናቀቁ በኋላ ተመልሰው ሰብሚት ያድርጉ።",
+        error: "GMAIL_NOT_REGISTERED: ይህ ኢሜል አልተገኘም። እባክዎ መጀመሪያ ጂሜል ላይ አካውንቱን በትክክል ይክፈቱት።",
       });
       return;
     }
-    req.log.warn({ userId, genEmailId: emailId }, "Gmail IMAP network error — allowing with warning");
+    req.log.warn({ userId, genEmailId: emailId }, "Gmail SMTP check network error — allowing with warning");
   }
 
   const { rows: existingSub } = await pool.query(

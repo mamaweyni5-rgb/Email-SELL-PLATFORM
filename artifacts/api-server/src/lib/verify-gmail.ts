@@ -1,64 +1,122 @@
-import { ImapFlow } from "imapflow";
+import net from "net";
 
 export type GmailVerifyResult =
   | { verified: true }
   | { verified: false; reason: "not_registered" | "network_error" };
 
 /**
- * Tries to authenticate to Gmail IMAP with the given credentials.
- * - verified = true  → account exists and password is correct (was registered)
- * - not_registered   → auth failed (account not created or wrong password)
- * - network_error    → could not reach Google (allow submission retry)
+ * Checks whether a Gmail address exists by probing Gmail's inbound MX server
+ * via a raw SMTP RCPT TO handshake. No email is ever sent.
+ *
+ * Flow: connect → read 220 banner → EHLO → MAIL FROM:<> → RCPT TO:<email> → QUIT
+ *
+ * Response codes:
+ *   250        → account exists
+ *   550/551/553 → account does not exist (not_registered)
+ *   timeout / connection error / other → network_error (caller should allow)
+ */
+export async function verifyGmailExists(
+  email: string,
+  timeoutMs = 10000
+): Promise<GmailVerifyResult> {
+  return new Promise((resolve) => {
+    let settled = false;
+
+    const settle = (result: GmailVerifyResult) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      try { socket.destroy(); } catch { /* ignore */ }
+      resolve(result);
+    };
+
+    const timer = setTimeout(
+      () => settle({ verified: false, reason: "network_error" }),
+      timeoutMs
+    );
+
+    const socket = net.createConnection({
+      host: "gmail-smtp-in.l.google.com",
+      port: 25,
+    });
+
+    let buffer = "";
+    let stage: "banner" | "ehlo" | "mailfrom" | "rcptto" | "done" = "banner";
+
+    const send = (line: string) => {
+      try { socket.write(line + "\r\n"); } catch { /* ignore */ }
+    };
+
+    socket.on("error", () => settle({ verified: false, reason: "network_error" }));
+    socket.on("timeout", () => settle({ verified: false, reason: "network_error" }));
+
+    socket.on("data", (chunk: Buffer) => {
+      buffer += chunk.toString();
+
+      const lines = buffer.split("\r\n");
+      buffer = lines.pop() ?? "";
+
+      for (const line of lines) {
+        if (!line) continue;
+        const code = parseInt(line.slice(0, 3), 10);
+        if (isNaN(code)) continue;
+
+        const isFinalLine = line[3] !== "-";
+        if (!isFinalLine) continue;
+
+        switch (stage) {
+          case "banner":
+            if (code === 220) {
+              stage = "ehlo";
+              send("EHLO smtp.verify.check");
+            } else {
+              settle({ verified: false, reason: "network_error" });
+            }
+            break;
+
+          case "ehlo":
+            if (code === 250) {
+              stage = "mailfrom";
+              send("MAIL FROM:<>");
+            } else {
+              settle({ verified: false, reason: "network_error" });
+            }
+            break;
+
+          case "mailfrom":
+            if (code === 250) {
+              stage = "rcptto";
+              send(`RCPT TO:<${email}>`);
+            } else {
+              settle({ verified: false, reason: "network_error" });
+            }
+            break;
+
+          case "rcptto":
+            stage = "done";
+            send("QUIT");
+            if (code === 250) {
+              settle({ verified: true });
+            } else if (code === 550 || code === 551 || code === 553) {
+              settle({ verified: false, reason: "not_registered" });
+            } else {
+              settle({ verified: false, reason: "network_error" });
+            }
+            break;
+        }
+      }
+    });
+  });
+}
+
+/**
+ * Legacy alias — keeps existing call-sites in generated-emails.ts compiling
+ * without requiring a password argument. The password is ignored.
  */
 export async function verifyGmailAccount(
   email: string,
-  password: string,
-  timeoutMs = 12000
+  _password: string,
+  timeoutMs = 10000
 ): Promise<GmailVerifyResult> {
-  const client = new ImapFlow({
-    host: "imap.gmail.com",
-    port: 993,
-    secure: true,
-    auth: { user: email, pass: password },
-    logger: false,
-    tls: { rejectUnauthorized: true },
-    connectionTimeout: timeoutMs,
-    greetingTimeout: timeoutMs,
-    socketTimeout: timeoutMs,
-  });
-
-  const timer = setTimeout(() => {
-    try { client.close(); } catch { /* ignore */ }
-  }, timeoutMs);
-
-  try {
-    await client.connect();
-    await client.logout();
-    return { verified: true };
-  } catch (err: unknown) {
-    // imapflow surfaces auth failures via dedicated properties, not err.message
-    // err.message is just "Command failed" for all command-level errors
-    const imapErr = err as Record<string, unknown>;
-    const isAuthErr =
-      imapErr["authenticationFailed"] === true ||
-      imapErr["serverResponseCode"] === "AUTHENTICATIONFAILED" ||
-      (typeof imapErr["response"] === "string" && (
-        imapErr["response"].includes("AUTHENTICATIONFAILED") ||
-        imapErr["response"].includes("Invalid credentials") ||
-        imapErr["response"].includes("Username and Password not accepted")
-      )) ||
-      // fallback: check message for older imapflow versions
-      (err instanceof Error && (
-        err.message.includes("Authentication failed") ||
-        err.message.includes("AUTHENTICATIONFAILED") ||
-        err.message.includes("Invalid credentials") ||
-        err.message.includes("Username and Password not accepted") ||
-        err.message.includes("NO [AUTHENTICATIONFAILED]")
-      ));
-    if (isAuthErr) return { verified: false, reason: "not_registered" };
-    return { verified: false, reason: "network_error" };
-  } finally {
-    clearTimeout(timer);
-    try { client.close(); } catch { /* ignore */ }
-  }
+  return verifyGmailExists(email, timeoutMs);
 }
