@@ -63,6 +63,26 @@ import {
   Plus,
 } from "lucide-react";
 
+function downloadTXT(filename: string, lines: string[]) {
+  const content = lines.join("\n");
+  const blob = new Blob([content], { type: "text/plain;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.style.cssText = "position:fixed;top:-100px;left:-100px;opacity:0;";
+  document.body.appendChild(a);
+  a.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 2000);
+  try {
+    const tgApp = (window as any)?.Telegram?.WebApp;
+    if (tgApp?.openLink) tgApp.openLink(url);
+  } catch (_) {}
+}
+
 function downloadCSV(filename: string, headers: string[], rows: (string | number)[][]) {
   const escape = (v: string | number) => {
     const s = String(v);
@@ -165,6 +185,32 @@ function SubmissionsTab() {
     toast({ title: "Exporting…", description: `${approved.length} approved accounts — file download started.` });
   };
 
+  const handleExportTxtEmails = () => {
+    const approved = submissions?.filter((s) => s.status === "approved") ?? [];
+    if (!approved.length) {
+      toast({ title: "ዳታ የለም", description: "ቢያንስ አንድ approved submission ይኑርዎ።" });
+      return;
+    }
+    downloadTXT(
+      `emails-${new Date().toISOString().slice(0, 10)}.txt`,
+      approved.map((s) => s.email),
+    );
+    toast({ title: "✅ TXT ተወርዷል", description: `${approved.length} ኢሜሎች — emails.txt` });
+  };
+
+  const handleExportTxtCredentials = () => {
+    const approved = submissions?.filter((s) => s.status === "approved") ?? [];
+    if (!approved.length) {
+      toast({ title: "ዳታ የለም", description: "ቢያንስ አንድ approved submission ይኑርዎ።" });
+      return;
+    }
+    downloadTXT(
+      `credentials-${new Date().toISOString().slice(0, 10)}.txt`,
+      approved.map((s) => `${s.email}:${s.password}`),
+    );
+    toast({ title: "✅ TXT ተወርዷል", description: `${approved.length} credentials — email:password format` });
+  };
+
   const handleTgExport = (type: "submissions" | "approved-submissions") => {
     tgExport.mutate({ data: { type } }, {
       onSuccess: (r) => toast({ title: "📨 Sent to Telegram", description: r.message }),
@@ -248,7 +294,7 @@ function SubmissionsTab() {
           </button>
         </div>
         {/* Export buttons */}
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button onClick={() => handleTgExport("approved-submissions")} disabled={tgExport.isPending} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all" style={{ background: "hsl(200,70%,18%)", border: "1px solid hsl(200,60%,32%)", color: "#29B6F6" }}>
             {tgExport.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
             Approved → TG
@@ -262,6 +308,12 @@ function SubmissionsTab() {
           </button>
           <button onClick={handleExport} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all" style={{ background: "hsl(74,90%,39%)", border: "1px solid hsl(43,40%,30%)", color: GOLD }}>
             <FileDown className="h-3.5 w-3.5" />All CSV
+          </button>
+          <button onClick={handleExportTxtEmails} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all" style={{ background: "hsl(270,50%,18%)", border: "1px solid hsl(270,50%,34%)", color: "hsl(270,80%,75%)" }}>
+            <FileDown className="h-3.5 w-3.5" />Emails TXT
+          </button>
+          <button onClick={handleExportTxtCredentials} className="inline-flex items-center gap-1.5 rounded-lg px-3 h-8 text-xs font-bold transition-all" style={{ background: "hsl(270,50%,18%)", border: "1px solid hsl(270,50%,34%)", color: "hsl(270,80%,75%)" }}>
+            <FileDown className="h-3.5 w-3.5" />Creds TXT
           </button>
         </div>
       </div>
