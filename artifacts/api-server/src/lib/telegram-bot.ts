@@ -588,26 +588,6 @@ async function handleSubmitPassword(chatId: string, text: string): Promise<void>
     return;
   }
 
-  const session = getSession(chatId);
-  const email = session.tempEmail!;
-
-  await sendMessage(chatId, `🔍 Gmail አካውንት እየተረጋገጠ ነው...`);
-
-  const verifyResult = await verifyGmailExists(email);
-
-  if (verifyResult.verified === false && verifyResult.reason === "not_registered") {
-    clearSession(chatId);
-    await sendMessage(chatId,
-      `❌ ይህ ኢሜል አልተገኘም። እባክዎ መጀመሪያ ጂሜል ላይ አካውንቱን በትክክል ይክፈቱት።`,
-      mainMenu(true)
-    );
-    return;
-  }
-
-  if (verifyResult.verified === false && verifyResult.reason === "network_error") {
-    logger.warn({ chatId, email }, "Gmail SMTP check network error — allowing submission");
-  }
-
   setSession(chatId, { step: "await_submit_recovery_email", tempPassword: password });
   await sendMessage(chatId,
     `📋 Please enter your recovery email address:\n<i>(or type <b>Skip</b> to skip)</i>`,
