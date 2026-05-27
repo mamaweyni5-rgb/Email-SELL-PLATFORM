@@ -606,12 +606,139 @@ function WithdrawalsTab() {
   );
 }
 
+type UserRow = {
+  id: number;
+  name: string | null;
+  email: string | null;
+  walletBalance: number;
+  isBanned: boolean;
+  createdAt: string;
+  totalSubmissions: number;
+  approvedSubmissions: number;
+};
+
+function UserDetailView({ user, onBack }: { user: UserRow; onBack: () => void }) {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const banUser = useAdminBanUser();
+  const { data: allSubmissions, isLoading: subLoading } = useAdminListSubmissions();
+
+  const userSubs = (allSubmissions ?? []).filter((s) => s.userId === user.id);
+  const pendingCount = userSubs.filter((s) => s.status === "pending").length;
+  const approvedCount = userSubs.filter((s) => s.status === "approved").length;
+  const rejectedCount = userSubs.filter((s) => s.status === "rejected").length;
+
+  const handleBan = () => {
+    banUser.mutate({ id: user.id }, {
+      onSuccess: (res) => {
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+        toast({ title: res.isBanned ? "User banned" : "User unbanned" });
+      },
+      onError: () => toast({ title: "Error", description: "Failed to update ban status.", variant: "destructive" }),
+    });
+  };
+
+  return (
+    <div>
+      {/* Back */}
+      <button onClick={onBack} className="flex items-center gap-2 mb-5 text-sm font-semibold" style={{ color: GOLD }}>
+        <ArrowLeft className="h-4 w-4" /> ወደ ዝርዝር ተመለስ
+      </button>
+
+      {/* User info card */}
+      <div className="rounded-2xl p-5 mb-5 space-y-4" style={{ background: BURGUNDY_CARD, border: "1px solid hsl(43,30%,24%,0.4)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 text-lg font-bold" style={{ background: "hsl(74,90%,39%)", color: GOLD }}>
+              {(user.name ?? user.email ?? "?")[0].toUpperCase()}
+            </div>
+            <div>
+              <p className="font-bold text-base" style={{ color: TEXT_BODY }}>{user.name ?? "—"}</p>
+              <p className="text-xs" style={{ color: TEXT_SOFT }}>{user.email ?? "—"}</p>
+              <p className="text-xs mt-0.5" style={{ color: TEXT_SOFT }}>
+                ተቀላቅሏል: {format(new Date(user.createdAt), "MMM d, yyyy")}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {user.isBanned
+              ? <span className="badge-rejected inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border">Banned</span>
+              : <span className="badge-approved inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border">Active</span>}
+            <button
+              onClick={handleBan}
+              disabled={banUser.isPending}
+              className="inline-flex items-center gap-1 rounded-lg px-3 h-7 text-xs font-bold"
+              style={user.isBanned
+                ? { background: "hsl(136,48%,14%)", border: "1px solid hsl(136,48%,28%)", color: "hsl(136,60%,65%)" }
+                : { background: "hsl(5,55%,16%)", border: "1px solid hsl(5,55%,28%)", color: "hsl(5,75%,65%)" }}
+            >
+              {user.isBanned ? <UserCheck className="h-3 w-3" /> : <Ban className="h-3 w-3" />}
+              {user.isBanned ? "Unban" : "Ban"}
+            </button>
+          </div>
+        </div>
+
+        {/* Stats row */}
+        <div className="grid grid-cols-4 gap-3">
+          {[
+            { label: "ዋሌት ባላንስ", value: `${user.walletBalance} ETB`, color: GOLD_BRIGHT },
+            { label: "✅ አፕሩቭ", value: approvedCount, color: "hsl(136,60%,50%)" },
+            { label: "⏳ ፔንዲንግ", value: pendingCount, color: "hsl(43,80%,55%)" },
+            { label: "❌ ሪጄክት", value: rejectedCount, color: "hsl(5,75%,60%)" },
+          ].map(({ label, value, color }) => (
+            <div key={label} className="rounded-xl p-3 text-center" style={{ background: "hsl(74,100%,34%)", border: "1px solid hsl(43,30%,22%,0.5)" }}>
+              <p className="text-xs mb-1" style={{ color: TEXT_SOFT }}>{label}</p>
+              <p className="font-bold text-sm" style={{ color }}>{value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Submissions */}
+      <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: TEXT_SOFT }}>
+        የዚህ ዩዘር ሰብሚሽኖች ({userSubs.length})
+      </p>
+      {subLoading ? (
+        <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-xl" style={{ background: "hsl(74,85%,40%)" }} />)}</div>
+      ) : userSubs.length === 0 ? (
+        <div className="text-center py-10 rounded-2xl" style={{ background: BURGUNDY_CARD, border: "1px solid hsl(43,30%,24%,0.4)" }}>
+          <Mail className="h-8 w-8 mx-auto mb-2" style={{ color: "#1a2d00" }} />
+          <p className="text-sm" style={{ color: TEXT_SOFT }}>ሰብሚሽን የለም</p>
+        </div>
+      ) : (
+        <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid hsl(43,30%,24%,0.4)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}>
+          <Table>
+            <TableHeader>
+              <TableRow style={{ background: "hsl(74,100%,37%)", borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}` }}>
+                {["Gmail Account", "Password", "ዋጋ", "ቀን", "Status"].map(h => (
+                  <TableHead key={h} className="text-xs font-bold uppercase tracking-wider" style={{ color: GOLD }}>{h}</TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {userSubs.map((sub) => (
+                <TableRow key={sub.id} className="luxury-row" style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}`, background: BURGUNDY_CARD }}>
+                  <TableCell className="font-semibold text-sm" style={{ color: TEXT_BODY }}>{sub.email}</TableCell>
+                  <TableCell className="font-mono text-xs" style={{ color: TEXT_SOFT }}>{sub.password}</TableCell>
+                  <TableCell className="font-bold text-sm" style={{ color: GOLD_BRIGHT }}>{sub.pricePaid} ETB</TableCell>
+                  <TableCell className="text-xs whitespace-nowrap" style={{ color: TEXT_SOFT }}>{format(new Date(sub.createdAt), "MMM d, yyyy")}</TableCell>
+                  <TableCell><StatusPill status={sub.status} /></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function UsersTab() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserRow | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search), 400);
@@ -621,7 +748,8 @@ function UsersTab() {
   const { data: users, isLoading } = useAdminListUsers(debouncedSearch ? { search: debouncedSearch } : undefined);
   const banUser = useAdminBanUser();
 
-  const handleBan = (userId: number) => {
+  const handleBan = (userId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
     banUser.mutate({ id: userId }, {
       onSuccess: (res) => {
         queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
@@ -643,6 +771,11 @@ function UsersTab() {
       ]),
     );
   };
+
+  if (selectedUser) {
+    const liveUser = users?.find((u) => u.id === selectedUser.id) ?? selectedUser;
+    return <UserDetailView user={liveUser} onBack={() => setSelectedUser(null)} />;
+  }
 
   if (isLoading) return (
     <div className="space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" style={{ background: "hsl(74,85%,40%)" }} />)}</div>
@@ -682,7 +815,12 @@ function UsersTab() {
             </TableHeader>
             <TableBody>
               {users.map((user) => (
-                <TableRow key={user.id} className="luxury-row transition-colors" style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}`, background: BURGUNDY_CARD }}>
+                <TableRow
+                  key={user.id}
+                  className="luxury-row transition-colors cursor-pointer hover:brightness-110"
+                  style={{ borderBottom: `1px solid ${BURGUNDY_ROW_BORDER}`, background: BURGUNDY_CARD }}
+                  onClick={() => setSelectedUser(user)}
+                >
                   <TableCell className="font-semibold text-sm" style={{ color: TEXT_BODY }}>{user.name ?? "—"}</TableCell>
                   <TableCell className="text-xs" style={{ color: TEXT_SOFT }}>{user.email ?? "—"}</TableCell>
                   <TableCell className="font-bold text-sm" style={{ color: GOLD_BRIGHT }}>{user.walletBalance} ETB</TableCell>
@@ -695,7 +833,7 @@ function UsersTab() {
                   </TableCell>
                   <TableCell className="text-right">
                     <button
-                      onClick={() => handleBan(user.id)}
+                      onClick={(e) => handleBan(user.id, e)}
                       disabled={banUser.isPending}
                       className="inline-flex items-center gap-1 rounded-lg px-3 h-7 text-xs font-bold transition-all"
                       style={user.isBanned
