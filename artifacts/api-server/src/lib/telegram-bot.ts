@@ -1058,6 +1058,8 @@ async function handleAdminMessage(chatId: string, text: string, session: ReturnT
     case "✅ Approved Submissions": await exportData(chatId, "approved-submissions"); break;
     case "💸 Export Withdrawals": await exportData(chatId, "withdrawals"); break;
     case "👥 Export Users": await exportData(chatId, "users"); break;
+    case "📧 Emails TXT": await exportData(chatId, "emails-txt"); break;
+    case "🔑 Credentials TXT": await exportData(chatId, "credentials-txt"); break;
     case "🚪 Go to User":
       setSession(chatId, { step: "idle", isAdmin: false });
       await sendMessage(chatId, "👤 Switched to user mode.", mainMenu(!!session.userId)); break;
@@ -1381,6 +1383,7 @@ async function showAdminExport(chatId: string): Promise<void> {
     {
       reply_markup: {
         keyboard: [
+          [{ text: "📧 Emails TXT" }, { text: "🔑 Credentials TXT" }],
           [{ text: "📋 All Submissions" }, { text: "✅ Approved Submissions" }],
           [{ text: "💸 Export Withdrawals" }, { text: "👥 Export Users" }],
           [{ text: "🚪 Back to Menu" }],
@@ -1392,6 +1395,37 @@ async function showAdminExport(chatId: string): Promise<void> {
 }
 
 async function exportData(chatId: string, type: string): Promise<void> {
+  // ── TXT exports ────────────────────────────────────────────────────────────
+  if (type === "emails-txt" || type === "credentials-txt") {
+    const rows = await db
+      .select({ email: submissionsTable.email, password: submissionsTable.password, status: submissionsTable.status })
+      .from(submissionsTable)
+      .orderBy(submissionsTable.createdAt);
+    const approved = rows.filter((r) => r.status === "approved");
+    if (!approved.length) {
+      await sendMessage(chatId, "❌ No approved submissions to export.", adminMenu());
+      return;
+    }
+    const lines = type === "emails-txt"
+      ? approved.map((r) => r.email)
+      : approved.map((r) => `${r.email}:${r.password}`);
+    const content = lines.join("\n");
+    const filename = type === "emails-txt"
+      ? `emails-${new Date().toISOString().slice(0, 10)}.txt`
+      : `credentials-${new Date().toISOString().slice(0, 10)}.txt`;
+    const caption = type === "emails-txt"
+      ? `📧 <b>Approved Emails</b>\n${approved.length} emails — one per line`
+      : `🔑 <b>Credentials</b>\n${approved.length} accounts — email:password format`;
+    const result = await sendDocumentToAdmin(filename, content, caption, "text/plain");
+    if (result.ok) {
+      await sendMessage(chatId, `✅ <b>${filename}</b> sent!`, adminMenu());
+    } else {
+      await sendMessage(chatId, `❌ Export failed: ${result.error}`, adminMenu());
+    }
+    return;
+  }
+
+  // ── CSV exports ────────────────────────────────────────────────────────────
   const escape = (v: string | number | null | undefined) => {
     const s = String(v ?? "");
     return s.includes(",") || s.includes('"') || s.includes("\n") ? `"${s.replace(/"/g, '""')}"` : s;
@@ -1487,7 +1521,12 @@ export async function sendBroadcastMessage(chatId: string, title: string, messag
   await sendMessage(chatId, `📢 <b>${title}</b>\n\n${message}`);
 }
 
-export async function sendDocumentToAdmin(filename: string, csvContent: string, caption: string): Promise<{ ok: boolean; error?: string }> {
+export async function sendDocumentToAdmin(
+  filename: string,
+  content: string,
+  caption: string,
+  mimeType: string = "text/csv;charset=utf-8",
+): Promise<{ ok: boolean; error?: string }> {
   const adminChatId = process.env.ADMIN_TELEGRAM_CHAT_ID;
   if (!BOT_TOKEN) return { ok: false, error: "TELEGRAM_BOT_TOKEN not set" };
   if (!adminChatId) return { ok: false, error: "ADMIN_TELEGRAM_CHAT_ID not set" };
@@ -1496,7 +1535,7 @@ export async function sendDocumentToAdmin(filename: string, csvContent: string, 
     form.append("chat_id", adminChatId);
     form.append("caption", caption);
     form.append("parse_mode", "HTML");
-    form.append("document", new Blob([csvContent], { type: "text/csv;charset=utf-8" }), filename);
+    form.append("document", new Blob([content], { type: mimeType }), filename);
     const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, { method: "POST", body: form });
     const json = await res.json() as { ok: boolean; description?: string };
     if (!json.ok) return { ok: false, error: json.description ?? "Telegram error" };
